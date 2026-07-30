@@ -1,0 +1,7 @@
+node_modules
+dist
+.vercel
+.playwright-mcp
+chrome-check-profile
+.DS_Store
+*.local

@@ -1,0 +1,1333 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  ArrowUpRight, 
+  ArrowRight, 
+  X, 
+  Check, 
+  Plus, 
+  Minus, 
+  Send, 
+  CheckCircle2,
+  Play,
+  Search,
+  ShoppingBag,
+  Star,
+  Quote,
+  ChevronLeft,
+  ChevronRight,
+  Camera,
+  Sliders,
+  Sparkles,
+  Film,
+  Aperture,
+  Layers,
+  Award,
+  Heart
+} from 'lucide-react';
+
+const HERO_CARDS = [
+  {
+    id: 'hero-1',
+    bg: 'bg-[#FF5E1E]',
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85',
+    title: 'የከተማ ፋሽን',
+    accentColor: '#FF5E1E',
+    tag: 'አዲስ'
+  },
+  {
+    id: 'hero-2',
+    bg: 'bg-[#10B981]',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=85',
+    title: 'ኤዲቶሪያል ሐር',
+    accentColor: '#10B981',
+    tag: 'የተመረጠ'
+  },
+  {
+    id: 'hero-3',
+    bg: 'bg-[#F59E0B]',
+    image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=85',
+    title: 'የክብር ባርኔጣ',
+    accentColor: '#F59E0B',
+    tag: 'በብዛት የሚወደድ'
+  },
+  {
+    id: 'hero-4',
+    bg: 'bg-[#3B82F6]',
+    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=85',
+    title: 'የስቱዲዮ ነጭ አልባሳት',
+    accentColor: '#3B82F6',
+    tag: '2026'
+  },
+  {
+    id: 'hero-5',
+    bg: 'bg-[#14B8A6]',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=85',
+    title: 'የጸሐፊ መነፅር ኤዲቶሪያል',
+    accentColor: '#14B8A6',
+    tag: 'ልዩ'
+  },
+  {
+    id: 'hero-6',
+    bg: 'bg-[#8B5CF6]',
+    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=800&q=85',
+    title: 'የጋብቻ ድምቀት',
+    accentColor: '#8B5CF6',
+    tag: 'ታዋቂ'
+  },
+  {
+    id: 'hero-7',
+    bg: 'bg-[#EC4899]',
+    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=800&q=85',
+    title: 'የከበሩ ጌጣጌጦች',
+    accentColor: '#EC4899',
+    tag: 'ፕሪሚየም'
+  }
+];
+
+const SHOWCASE_PROJECTS = [
+  {
+    id: 'proj-01',
+    num: '01',
+    title: 'ጸጥተኛ ሞገዶች',
+    category: 'የፋሽን ኤዲቶሪያል',
+    year: '2026',
+    location: 'ፓሪስ፣ ፈረንሳይ',
+    client: 'ሜዞን ደ ኦት ኩቱር',
+    medium: 'ሃሰልብላድ H6D-100c እና 120 ሲልቨር ጌላቲን ፊልም',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1600&q=85',
+    aspect: 'aspect-[3/4]',
+    summary: 'በ18ኛው ክፍለ ዘመን የፓሪስ ህንፃዎች እና ከፍተኛ የፋሽን አልባሳት ላይ የተሰሩ የብርሃንና ጥላ ጥናቶች።',
+    gallery: [
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=85'
+    ]
+  },
+  {
+    id: 'proj-02',
+    num: '02',
+    title: 'የቱስካኒ ቪላ ትውስታ',
+    category: 'የጋብቻ ፎቶግራፍ',
+    year: '2025',
+    location: 'ፍሎረንስ፣ ጣሊያን',
+    client: 'የግል ትዕዛዝ',
+    medium: 'ኮዳክ ፖርትራ 400 እና ላይካ M11',
+    image: 'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1600&q=85',
+    aspect: 'aspect-[4/5]',
+    summary: 'በቱስካኒ የወይራ እርሻዎች ውስጥ በዝቅተኛ የፀሐይ ብርሃን የተነሱ ጥበባዊ የሰርግ ምስሎች።',
+    gallery: [
+      'https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85'
+    ]
+  },
+  {
+    id: 'proj-03',
+    num: '03',
+    title: 'የዕፅዋት ጥላዎች',
+    category: 'የጥበብ ፎቶግራፍ',
+    year: '2026',
+    location: 'ኪዮቶ፣ ጃፓን',
+    client: 'ጋለሪ ደ አርት ማሬ',
+    medium: 'ፕላቲነም ጌላቲን ህትመት',
+    image: 'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1600&q=85',
+    aspect: 'aspect-[3/4]',
+    summary: 'በጃፓን ባህላዊ የሻይ ቤቶች ውስጥ የተፈጥሮ አበቦችና የጠዋት ብርሃን ጥምረት።',
+    gallery: [
+      'https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=1200&q=85',
+      'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=85'
+    ]
+  },
+  {
+    id: 'proj-04',
+    num: '04',
+    title: 'የከበሩ ጌጣጌጦች ሰዓት',
+    category: 'ንግድ ማስታወቂያ',
+    year: '2025',
+    location: 'ጄኔቫ፣ ስዊዘርላንድ',
+    client: 'ጄኔቫ ጄም አቴሊየር',
+    medium: 'ማክሮ ሌንስ እና ቀጣይነት ያለው ሞቅ ያለ ብርሃን',
+    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1600&q=85',
+    aspect: 'aspect-[1/1]',
+    summary: 'በደመቀ ምሽት የከበሩ ድንጋዮችና ጌጣጌጦች ጥራትን የሚያሳይ የማክሮ ፎቶግራፍ ጥናት።',
+    gallery: [
+      'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=85'
+    ]
+  },
+  {
+    id: 'proj-05',
+    num: '05',
+    title: 'የአልፕስ አድማስ',
+    category: 'የግል ፕሮፌሽናል ፎቶ',
+    year: '2025',
+    location: 'ዙሪክ፣ ስዊዘርላንድ',
+    client: 'ስዊስ ባሕል መጽሔት',
+    medium: 'የተፈጥሮ ብርሃን እና 35mm Tri-X',
+    image: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=85',
+    aspect: 'aspect-[3/4]',
+    summary: 'በከፍተኛ አልፕስ ተራራዎች ንጹህ አየር ውስጥ የተነሱ ጥልቅ ስሜት ያላቸው ምስሎች።',
+    gallery: [
+      'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1200&q=85'
+    ]
+  }
+];
+
+const CRAFT_SPECIFICATIONS = [
+  {
+    id: 'spec-1',
+    title: 'አናሎግ ሲልቨር ጌላቲን',
+    subtitle: 'በጨለማ ክፍል በእጅ የተሰራ',
+    icon: Film,
+    desc: 'የጥንታውያን ፎቶግራፈሮችን ፈለግ በመከተል 120 ጥቁር እና ነጭ ፊልሞችን በጥንቃቄ በእጅ የማጠብ እና የማተም ጥበብ።'
+  },
+  {
+    id: 'spec-2',
+    title: '100 ሜጋፒክሰል ዲጂታል',
+    subtitle: 'የሃሰልብላድ ከፍተኛ ጥራት',
+    icon: Aperture,
+    desc: 'ለከፍተኛ ህትመቶች እና ለፋሽን መጽሔቶች የሚሆኑ እጅግ ጥቃቅን ዝርዝሮችን የሚያሳይ ዘመናዊ የዲጂታል ካሜራ ቴክኖሎጂ።'
+  },
+  {
+    id: 'spec-3',
+    title: 'የጣሊያን ሌዘር አልበሞች',
+    subtitle: 'በፍሎረንስ በእጅ የተሰሩ',
+    icon: Layers,
+    desc: 'ለብዙ ትውልድ የሚቆዩ በተፈጥሯዊ የቆዳ ሽፋን እና በሐር የተሸፈኑ የጣሊያን አርቲሳን የሰርግ እና የስብስብ አልበሞች።'
+  }
+];
+
+const TESTIMONIALS = [
+  {
+    id: 'test-1',
+    name: 'ሳራ ኤልያና',
+    role: 'የፋሽን ዲዛይነር - ሚላን',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    quote: 'የሌኦና ስቱዲዮ የብርሃንና የጥላ አጠቃቀም አስደናቂ ነው። የፋሽን ስብስባችንን ሙሉ በሙሉ በዓለም አቀፍ ደረጃ አድምቆታል።',
+    rating: 5,
+    location: 'ሚላን፣ ጣሊያን'
+  },
+  {
+    id: 'test-2',
+    name: 'ዳንኤል እና ኤሌና',
+    role: 'የጋብቻ ደንበኞች',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    quote: 'በቱስካኒ ላደረግነው የሰርግ ስነ-ስርዓት የተነሱት ፎቶዎች ልክ እንደ ጥበብ ጋለሪ ስዕሎች ናቸው። ከጠበቅነው በላይ ሆኖ አግኝተነዋል።',
+    rating: 5,
+    location: 'ፍሎረንስ፣ ጣሊያን'
+  },
+  {
+    id: 'test-3',
+    name: 'ማርቲን ቮን',
+    role: 'የጋለሪ ዳይሬክተር - ዙሪክ',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=200&q=80',
+    quote: 'በአናሎግ ፊልም እና በዲጂታል ቴክኖሎጂ መካከል ያለው ሚዛን ፍጹም ነው። የሕትመቶቹ ጥራት እጅግ አስደምሞናል።',
+    rating: 5,
+    location: 'ዙሪክ፣ ስዊዘርላንድ'
+  }
+];
+
+const JOURNAL_ESSAYS = [
+  {
+    id: 'essay-1',
+    code: 'ጽሑፍ // 01',
+    title: 'የሌክ ኮሞ ብርሃን እና የህንፃዎች ጥበብ',
+    date: 'ነሐሴ 2026',
+    readTime: '6 ደቂቃ ንባብ',
+    image: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1000&q=80',
+    excerpt: 'የጠዋት የሐይቅ ውቅያኖስ አንጸባራቂ ብርሃን ያለ ተጨማሪ ሰራሽ ብርሃን እንዴት ተፈጥሯዊ ውበት እንደሚፈጥር።',
+    content: 'በሌክ ኮሞ አካባቢ የፋሽን ፎቶግራፎችን በሚነሱበት ጊዜ፣ ውሃው እንደ ትልቅ 40-ፊሊክስ ለስላሳ ብርሃን ሰጪ ያገለግላል። ተፈጥሯዊውን የፀሐይ ብርሃን ከውሃው ነጸብራቅ ጋር በማቀናጀት የማይደገሙ አበይት ምስሎችን መፍጠር ይቻላል...'
+  },
+  {
+    id: 'essay-2',
+    code: 'ጽሑፍ // 02',
+    title: 'የሲልቨር ፊልም እና የዲጂታል ካሜራ ልዩነት',
+    date: 'ሐምሌ 2026',
+    readTime: '8 ደቂቃ ንባብ',
+    image: 'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1000&q=80',
+    excerpt: 'ዲጂታል ካሜራዎች ብርሃንን በሂሳብ ስሌት ሲመዘግቡ፣ አናሎግ ፊልም ግን ስሜትን በተፈጥሯዊ መንገድ ይቀርጻል።',
+    content: 'በአርቲፊሻል ኢንቴሊጀንስ እና በዲጂታል ካሜራዎች ዘመን፣ የዓለም ከፍተኛ የፋሽን ድርጅቶች ወደ አናሎግ ፊልም እየተመለሱ ይገኛሉ። የፊልም ቅጣቶችና ጥቃቅን የብር ጌላቲን ቅንጣቶች ምስሉ ሕያው እንዲሆን ያደርጋሉ።'
+  }
+];
+
+const INVESTMENT_TIERS = [
+  {
+    id: 'tier-1',
+    name: 'የግል ፕሮፌሽናል ፎቶ',
+    price: '€4,200',
+    duration: 'እስከ ግማሽ ቀን',
+    deliverables: '25 ማስተር ህትመቶች + ዲጂታል ማዝገብያ',
+    bullets: [
+      'የቦታ መረጣ እና የጥበብ ዳይሬክተር ምክር',
+      'አናሎግ 120 ፊልም እና ከፍተኛ ጥራት ዲጂታል ካፕቸር',
+      '25 በእጅ የተሰሩ ጥበባዊ ህትመቶች',
+      'ለ2 ዓመታት የተጠበቀ የደመና ማከማቻ'
+    ]
+  },
+  {
+    id: 'tier-2',
+    name: 'የፋሽን ዘመቻ',
+    price: '€9,500',
+    duration: 'ሙሉ ቀን ፕሮዳክሽን',
+    deliverables: 'ሙሉ የንግድ ማስታወቂያ ምስሎች + መብት',
+    featured: true,
+    bullets: [
+      'ሙሉ የአርት ዳይሬክሽን እና ሙድቦርድ ዝግጅት',
+      'የብርሃንና ዲጂታል ቴክኒሻን ቡድን ድጋፍ',
+      '60+ ሙሉ በሙሉ የተቀነባበሩ ከፍተኛ ጥራት ምስሎች',
+      'በ48 ሰዓታት ውስጥ የሚደርስ አጣዳፊ ጋለሪ',
+      'ዓለም አቀፍ የንግድ ህትመት መብቶች'
+    ]
+  },
+  {
+    id: 'tier-3',
+    name: 'የዓለም አቀፍ ሰርግና ትውስታ',
+    price: '€16,000',
+    duration: 'የ3 ቀን አገልግሎት',
+    deliverables: 'የጣሊያን ሌዘር አልበም + ሙሉ አርካይቭ',
+    bullets: [
+      'የእንኳን ደህና መጣችሁ ምሽት፣ የሰርግ ቀን እና የፎቶ ክፍለ ጊዜ',
+      'ሁለት ማስተር ፎቶግራፈሮች እና የአናሎግ ፊልም ባለሙያ',
+      'በፍሎረንስ በእጅ የተሰራ የጣሊያን ሌዘር አልበም (30x40cm)',
+      '250+ በጥንቃቄ የተመረጡ እና የተቀነባበሩ ምስሎች',
+      'የጉዞ ወጪ የተካተተ (ሌክ ኮሞ፣ ቱስካኒ፣ ፓሪስ፣ እና लンドン)'
+    ]
+  }
+];
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('ሁሉንም');
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedEssay, setSelectedEssay] = useState(null);
+  const [isInquireOpen, setIsInquireOpen] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+  const [inquireSubject, setInquireSubject] = useState('የፋሽን ዘመቻ');
+  const [toastMsg, setToastMsg] = useState('');
+  const [faqExpanded, setFaqExpanded] = useState(0);
+  const [activeHeroCard, setActiveHeroCard] = useState(2);
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+
+  /* Horizontal Hero Slider State & Drag Mechanics */
+  const heroTrackRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftPos, setScrollLeftPos] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(true);
+
+  /* Auto-slide Sideways Effect */
+  useEffect(() => {
+    if (!isAutoPlay) return;
+    const interval = setInterval(() => {
+      if (heroTrackRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = heroTrackRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 20) {
+          heroTrackRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          heroTrackRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+        }
+      }
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [isAutoPlay]);
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setIsAutoPlay(false);
+    setStartX(e.pageX - heroTrackRef.current.offsetLeft);
+    setScrollLeftPos(heroTrackRef.current.scrollLeft);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const x = e.pageX - heroTrackRef.current.offsetLeft;
+    const walk = (x - startX) * 1.8;
+    heroTrackRef.current.scrollLeft = scrollLeftPos - walk;
+  };
+
+  const slideHero = (direction) => {
+    setIsAutoPlay(false);
+    if (heroTrackRef.current) {
+      const scrollAmount = direction === 'left' ? -340 : 340;
+      heroTrackRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  /* Wizard state for custom quote finder */
+  const [wizardStep, setWizardStep] = useState(1);
+  const [wizardChoice, setWizardChoice] = useState({ eventType: '', location: '', medium: '' });
+  const [wizardResult, setWizardResult] = useState('');
+
+  /* Custom Cursor Position */
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 });
+  const [targetPos, setTargetPos] = useState({ x: -100, y: -100 });
+  const [cursorState, setCursorState] = useState('default');
+  const [cursorLabel, setCursorLabel] = useState('');
+
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href = 'https://fonts.googleapis.com/css2?family=Anton&family=Noto+Sans+Ethiopic:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setTargetPos({ x: e.clientX, y: e.clientY });
+
+      const target = e.target;
+      const interactiveEl = target.closest('[data-cursor]');
+      
+      if (interactiveEl) {
+        const cursorType = interactiveEl.getAttribute('data-cursor');
+        const cursorText = interactiveEl.getAttribute('data-cursor-label') || '';
+        setCursorState(cursorType || 'hover');
+        setCursorLabel(cursorText);
+      } else if (target.closest('a, button')) {
+        setCursorState('link');
+        setCursorLabel('');
+      } else if (target.closest('h1, h2, h3, p')) {
+        setCursorState('text');
+        setCursorLabel('');
+      } else {
+        setCursorState('default');
+        setCursorLabel('');
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    let animationFrameId;
+    const renderCursor = () => {
+      setCursorPos((prev) => {
+        const dx = targetPos.x - prev.x;
+        const dy = targetPos.y - prev.y;
+        return {
+          x: prev.x + dx * 0.2,
+          y: prev.y + dy * 0.2
+        };
+      });
+      animationFrameId = requestAnimationFrame(renderCursor);
+    };
+
+    renderCursor();
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [targetPos]);
+
+  const triggerToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(''), 4000);
+  };
+
+  const handleWizardSubmit = () => {
+    let rec = 'የፋሽን ዘመቻ ፓኬጅ (€9,500)';
+    if (wizardChoice.eventType === 'ሰርግ') rec = 'የዓለም አቀፍ ሰርግና ትውስታ (€16,000)';
+    if (wizardChoice.eventType === 'ፖርትሬት') rec = 'የግል ፕሮፌሽናል ፎቶ (€4,200)';
+    setWizardResult(rec);
+  };
+
+  const filteredProjects = activeTab === 'ሁሉንም'
+    ? SHOWCASE_PROJECTS
+    : SHOWCASE_PROJECTS.filter(p => {
+        if (activeTab === 'ኤዲቶሪያል') return p.category.includes('ኤዲቶሪያል');
+        if (activeTab === 'ሰርግ') return p.category.includes('ጋብቻ');
+        if (activeTab === 'ጥበብ') return p.category.includes('ጥበብ');
+        if (activeTab === 'ንግድ') return p.category.includes('ንግድ');
+        return true;
+      });
+
+  return (
+    <div className="min-h-screen bg-[#FAFAFA] text-[#0A0A0A] font-ethiopic selection:bg-[#FF5E1E] selection:text-white relative overflow-x-hidden antialiased">
+      
+      {}
+      <style>{`
+        :root {
+          --bg: #FAFAFA;
+          --surface: #F3F3F3;
+          --border: #E2E2E2;
+          --muted: #8E8E93;
+          --text: #0A0A0A;
+          --accent: #FF5E1E;
+        }
+
+        .font-display {
+          font-family: 'Anton', 'Noto Sans Ethiopic', sans-serif;
+          letter-spacing: -0.01em;
+        }
+
+        .font-ethiopic {
+          font-family: 'Noto Sans Ethiopic', 'Space Grotesk', sans-serif;
+        }
+
+        /* Folder/Tab cutout corners for hero cards matching reference image */
+        .card-tab-corner {
+          border-top-left-radius: 28px;
+          border-top-right-radius: 28px;
+          border-bottom-left-radius: 28px;
+          border-bottom-right-radius: 28px;
+        }
+
+        .card-tab-cutout {
+          border-radius: 28px 28px 28px 28px;
+          position: relative;
+        }
+
+        @keyframes spinSlow {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        .animate-spin-slow {
+          animation: spinSlow 14s linear infinite;
+        }
+
+        /* Hide scrollbar for sideways slider */
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+
+      {/* Custom Animated Cursor */}
+      <div 
+        className={`fixed pointer-events-none z-[9999] transition-transform duration-75 ease-out mix-blend-difference hidden md:flex items-center justify-center rounded-full ${
+          cursorState === 'hover' 
+            ? 'w-24 h-24 bg-[#FF5E1E] text-white scale-100' 
+            : cursorState === 'link' 
+            ? 'w-12 h-12 bg-white scale-125' 
+            : cursorState === 'text' 
+            ? 'w-1 h-8 bg-[#FF5E1E] rounded-none' 
+            : 'w-4 h-4 bg-black'
+        }`}
+        style={{
+          left: `${cursorPos.x}px`,
+          top: `${cursorPos.y}px`,
+          transform: `translate(-50%, -50%)`
+        }}
+      >
+        {cursorState === 'hover' && cursorLabel && (
+          <span className="text-[10px] font-bold uppercase tracking-wider text-center px-2">
+            {cursorLabel}
+          </span>
+        )}
+      </div>
+
+      {/* Toast Notification */}
+      {toastMsg && (
+        <div className="fixed bottom-8 right-8 z-[9000] bg-[#0A0A0A] text-white px-6 py-4 rounded-none border-l-4 border-[#FF5E1E] shadow-2xl flex items-center space-x-3 text-xs font-semibold animate-bounce">
+          <CheckCircle2 size={16} className="text-[#FF5E1E]" />
+          <span>{toastMsg}</span>
+        </div>
+      )}
+
+      {}
+      <header className="sticky top-0 z-50 bg-[#FAFAFA]/95 backdrop-blur-md border-b border-[#E2E2E2] transition-all">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          
+          {/* Logo */}
+          <a href="#" className="flex items-center space-x-2 group" data-cursor="link">
+            <span className="font-display text-3xl font-black text-[#0A0A0A] tracking-tight group-hover:text-[#FF5E1E] transition-colors">
+              ሌኦና ስቱዲዮ
+            </span>
+          </a>
+
+          {/* Navigation links centered */}
+          <nav className="hidden lg:flex items-center space-x-8 text-xs font-semibold tracking-wide text-[#333333]">
+            <a href="#hero" className="hover:text-[#FF5E1E] transition-colors" data-cursor="link">የመጀመሪያ</a>
+            <a href="#showcase" className="hover:text-[#FF5E1E] transition-colors" data-cursor="link">አዲስ ስብስብ</a>
+            <a href="#wizard" className="hover:text-[#FF5E1E] transition-colors" data-cursor="link">ፓኬጅ መምረጫ</a>
+            <a href="#investment" className="hover:text-[#FF5E1E] transition-colors" data-cursor="link">አገልግሎቶች</a>
+            <a href="#craft" className="hover:text-[#FF5E1E] transition-colors" data-cursor="link">ስለ እኛ</a>
+            <a href="#journal" className="hover:text-[#FF5E1E] transition-colors" data-cursor="link">መጽሔት</a>
+          </nav>
+
+          {/* Right utility items: Search, Bag, Sign In / Booking CTA */}
+          <div className="flex items-center space-x-5">
+            <button 
+              onClick={() => triggerToast('የፍለጋ ሳጥን በቅርቡ ይከፈታል')}
+              className="p-2 text-[#0A0A0A] hover:text-[#FF5E1E] transition-colors"
+              aria-label="Search"
+            >
+              <Search size={18} />
+            </button>
+
+            <button 
+              onClick={() => setIsInquireOpen(true)}
+              className="p-2 text-[#0A0A0A] hover:text-[#FF5E1E] transition-colors relative"
+              aria-label="Bookings"
+            >
+              <ShoppingBag size={18} />
+              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#FF5E1E]"></span>
+            </button>
+
+            <button
+              onClick={() => setIsInquireOpen(true)}
+              data-cursor="hover"
+              data-cursor-label="ይመዝገቡ"
+              className="px-6 py-2.5 rounded-full border border-[#0A0A0A] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white transition-all text-xs font-bold tracking-wider"
+            >
+              ቀነ-ቀጠሮ ይያዙ
+            </button>
+          </div>
+
+        </div>
+      </header>
+
+      {}
+      <section id="hero" className="pt-10 pb-16 px-6 max-w-7xl mx-auto relative">
+        
+        {/* Top Hero Heading Row with Video Widget & Avatar Stack */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-10 text-center md:text-left">
+          
+          {/* Left Rotating Video Widget Badge */}
+          <div className="hidden md:flex items-center space-x-3 cursor-pointer group" onClick={() => setIsVideoModalOpen(true)}>
+            <div className="relative w-16 h-16 flex items-center justify-center">
+              <svg className="w-full h-full animate-spin-slow text-xs uppercase tracking-widest font-mono text-[#666666]" viewBox="0 0 100 100">
+                <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none" />
+                <text className="text-[10px] fill-current uppercase">
+                  <textPath href="#circlePath">
+                    &bull; ስለ እኛ በቪዲዮ ይመልከቱ &bull; ሌኦና
+                  </textPath>
+                </text>
+              </svg>
+              <div className="absolute inset-0 m-auto w-8 h-8 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center group-hover:bg-[#FF5E1E] transition-colors shadow-md">
+                <Play size={12} className="ml-0.5 fill-current" />
+              </div>
+            </div>
+          </div>
+
+          {/* Centered Main Hero Title */}
+          <h1 className="font-display text-4xl sm:text-6xl md:text-7xl font-extrabold text-[#0A0A0A] leading-[1.08] tracking-tight max-w-3xl">
+            የራስዎን ስታይል በደመቀ <br />
+            <span className="text-[#FF5E1E]">የፎቶግራፍ ጥበብ ያሳድጉ</span>
+          </h1>
+
+          {/* Right Social Proof Avatar Stack */}
+          <div className="flex items-center space-x-2 bg-[#F3F3F3] px-4 py-2 rounded-full border border-[#E2E2E2]">
+            <div className="flex -space-x-2 overflow-hidden">
+              <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
+              <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
+              <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80" alt="Avatar" />
+            </div>
+            <div className="w-7 h-7 rounded-full bg-[#0A0A0A] text-white text-[10px] font-bold flex items-center justify-center">
+              +150
+            </div>
+          </div>
+
+        </div>
+
+        {/* Sideways Animated & Draggable Hero Carousel Header Control Bar */}
+        <div className="flex items-center justify-between mb-4 px-2">
+          <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#8E8E93]">
+            <span className="w-2 h-2 rounded-full bg-[#FF5E1E] animate-ping"></span>
+            <span>ምስሎቹን ለጎን ያንሸራትቱ // SWIPE SIDEWAYS</span>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setIsAutoPlay(!isAutoPlay)}
+              className={`px-3 py-1 rounded-full text-[10px] font-mono tracking-wider border transition-all ${
+                isAutoPlay 
+                  ? 'bg-[#FF5E1E]/10 text-[#FF5E1E] border-[#FF5E1E]/30' 
+                  : 'bg-gray-200 text-gray-600 border-gray-300'
+              }`}
+            >
+              {isAutoPlay ? 'እየተንቀሳቀሰ ነው ⏸' : 'ማንቀሳቀስ ጀምር ▶'}
+            </button>
+            <button
+              onClick={() => slideHero('left')}
+              data-cursor="link"
+              className="w-10 h-10 rounded-full border border-[#E2E2E2] bg-white text-[#0A0A0A] flex items-center justify-center hover:bg-[#FF5E1E] hover:text-white hover:border-[#FF5E1E] shadow-sm transition-all active:scale-95"
+              aria-label="Slide Left"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={() => slideHero('right')}
+              data-cursor="link"
+              className="w-10 h-10 rounded-full border border-[#E2E2E2] bg-white text-[#0A0A0A] flex items-center justify-center hover:bg-[#FF5E1E] hover:text-white hover:border-[#FF5E1E] shadow-sm transition-all active:scale-95"
+              aria-label="Slide Right"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Sideways Moving & Draggable Hero Track */}
+        <div
+          ref={heroTrackRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          data-cursor="hover"
+          data-cursor-label="ያንሸራትቱ"
+          className="flex space-x-5 overflow-x-auto no-scrollbar scroll-smooth items-end mb-12 pb-4 pt-2 cursor-grab active:cursor-grabbing select-none"
+        >
+          {HERO_CARDS.map((card, idx) => {
+            const isActive = activeHeroCard === idx;
+            return (
+              <div
+                key={card.id}
+                onClick={() => setActiveHeroCard(idx)}
+                className={`relative shrink-0 rounded-[28px] overflow-hidden transition-all duration-500 cursor-pointer ${card.bg} ${
+                  idx % 2 === 0 ? 'h-[340px] sm:h-[420px] w-[240px] sm:w-[290px]' : 'h-[380px] sm:h-[480px] w-[260px] sm:w-[310px]'
+                } ${isActive ? 'ring-4 ring-[#FF5E1E] scale-102 shadow-2xl' : 'opacity-90 hover:opacity-100 hover:scale-[1.01]'}`}
+              >
+                {/* Decorative Icon or Tag */}
+                <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm text-[#0A0A0A] text-[10px] font-bold px-3 py-1 rounded-full shadow-sm flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: card.accentColor }}></span>
+                  <span>{card.tag}</span>
+                </div>
+
+                {/* Card Main Image */}
+                <img 
+                  src={card.image} 
+                  alt={card.title} 
+                  draggable={false}
+                  className="w-full h-full object-cover contrast-105 hover:scale-105 transition-transform duration-700 pointer-events-none"
+                />
+
+                {/* Card Title Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-5 text-white">
+                  <span className="text-[10px] font-mono text-[#FF5E1E] uppercase tracking-widest block mb-1">
+                    0{idx + 1} // LEONA
+                  </span>
+                  <h4 className="font-display text-xl sm:text-2xl font-bold leading-tight">
+                    {card.title}
+                  </h4>
+                </div>
+
+                {/* Floating CTA Button on Middle Active Card */}
+                {idx === 2 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-11/12 z-20">
+                    <a
+                      href="#showcase"
+                      data-cursor="hover"
+                      data-cursor-label="ይመልከቱ"
+                      className="w-full py-3 px-4 bg-[#0A0A0A] text-white hover:bg-[#FF5E1E] transition-colors rounded-full text-xs font-bold flex items-center justify-center space-x-2 shadow-xl"
+                    >
+                      <span>ስብስቦችን ይመልከቱ</span>
+                      <ArrowUpRight size={14} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Hero Bottom Bar: Left Signature Quote & Right Category Slide Preview */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pt-6 border-t border-[#E2E2E2] items-center">
+          
+          {/* Left Quote & Handwritten Signature */}
+          <div className="md:col-span-7 flex items-start space-x-4">
+            <Quote size={32} className="text-[#FF5E1E] shrink-0 fill-current opacity-30" />
+            <div className="space-y-2">
+              <p className="text-xs sm:text-sm text-[#444444] font-medium leading-relaxed italic">
+                "የሌኦና ስቱዲዮ የፎቶግራፍ ስታይል እጅግ በጣም አዲስ፣ ደፋር እና የፋሽን አልባሳቶቼን በከፍተኛ ጥራት ያደመቀ ነው! ጥራቱን እና የፈጠራ ስሜቱን ወድጄዋለሁ!"
+              </p>
+              <div className="pt-1">
+                <span className="font-serif italic text-lg font-bold text-[#0A0A0A] block">ራፊ ኤች.</span>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-[#8E8E93]">የፋሽን አርቲስት</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Numbered Slide Preview Card */}
+          <div className="md:col-span-5 flex items-center justify-between bg-[#F3F3F3] p-5 rounded-2xl border border-[#E2E2E2]">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-display text-2xl font-bold text-[#0A0A0A]">01</span>
+                <span className="text-[10px] uppercase font-mono tracking-widest text-[#8E8E93]">የህይወት ዘይቤ</span>
+              </div>
+              <p className="text-xs font-bold text-[#0A0A0A]">
+                በአዲሱ የፋሽን እና የፎቶ አዝማሚያዎች ህይወትዎን ይቅረጹ
+              </p>
+            </div>
+            <a href="#showcase" className="w-10 h-10 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center hover:bg-[#FF5E1E] transition-colors shrink-0 ml-4">
+              <ArrowRight size={16} />
+            </a>
+          </div>
+
+        </div>
+
+      </section>
+
+      {}
+      <section id="wizard" className="py-20 px-6 bg-[#0A0A0A] text-white my-12 relative overflow-hidden">
+        <div className="max-w-5xl mx-auto relative z-10 space-y-10">
+          
+          <div className="text-center space-y-3">
+            <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block">ኢንተራክቲቭ መምረጫ</span>
+            <h2 className="font-display text-3xl sm:text-5xl font-extrabold">ለእርስዎ የሚስማማውን ፓኬጅ ይምረጡ</h2>
+            <p className="text-xs sm:text-sm text-[#8E8E93] max-w-xl mx-auto">
+              የዝግጅትዎን አይነት፣ ቦታ እና የሚፈልጉትን የፎቶ አይነት በመምረጥ ፈጣን የምክር አገልግሎት ያግኙ።
+            </p>
+          </div>
+
+          <div className="bg-[#171717] p-8 rounded-3xl border border-[#262626] space-y-8">
+            
+            {/* Step 1: Event Type */}
+            <div className="space-y-4">
+              <label className="block text-xs uppercase font-mono tracking-widest text-[#FF5E1E]">1. የዝግጅቱ አይነት</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {['ኤዲቶሪያል ፋሽን', 'ሰርግ', 'ፖርትሬት'].map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setWizardChoice({ ...wizardChoice, eventType: type })}
+                    className={`p-4 rounded-xl text-xs font-bold text-left border transition-all ${
+                      wizardChoice.eventType === type 
+                        ? 'bg-[#FF5E1E] border-[#FF5E1E] text-white' 
+                        : 'bg-[#262626] border-[#333333] text-[#A3A3A3] hover:border-white'
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Step 2: Location */}
+            <div className="space-y-4">
+              <label className="block text-xs uppercase font-mono tracking-widest text-[#FF5E1E]">2. የቦታ መረጣ</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {['ፓሪስ / ሚላን', 'ሌክ ኮሞ / ቱስካኒ', 'በስቱዲዮ ውስጥ'].map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => setWizardChoice({ ...wizardChoice, location: loc })}
+                    className={`p-4 rounded-xl text-xs font-bold text-left border transition-all ${
+                      wizardChoice.location === loc 
+                        ? 'bg-[#FF5E1E] border-[#FF5E1E] text-white' 
+                        : 'bg-[#262626] border-[#333333] text-[#A3A3A3] hover:border-white'
+                    }`}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Submit Recommendation Button */}
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#262626]">
+              <button
+                onClick={handleWizardSubmit}
+                disabled={!wizardChoice.eventType || !wizardChoice.location}
+                className="w-full sm:w-auto px-8 py-4 bg-[#FF5E1E] text-white rounded-full text-xs font-bold tracking-wider hover:bg-white hover:text-[#0A0A0A] transition-colors disabled:opacity-40"
+              >
+                የተመከረውን ፓኬጅ ተመልከት
+              </button>
+
+              {wizardResult && (
+                <div className="bg-[#262626] px-6 py-3 rounded-xl border border-[#FF5E1E] text-xs text-white font-bold flex items-center space-x-3">
+                  <Sparkles size={16} className="text-[#FF5E1E]" />
+                  <span>ምክረ ሀሳብ፡ {wizardResult}</span>
+                </div>
+              )}
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {}
+      <section id="showcase" className="py-20 px-6 max-w-7xl mx-auto">
+        
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 border-b border-[#E2E2E2] pb-8">
+          <div>
+            <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block mb-2">የተመረጡ ሥራዎች</span>
+            <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-[#0A0A0A]">
+              የስዕል ጋለሪ
+            </h2>
+          </div>
+
+          {/* Category Filters */}
+          <div className="flex flex-wrap gap-2">
+            {['ሁሉንም', 'ኤዲቶሪያል', 'ሰርግ', 'ጥበብ', 'ንግድ'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                data-cursor="link"
+                className={`px-5 py-2.5 text-xs font-mono tracking-wider rounded-full border transition-all ${
+                  activeTab === tab
+                    ? 'bg-[#FF5E1E] text-white border-[#FF5E1E]'
+                    : 'bg-[#FAFAFA] text-[#555555] border-[#E2E2E2] hover:border-[#0A0A0A]'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Gallery Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredProjects.map((proj) => (
+            <div
+              key={proj.id}
+              onClick={() => setSelectedProject(proj)}
+              data-cursor="hover"
+              data-cursor-label="ተመልከት"
+              className="group bg-[#F3F3F3] border border-[#E2E2E2] rounded-3xl p-4 cursor-pointer hover:border-[#FF5E1E] transition-all duration-300 flex flex-col justify-between"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-[#E2E2E2] mb-4">
+                <img
+                  src={proj.image}
+                  alt={proj.title}
+                  className="w-full h-full object-cover grayscale contrast-110 group-hover:scale-105 group-hover:grayscale-0 transition-all duration-700 ease-out"
+                />
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 font-mono text-[10px] font-bold text-[#0A0A0A] rounded-full">
+                  {proj.num}
+                </div>
+              </div>
+
+              <div className="space-y-2 px-2 pb-2">
+                <div className="flex items-center justify-between text-[10px] font-mono tracking-widest text-[#8E8E93]">
+                  <span>{proj.category}</span>
+                  <span>{proj.year}</span>
+                </div>
+                <h3 className="font-display text-2xl font-bold text-[#0A0A0A] group-hover:text-[#FF5E1E] transition-colors">
+                  {proj.title}
+                </h3>
+                <p className="text-xs text-[#555555] line-clamp-2 font-light">
+                  {proj.summary}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+      </section>
+
+      {}
+      <section id="craft" className="bg-[#F3F3F3] py-20 px-6 border-t border-b border-[#E2E2E2]">
+        <div className="max-w-7xl mx-auto space-y-12">
+          
+          <div className="text-center space-y-3">
+            <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block">የጥበብ ፍልስፍና</span>
+            <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-[#0A0A0A]">
+              የካሜራዎች እና የመሳሪያዎች ጥበብ
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {CRAFT_SPECIFICATIONS.map((spec) => {
+              const IconComp = spec.icon;
+              return (
+                <div key={spec.id} className="bg-[#FAFAFA] p-8 rounded-3xl border border-[#E2E2E2] space-y-4 hover:border-[#FF5E1E] transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FF5E1E]/10 text-[#FF5E1E] flex items-center justify-center">
+                    <IconComp size={24} />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#8E8E93]">{spec.subtitle}</span>
+                    <h3 className="font-display text-2xl font-bold text-[#0A0A0A]">{spec.title}</h3>
+                  </div>
+                  <p className="text-xs text-[#555555] font-light leading-relaxed">
+                    {spec.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </section>
+
+      {}
+      <section id="investment" className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="text-center mb-16 space-y-3">
+          <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block">የአገልግሎት ዋጋዎች</span>
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-[#0A0A0A]">
+            የአገልግሎት ደረጃዎች
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {INVESTMENT_TIERS.map((tier) => (
+            <div
+              key={tier.id}
+              className={`p-8 rounded-3xl border flex flex-col justify-between transition-all ${
+                tier.featured
+                  ? 'bg-[#0A0A0A] text-white border-[#0A0A0A] shadow-2xl relative'
+                  : 'bg-[#F3F3F3] text-[#0A0A0A] border-[#E2E2E2] hover:border-[#FF5E1E]'
+              }`}
+            >
+              {tier.featured && (
+                <div className="absolute -top-3 left-8 px-4 py-1 bg-[#FF5E1E] text-white text-[9px] font-mono tracking-widest rounded-full uppercase font-bold">
+                  በብዛት የሚመረጥ
+                </div>
+              )}
+
+              <div className="space-y-6">
+                <div>
+                  <span className={`text-[10px] font-mono uppercase tracking-widest block mb-1 ${tier.featured ? 'text-[#FF5E1E]' : 'text-[#8E8E93]'}`}>
+                    {tier.duration}
+                  </span>
+                  <h3 className="font-display text-2xl font-bold">{tier.name}</h3>
+                </div>
+
+                <div className="border-t border-b py-4" style={{ borderColor: tier.featured ? 'rgba(255,255,255,0.15)' : '#E2E2E2' }}>
+                  <span className="font-display text-4xl font-extrabold block">{tier.price}</span>
+                  <span className="text-[10px] font-mono tracking-widest text-[#8E8E93]">{tier.deliverables}</span>
+                </div>
+
+                <ul className="space-y-3 text-xs font-light">
+                  {tier.bullets.map((bullet, i) => (
+                    <li key={i} className="flex items-start space-x-2">
+                      <Check size={14} className="mt-0.5 shrink-0 text-[#FF5E1E]" />
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="pt-8">
+                <button
+                  onClick={() => {
+                    setInquireSubject(tier.name);
+                    setIsInquireOpen(true);
+                  }}
+                  data-cursor="hover"
+                  data-cursor-label="ምረጥ"
+                  className={`w-full py-4 rounded-full text-xs font-bold tracking-wider transition-colors ${
+                    tier.featured
+                      ? 'bg-[#FF5E1E] text-white hover:bg-white hover:text-[#0A0A0A]'
+                      : 'bg-[#0A0A0A] text-white hover:bg-[#FF5E1E]'
+                  }`}
+                >
+                  {tier.price} አስይዝ
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {}
+      <section className="bg-[#0A0A0A] text-white py-20 px-6 my-12">
+        <div className="max-w-5xl mx-auto space-y-10">
+          
+          <div className="flex flex-col sm:flex-row items-center justify-between border-b border-[#262626] pb-8 gap-4">
+            <div>
+              <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block">የደንበኞች ምስክርነት</span>
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold">የከበሩ ደንበኞቻችን አስተያየት</h2>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={() => setTestimonialIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
+                className="w-10 h-10 rounded-full border border-[#333333] flex items-center justify-center hover:bg-[#FF5E1E] hover:border-[#FF5E1E] transition-colors"
+              >
+                <ChevronLeft size={18} />
+              </button>
+              <button
+                onClick={() => setTestimonialIndex((prev) => (prev + 1) % TESTIMONIALS.length)}
+                className="w-10 h-10 rounded-full border border-[#333333] flex items-center justify-center hover:bg-[#FF5E1E] hover:border-[#FF5E1E] transition-colors"
+              >
+                <ChevronRight size={18} />
+              </button>
+            </div>
+          </div>
+
+          <div className="bg-[#171717] p-8 sm:p-12 rounded-3xl border border-[#262626] grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <div className="md:col-span-4 flex flex-col items-center text-center space-y-3">
+              <img 
+                src={TESTIMONIALS[testimonialIndex].avatar} 
+                alt={TESTIMONIALS[testimonialIndex].name} 
+                className="w-24 h-24 rounded-full object-cover ring-4 ring-[#FF5E1E]"
+              />
+              <div>
+                <h3 className="font-display text-2xl font-bold">{TESTIMONIALS[testimonialIndex].name}</h3>
+                <span className="text-[10px] font-mono text-[#8E8E93] block">{TESTIMONIALS[testimonialIndex].role}</span>
+                <span className="text-[10px] text-[#FF5E1E] block font-mono mt-1">{TESTIMONIALS[testimonialIndex].location}</span>
+              </div>
+            </div>
+
+            <div className="md:col-span-8 space-y-4">
+              <div className="flex items-center space-x-1 text-[#FF5E1E]">
+                {[...Array(TESTIMONIALS[testimonialIndex].rating)].map((_, i) => (
+                  <Star key={i} size={16} className="fill-current" />
+                ))}
+              </div>
+              <p className="text-sm sm:text-base text-[#D4D4D4] font-light leading-relaxed italic">
+                "{TESTIMONIALS[testimonialIndex].quote}"
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {}
+      <section id="journal" className="py-20 px-6 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block mb-2">መጽሔት እና ጽሑፎች</span>
+            <h2 className="font-display text-4xl sm:text-5xl font-extrabold text-[#0A0A0A]">
+              የሌኦና መጽሔት
+            </h2>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {JOURNAL_ESSAYS.map((essay) => (
+            <article
+              key={essay.id}
+              onClick={() => setSelectedEssay(essay)}
+              data-cursor="hover"
+              data-cursor-label="አንብብ"
+              className="bg-[#F3F3F3] border border-[#E2E2E2] rounded-3xl p-6 space-y-6 cursor-pointer hover:border-[#FF5E1E] transition-all"
+            >
+              <div className="aspect-[16/9] bg-[#E2E2E2] rounded-2xl overflow-hidden">
+                <img src={essay.image} alt={essay.title} className="w-full h-full object-cover grayscale hover:grayscale-0 transition-transform duration-500 hover:scale-105" />
+              </div>
+              <div className="space-y-2">
+                <span className="text-[10px] font-mono tracking-widest text-[#FF5E1E]">{essay.code} &bull; {essay.readTime}</span>
+                <h3 className="font-display text-2xl font-bold text-[#0A0A0A] leading-snug">{essay.title}</h3>
+                <p className="text-xs text-[#555555] font-light leading-relaxed">{essay.excerpt}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {}
+      <section id="faq" className="py-20 px-6 bg-[#F3F3F3] border-t border-b border-[#E2E2E2]">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="text-center space-y-2">
+            <span className="text-xs uppercase font-mono tracking-widest text-[#FF5E1E] block">ጥያቄዎች</span>
+            <h2 className="font-display text-4xl font-extrabold text-[#0A0A0A]">ተደጋግመው የሚጠየቁ</h2>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { q: 'የፎቶዎቹን ማጠናቀቂያ ጊዜ ያህል ይወስዳል?', a: 'የመጀመሪያው 20-30 የተመረጡ ምስሎች በ48 ሰዓታት ውስጥ ይደርሳሉ። ሙሉ የፎቶ አልበሞች እና በእጅ የተሰሩ አልበሞች በ6 ሳምንታት ውስጥ ይጠናቀቃሉ።' },
+              { q: 'በዓለም ዙሪያ ለሚደረጉ ዝግጅቶች ትጓዛላችሁ?', a: 'አዎ። ከሥራዎቻችን ከ70% በላይ የሚሆኑት በሌክ ኮሞ፣ ፓሪስ፣ ለንደን፣ ኪዮቶ እና ዙሪክ የሚከናወኑ ናቸው።' },
+              { q: 'የቀነ-ቀጠሮ ማስያዝ ሂደት እንዴት ነው?', a: 'በዓመት ቢበዛ 15 ቀጠሮዎችን ብቻ እንቀበላለን። ቀናት የሚረጋገጡት ስምምነት ከተፈረመና ተቀማጭ ከተከፈለ በኋላ ነው።' }
+            ].map((faq, idx) => (
+              <div key={idx} className="border border-[#E2E2E2] bg-[#FAFAFA] rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setFaqExpanded(faqExpanded === idx ? -1 : idx)}
+                  className="w-full p-6 text-left font-display text-xl font-bold flex items-center justify-between text-[#0A0A0A]"
+                >
+                  <span>{faq.q}</span>
+                  <span>{faqExpanded === idx ? <Minus size={18} /> : <Plus size={18} />}</span>
+                </button>
+                {faqExpanded === idx && (
+                  <div className="px-6 pb-6 text-xs text-[#555555] font-light leading-relaxed border-t border-[#E2E2E2] pt-4">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {}
+      <footer className="bg-[#0A0A0A] text-white py-16 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8 border-b border-[#262626] pb-12 mb-8">
+          <div>
+            <span className="font-display text-3xl font-extrabold text-[#FF5E1E] block">ሌኦና ስቱዲዮ</span>
+            <span className="text-[10px] font-mono tracking-widest text-[#8E8E93]">ፓሪስ &bull; ሚላን &bull; ለንደን</span>
+          </div>
+
+          <div className="flex items-center space-x-8 text-xs font-mono tracking-widest text-[#8E8E93]">
+            <a href="#" className="hover:text-white transition-colors">ኢንስታግራም</a>
+            <a href="#" className="hover:text-white transition-colors">ቮግ አርካይቭ</a>
+            <a href="#" className="hover:text-white transition-colors">ፒንተረስት</a>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-[10px] font-mono tracking-widest text-[#8E8E93]">
+          <p>&copy; {new Date().getFullYear()} ሌኦና ስቱዲዮ. መብቱ በህግ የተጠበቀ ነው።</p>
+          <p>አነስተኛ የንድፍ ስልት #FF5E1E</p>
+        </div>
+      </footer>
+
+      {}
+      {selectedProject && (
+        <div className="fixed inset-0 z-[9999] bg-[#0A0A0A]/90 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="bg-[#FAFAFA] text-[#0A0A0A] max-w-4xl w-full max-h-[90vh] overflow-y-auto p-8 rounded-3xl relative space-y-6 border border-[#E2E2E2]">
+            <button
+              onClick={() => setSelectedProject(null)}
+              className="absolute top-6 right-6 p-2 rounded-full bg-[#F3F3F3] hover:bg-[#FF5E1E] hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div>
+              <span className="text-[10px] font-mono tracking-widest text-[#FF5E1E] block">{selectedProject.category}</span>
+              <h2 className="font-display text-3xl font-extrabold mt-1">{selectedProject.title}</h2>
+              <p className="text-xs font-mono text-[#8E8E93]">{selectedProject.location} &bull; {selectedProject.year}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 text-xs font-mono border-t border-b border-[#E2E2E2] py-4">
+              <div>
+                <span className="text-[#8E8E93] block">ደንበኛ</span>
+                <span className="font-bold">{selectedProject.client}</span>
+              </div>
+              <div>
+                <span className="text-[#8E8E93] block">መሣሪያ</span>
+                <span className="font-bold">{selectedProject.medium}</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-[#555555] font-light leading-relaxed">{selectedProject.summary}</p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {selectedProject.gallery.map((img, idx) => (
+                <div key={idx} className="aspect-[3/4] rounded-2xl overflow-hidden bg-[#E2E2E2]">
+                  <img src={img} alt="Gallery frame" className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {isVideoModalOpen && (
+        <div className="fixed inset-0 z-[9999] bg-[#0A0A0A]/95 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="bg-[#171717] text-white max-w-3xl w-full p-6 rounded-3xl relative space-y-4 border border-[#262626]">
+            <button
+              onClick={() => setIsVideoModalOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-[#262626] hover:bg-[#FF5E1E] transition-colors"
+            >
+              <X size={20} />
+            </button>
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono text-[#FF5E1E] uppercase tracking-widest">የቪዲዮ ቲሰር</span>
+              <h3 className="font-display text-2xl font-bold">ስለ ሌኦና ስቱዲዮ የፈጠራ ጉዞ</h3>
+            </div>
+            <div className="aspect-video bg-[#0A0A0A] rounded-2xl flex flex-col items-center justify-center space-y-3 relative overflow-hidden border border-[#262626]">
+              <Play size={48} className="text-[#FF5E1E] animate-pulse" />
+              <span className="text-xs font-mono text-[#8E8E93]">የቪዲዮ ማሳያ በዝግጅት ላይ ነው...</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {}
+      {selectedEssay && (
+        <div className="fixed inset-0 z-[9999] bg-[#0A0A0A]/90 backdrop-blur-md flex items-center justify-center p-6">
+          <div className="bg-[#FAFAFA] text-[#0A0A0A] max-w-3xl w-full max-h-[90vh] overflow-y-auto p-8 rounded-3xl relative space-y-6 border border-[#E2E2E2]">
+            <button
+              onClick={() => setSelectedEssay(null)}
+              className="absolute top-6 right-6 p-2 rounded-full bg-[#F3F3F3] hover:bg-[#FF5E1E] hover:text-white transition-colors"
+            >
+              <X size={20} />
+            </button>
+
+            <div>
+              <span className="text-[10px] font-mono tracking-widest text-[#FF5E1E] block">{selectedEssay.code}</span>
+              <h2 className="font-display text-3xl font-extrabold mt-1">{selectedEssay.title}</h2>
+              <p className="text-xs font-mono text-[#8E8E93]">{selectedEssay.date} &bull; {selectedEssay.readTime}</p>
+            </div>
+
+            <div className="aspect-[16/9] bg-[#E2E2E2] rounded-2xl overflow-hidden">
+              <img src={selectedEssay.image} alt={selectedEssay.title} className="w-full h-full object-cover" />
+            </div>
+
+            <p className="text-xs text-[#555555] font-light leading-relaxed">{selectedEssay.content}</p>
+          </div>
+        </div>
+      )}
+
+      {}
+      {isInquireOpen && (
+        <div className="fixed inset-0 z-[9999] bg-[#0A0A0A]/80 backdrop-blur-sm flex justify-end">
+          <div className="w-full max-w-lg bg-[#FAFAFA] h-full p-8 overflow-y-auto flex flex-col justify-between border-l border-[#E2E2E2] space-y-8">
+            <div>
+              <div className="flex items-center justify-between border-b border-[#E2E2E2] pb-6 mb-8">
+                <div>
+                  <span className="text-[10px] font-mono tracking-widest text-[#FF5E1E] block">የቀነ-ቀጠሮ ጥያቄ</span>
+                  <h3 className="font-display text-3xl font-extrabold">ቀን ያስይዙ</h3>
+                </div>
+                <button
+                  onClick={() => setIsInquireOpen(false)}
+                  className="p-2 rounded-full bg-[#F3F3F3] hover:bg-[#FF5E1E] hover:text-white transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form className="space-y-6 text-xs font-mono">
+                <div className="space-y-2">
+                  <label className="block text-[#0A0A0A] font-bold">የተመረጠው አገልግሎት</label>
+                  <input
+                    type="text"
+                    value={inquireSubject}
+                    onChange={(e) => setInquireSubject(e.target.value)}
+                    className="w-full p-3 bg-[#F3F3F3] border border-[#E2E2E2] rounded-xl text-[#0A0A0A] focus:outline-none focus:border-[#FF5E1E]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[#0A0A0A] font-bold">ሙሉ ስም *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="ለምሳሌ፡ ቪክቶሪያ ስተርሊንግ"
+                    className="w-full p-3 bg-[#F3F3F3] border border-[#E2E2E2] rounded-xl text-[#0A0A0A] focus:outline-none focus:border-[#FF5E1E]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[#0A0A0A] font-bold">ኢሜይል *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="ለምሳሌ፡ victoria@sterling.com"
+                    className="w-full p-3 bg-[#F3F3F3] border border-[#E2E2E2] rounded-xl text-[#0A0A0A] focus:outline-none focus:border-[#FF5E1E]"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[#0A0A0A] font-bold">የዝግጅቱ ቀን እና ቦታ</label>
+                  <input
+                    type="text"
+                    placeholder="ለምሳሌ፡ ሌክ ኮሞ፣ ጣሊያን - መስከረም 2026"
+                    className="w-full p-3 bg-[#F3F3F3] border border-[#E2E2E2] rounded-xl text-[#0A0A0A] focus:outline-none focus:border-[#FF5E1E]"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    triggerToast('ጥያቄዎ ደርሶናል! በ24 ሰዓታት ውስጥ እንመልስልዎታለን።');
+                    setIsInquireOpen(false);
+                  }}
+                  className="w-full py-4 bg-[#FF5E1E] text-white text-xs font-bold tracking-wider rounded-full hover:bg-[#0A0A0A] transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Send size={14} />
+                  <span>ጥያቄውን ላክ</span>
+                </button>
+              </form>
+            </div>
+
+            <p className="text-[10px] font-mono tracking-widest text-[#8E8E93] text-center">
+              በምስጢር የተጠበቀ &bull; ሌኦና ስቱዲዮ
+            </p>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
