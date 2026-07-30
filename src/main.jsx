@@ -4,6 +4,7 @@ import {
   ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
+  Award,
   CalendarDays,
   Camera,
   Check,
@@ -12,14 +13,20 @@ import {
   ChevronRight,
   ChevronUp,
   Clock3,
+  Film,
   Heart,
+  Image,
+  Layers,
   Menu,
   MessageCircle,
   Phone,
   Play,
   Quote,
+  Sliders,
   Sparkles,
+  Sun,
   Video,
+  Wand2,
   X,
 } from 'lucide-react';
 import './styles.css';
@@ -120,6 +127,40 @@ const processSteps = [
   }
 ];
 
+const craftHighlights = [
+  { icon: Film, title: '4K & 8K Cinema Cameras', desc: 'በቅርብ የቴክኖሎጂ ደረጃ የተሰሩ ፕሮፌሽናል የሲኒማ ካሜራዎችና የሌንስ ስብስቦች።' },
+  { icon: Sparkles, title: 'Drone & Aerial Lighting', desc: 'የሰርግዎን ግርማ ሞገስ በከፍታ የሚያሳዩ ድሮኖች እና ለቪዲዮው ውበት የሚሆኑ የአየር ላይ መብራቶች።' },
+  { icon: Sliders, title: 'Color Grading Master', desc: 'ለእያንዳንዱ ምስል እና ቪዲዮ ሞቅ ያለ፣ ተፈጥሯዊ እና የፊልም እይታ የሚሰጥ የከለር ኤዲቲንግ።' },
+  { icon: Layers, title: 'Fine-Art Laminated Albums', desc: 'ከውጭ ሀገር የሚመጡ ዘላቂ፣ በውሃና አቧራ የማይበላሹ በእጅ የተሰሩ ላሚኔት አልበሞች።' },
+];
+
+const locationsData = [
+  {
+    id: 'garden',
+    label: 'የጋርደን እና ተፈጥሮ ቀረጻ',
+    title: 'የተፈጥሮ ውበትና የጋርደን ፎቶዎች',
+    desc: 'የተረጋጉ፣ በተፈጥሮ ብርሃን የተዋቡ እና የፍቅር አፍታዎችን በሰፊ አረንጓዴ ጋርደኖች ውስጥ የምናስቀራቸው።',
+    image: galleryImages[1].src,
+    tag: 'OUTDOOR GARDEN'
+  },
+  {
+    id: 'studio',
+    label: 'የቤት ውስጥ ስታዲዮ',
+    title: 'የላቀ የስታዲዮ የብርሃንና የባህል አልበሞች',
+    desc: 'ለየት ባሉ የስታዲዮ መብራቶች፣ ዳራዎች እና የመካፕ ማዘጋጃዎች የተሟላ የቤት ውስጥ ፎቶግራፍ።',
+    image: galleryImages[3].src,
+    tag: 'INDOOR STUDIO'
+  },
+  {
+    id: 'editorial',
+    label: 'የምሽት እና የኤዲቶሪያል ፎቶ',
+    title: 'የምሽት የብርሃን ውበት እና የፊልም እይታ',
+    desc: 'በምሽት ብርሃን እና የከለር ኤዲቲንግ የሚሰሩ በውበት የተቀነባበሩ የሰርግ አፍታዎች።',
+    image: galleryImages[5].src,
+    tag: 'NIGHT EDITORIAL'
+  }
+];
+
 const testimonials = [
   {
     quote: 'ሆፕ በሰርጋችን ቀን ያደረገልን እንክብካቤ እና ያስረከበን አልበም ከጠበቅነው በላይ ውብ ነው! በቪዲዮው ኤዲቲንግ በጣም ተደስተናል።',
@@ -211,6 +252,7 @@ function App() {
   const [bookingPackage, setBookingPackage] = useState(null);
   const [activeImage, setActiveImage] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
+  const [activeLocTab, setActiveLocTab] = useState(0);
 
   useEffect(() => {
     document.body.style.overflow = bookingPackage ? 'hidden' : '';
@@ -219,6 +261,8 @@ function App() {
 
   const openBooking = (pkg = null) => { setBookingPackage(pkg ?? { name: 'የ HOPE አገልግሎት', price: 'ተመጣጣኝ' }); setMenuOpen(false); };
   const nav = (target) => { scrollToSection(target); setMenuOpen(false); };
+
+  const currentLoc = locationsData[activeLocTab];
 
   return (
     <main>
@@ -231,6 +275,8 @@ function App() {
         <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'}>
           <button onClick={() => nav('story')}>ስለ እኛ</button>
           <button onClick={() => nav('work')}>ሥራዎቻችን</button>
+          <button onClick={() => nav('craft')}>ቴክኖሎጂያችን</button>
+          <button onClick={() => nav('locations')}>ቦታዎቻችን</button>
           <button onClick={() => nav('process')}>ሂደታችን</button>
           <button onClick={() => nav('pricing')}>አገልግሎቶች</button>
           <button onClick={() => nav('testimonials')}>ምስክርነት</button>
@@ -280,7 +326,62 @@ function App() {
         <a className="instagram-banner" href="https://instagram.com" target="_blank" rel="noreferrer"><Camera size={19} /><span>ተጨማሪ ድንቅ ሥራዎችን በኢንስታግራም ይከተሉን</span><ArrowUpRight size={19} /></a>
       </section>
 
-      {/* NEW SECTION 1: HOW IT WORKS / OUR PROCESS */}
+      {/* NEW DESIGNED SECTION A: CRAFT & EQUIPMENT ( dark luxury stats & tools ) */}
+      <section id="craft" className="craft-section section-anchor">
+        <div className="craft-header">
+          <p className="eyebrow">የሙያችን እና የቴክኖሎጂ ጥራት</p>
+          <h2>በከፍተኛ የቴክኖሎጂ ደረጃ<br /><em>የተሰሩ ጥራቶች።</em></h2>
+        </div>
+        <div className="craft-stats-bar">
+          <div className="craft-stat"><strong>9+</strong><span>ዓመታት ልምድ</span></div>
+          <div className="craft-stat"><strong>500+</strong><span>የተቀረፁ የሰርግ በዓላት</span></div>
+          <div className="craft-stat"><strong>4K/8K</strong><span>የሲኒማ ጥራት ቪዲዮ</span></div>
+          <div className="craft-stat"><strong>100%</strong><span>የደንበኞች እርካታ</span></div>
+        </div>
+        <div className="craft-grid">
+          {craftHighlights.map(({ icon: Icon, title, desc }) => (
+            <div className="craft-card" key={title}>
+              <div className="craft-icon"><Icon size={26} /></div>
+              <h3>{title}</h3>
+              <p>{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* NEW DESIGNED SECTION B: INTERACTIVE LOCATIONS SHOWCASE */}
+      <section id="locations" className="locations-section section-anchor">
+        <div className="locations-header">
+          <p className="eyebrow">የፎቶግራፍ ቦታዎችና ስታዲዮዎች</p>
+          <h2>የእርስዎ ምርጥ<br /><em>የቀረጻ ዳራዎች።</em></h2>
+        </div>
+        <div className="locations-tabs">
+          {locationsData.map((loc, idx) => (
+            <button
+              key={loc.id}
+              className={activeLocTab === idx ? 'loc-tab loc-tab-active' : 'loc-tab'}
+              onClick={() => setActiveLocTab(idx)}
+            >
+              {loc.label}
+            </button>
+          ))}
+        </div>
+        <div className="locations-display">
+          <div className="locations-art">
+            <img src={currentLoc.image} alt={currentLoc.title} />
+            <span className="loc-badge">{currentLoc.tag}</span>
+          </div>
+          <div className="locations-info">
+            <p className="script">የቀረጻ አማራጭ</p>
+            <h3>{currentLoc.title}</h3>
+            <p>{currentLoc.desc}</p>
+            <button className="primary-button" onClick={() => openBooking()}>
+              ይህንን ቦታ ይምረጡ <ArrowRight size={17} />
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section id="process" className="process-section section-anchor">
         <div className="process-heading">
           <p className="eyebrow">የአሠራር ሂደታችን</p>
@@ -303,7 +404,6 @@ function App() {
         <div className="price-note"><Play size={14} fill="currentColor" /> ሁሉም የአገልግሎት ዝርዝሮች እና ዋጋዎች ከ HOPE ቡድን ጋር በሚደረግ የመጨረሻ ማረጋገጫ የሚጸኑ ይሆናሉ።</div>
       </section>
 
-      {/* NEW SECTION 2: CLIENT TESTIMONIALS */}
       <section id="testimonials" className="testimonials-section section-anchor">
         <div className="testimonials-heading">
           <p className="eyebrow">የደንበኞቻችን ምስክርነት</p>
@@ -323,7 +423,6 @@ function App() {
         </div>
       </section>
 
-      {/* NEW SECTION 3: FREQUENTLY ASKED QUESTIONS */}
       <section id="faq" className="faq-section section-anchor">
         <div className="faq-heading">
           <p className="eyebrow">ተደጋግመው የሚጠየቁ ጥያቄዎች</p>
@@ -350,7 +449,7 @@ function App() {
         <div className="closing-copy"><p className="eyebrow">ልዩ ቀንዎ ሁልጊዜ ከእርስዎ ጋር</p><h2>ዘላቂ የሚሆን<br />ድንቅ ነገር <em>እንፍጠር።</em></h2><p>ቀናት በፍጥነት ስለሚያዙ፣ የሚያከብሩትን በዓል ይንገሩን፤ ቀጣዩን እርምጃ ቀላል እናደርገዋለን።</p><div><button className="primary-button light-button" onClick={() => openBooking()}>ቀንዎን ያስይዙ <CalendarDays size={18} /></button><a className="call-light" href={`tel:${PHONE_LINK}`}><Phone size={16} /> {PHONE_DISPLAY}</a></div></div>
       </section>
 
-      <footer><div className="footer-brand"><img src={`${ASSET}/hope-logo.gif`} alt="HOPE" /><p>ፎቶ እና ቪዲዮ (VELO)<br /><span>ከፍተኛ ዋጋ ላላቸው አፍታዎች።</span></p></div><div className="footer-links"><button onClick={() => scrollToSection('home')}>ዋና ገጽ</button><button onClick={() => scrollToSection('work')}>ሥራዎቻችን</button><button onClick={() => scrollToSection('process')}>ሂደታችን</button><button onClick={() => scrollToSection('pricing')}>አገልግሎቶች</button><button onClick={() => scrollToSection('testimonials')}>ምስክርነት</button><button onClick={() => scrollToSection('faq')}>FAQ</button><a href={`tel:${PHONE_LINK}`}>ደውሉልን</a></div><a className="whatsapp-link" href={`https://wa.me/${PHONE_LINK.replace('+', '')}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> በዋትስአፕ ያውሩን</a><p className="copyright">© {new Date().getFullYear()} HOPE Photo &amp; Velo</p></footer>
+      <footer><div className="footer-brand"><img src={`${ASSET}/hope-logo.gif`} alt="HOPE" /><p>ፎቶ እና ቪዲዮ (VELO)<br /><span>ከፍተኛ ዋጋ ላላቸው አፍታዎች።</span></p></div><div className="footer-links"><button onClick={() => scrollToSection('home')}>ዋና ገጽ</button><button onClick={() => scrollToSection('work')}>ሥራዎቻችን</button><button onClick={() => scrollToSection('craft')}>ቴክኖሎጂያችን</button><button onClick={() => scrollToSection('locations')}>ቦታዎቻችን</button><button onClick={() => scrollToSection('process')}>ሂደታችን</button><button onClick={() => scrollToSection('pricing')}>አገልግሎቶች</button><button onClick={() => scrollToSection('testimonials')}>ምስክርነት</button><button onClick={() => scrollToSection('faq')}>FAQ</button><a href={`tel:${PHONE_LINK}`}>ደውሉልን</a></div><a className="whatsapp-link" href={`https://wa.me/${PHONE_LINK.replace('+', '')}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> በዋትስአፕ ያውሩን</a><p className="copyright">© {new Date().getFullYear()} HOPE Photo &amp; Velo</p></footer>
       {bookingPackage && <BookingPanel selectedPackage={bookingPackage} onClose={() => setBookingPackage(null)} />}
     </main>
   );
