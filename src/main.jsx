@@ -279,7 +279,7 @@ function PageLoader({ onDone }) {
   return (
     <div className={out ? 'page-loader loader-out' : 'page-loader'} aria-hidden="true">
       <div className="loader-logo">
-        <img src={`${ASSET}/hope-logo.gif`} alt="HOPE" />
+        <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="loader-logo-img" />
         <span className="loader-name">HOPE</span>
         <span className="loader-sub">PHOTO & VELO</span>
       </div>
@@ -696,7 +696,7 @@ function App() {
         {/* ── FOOTER ── */}
         <footer>
           <div className="footer-brand">
-            <img src={`${ASSET}/hope-logo.gif`} alt="HOPE" />
+            <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="footer-logo" />
             <p>ፎቶ እና ቪዲዮ (VELO)<br /><span>{t.footerTagline}</span></p>
           </div>
           <div className="footer-links">

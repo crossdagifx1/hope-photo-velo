@@ -318,7 +318,7 @@ h1, h2 { font-family:'Playfair Display',Georgia,serif; font-weight:800; letter-s
 /* ── FOOTER ── */
 footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8fr; gap:2rem; background:#1e1816; color:#f6eee6; }
 .footer-brand { display:flex; align-items:center; gap:.85rem; }
-.footer-brand img { width:90px; height:50px; object-fit:contain; }
+.footer-brand img, .footer-logo { width: auto; height: 56px; max-width: 160px; object-fit: contain; display: block; }
 .footer-brand p { margin:0; font:800 11px/1.5 'DM Mono',monospace; letter-spacing:.1em; }
 .footer-brand span { color:#d0c1b6; letter-spacing:0; font-weight:500; }
 .footer-links { display:flex; flex-wrap:wrap; align-content:center; gap:.8rem 1.4rem; }
