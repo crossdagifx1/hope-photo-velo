@@ -680,7 +680,7 @@ function App() {
                     {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                   </button>
                   <div className={isOpen ? 'faq-answer faq-answer-open' : 'faq-answer'}>
-                    <p>{faq.a}</p>
+                    <div><p>{faq.a}</p></div>
                   </div>
                 </div>
               );

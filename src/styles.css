@@ -290,9 +290,11 @@ h1, h2 { font-family:'Playfair Display',Georgia,serif; font-weight:800; letter-s
 .faq-question:hover { color:var(--red); }
 .faq-question span { flex:1; }
 .faq-question svg { flex:0 0 auto; }
-.faq-answer { display:grid; grid-template-rows:0fr; transition:grid-template-rows .32s var(--ease); overflow:hidden; }
+.faq-answer { display:grid; grid-template-rows:0fr; transition:grid-template-rows .38s var(--ease); }
 .faq-answer-open { grid-template-rows:1fr; }
-.faq-answer > p { min-height:0; padding:0 2rem 1.6rem; margin:0; font-size:1.1rem; font-weight:500; color:#4a3e37; line-height:1.78; }
+.faq-answer > div { min-height:0; overflow:hidden; }
+.faq-answer > div > p { padding:0 2rem 1.8rem; margin:0; font-size:1.1rem; font-weight:500; color:#4a3e37; line-height:1.82; white-space:normal; word-break:break-word; overflow-wrap:break-word; }
+
 
 /* ── CLOSING CTA ── */
 .closing-cta { min-height:560px; display:grid; grid-template-columns:1fr 1fr; background:var(--red); color:#fff; }
