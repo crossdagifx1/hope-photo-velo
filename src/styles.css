@@ -230,6 +230,99 @@ h1, h2 { font-family:'Playfair Display',Georgia,serif; font-weight:800; letter-s
 .locations-info h3 { font:800 2.2rem 'Playfair Display',serif; margin:.4rem 0 1.1rem; line-height:1.18; }
 .locations-info > p { font-size:1.18rem; font-weight:500; color:#4a3e37; line-height:1.78; margin-bottom:1.8rem; }
 
+/* ── STUDIO MAP CARD ── */
+.studio-map-card {
+  margin-top: 2.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 0;
+  background: #fffdf9;
+  border: 2px solid rgba(30,24,22,.12);
+  box-shadow: 0 10px 32px rgba(0,0,0,.05);
+  overflow: hidden;
+}
+.map-card-info {
+  padding: 2.5rem 2.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  border-right: 2px solid rgba(30,24,22,.1);
+}
+.map-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .4rem .8rem;
+  background: var(--red);
+  color: #fff;
+  font: 800 11px 'DM Mono', monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+.map-card-info h3 {
+  font: 800 1.9rem/1.2 'Playfair Display', serif;
+  margin: 0 0 .8rem;
+  color: var(--ink);
+}
+.map-card-info h3 small {
+  font: 700 1.25rem 'DM Sans', sans-serif;
+  color: var(--red);
+  display: block;
+  margin-top: .3rem;
+}
+.map-card-info p {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #4a3e37;
+  line-height: 1.7;
+  margin: 0 0 1.6rem;
+}
+.map-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  padding: .85rem 1.4rem;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: #fff;
+  font: 800 12.5px 'DM Mono', monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: all .25s var(--ease);
+}
+.map-link-btn:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  transform: translateY(-2px);
+}
+.map-card-preview {
+  min-height: 320px;
+  width: 100%;
+  position: relative;
+}
+.footer-map-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  margin-top: .5rem;
+  color: #fce0dc;
+  font: 700 11.5px 'DM Mono', monospace;
+  transition: color .2s;
+}
+.footer-map-badge:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+@media (max-width: 900px) {
+  .studio-map-card { grid-template-columns: 1fr; }
+  .map-card-info { border-right: 0; border-bottom: 2px solid rgba(30,24,22,.1); padding: 1.8rem 1.4rem; }
+  .map-card-preview { min-height: 260px; }
+}
+
+
 /* ── PROCESS ── */
 .process-section { padding:8rem 8vw; background:#fffdf9; border-top:1.5px solid var(--line); }
 .process-heading { margin-bottom:3.5rem; }

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
-  ChevronDown, ChevronRight, ChevronUp, Film, Globe, Heart, Layers, Menu,
+  ChevronDown, ChevronRight, ChevronUp, ExternalLink, Film, Globe, Heart, Layers, MapPin, Menu,
   MessageCircle, Phone, Play, Quote, Send, Sliders, Sparkles, Video, X,
 } from 'lucide-react';
 import './styles.css';
@@ -593,6 +593,45 @@ function App() {
               <button className="primary-button" onClick={() => openBooking()}>{t.locationsCta} <ArrowRight size={17} /></button>
             </div>
           </div>
+
+          {/* ── STUDIO MAP PREVIEW CARD ── */}
+          <div className="studio-map-card">
+            <div className="map-card-info">
+              <span className="map-badge"><MapPin size={14} /> {lang === 'am' ? 'የስቱዲዮችን አድራሻ' : 'Studio Location'}</span>
+              <h3>
+                Tigat Building | Hayahulet<br />
+                <small>ትጋት ህንጻ | ሃያሁለት</small>
+              </h3>
+              <p>
+                {lang === 'am'
+                  ? 'አዲስ አበባ፣ ሃያሁለት፣ ትጋት ህንጻ። ለቀረጻ፣ ለአልበም ምርጫ እና ለምክክር በምቹ ቦታ ላይ እንገኛለን።'
+                  : 'Hayahulet, Tigat Building, Addis Ababa, Ethiopia. Conveniently located for photo sessions, album reviews, and consultation.'}
+              </p>
+              <a
+                href="https://maps.app.goo.gl/LAsxQjdytUAaCJTw9?g_st=atm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="map-link-btn"
+              >
+                <MapPin size={16} />
+                <span>{lang === 'am' ? 'በጉግል ካርታ ይክፈቱ (Google Maps)' : 'Open in Google Maps'}</span>
+                <ExternalLink size={14} />
+              </a>
+            </div>
+
+            <div className="map-card-preview">
+              <iframe
+                title="Tigat Building Hayahulet Google Map Location"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3940.5524675975284!2d38.7839659!3d9.0132338!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b85002b8b9f1d%3A0x6b30f8d09559c5d1!2sHayahulet%2C%20Addis%20Ababa!5e0!3m2!1sen!2set!4v1700000000000!5m2!1sen!2set"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
         </section>
 
         {/* ── PROCESS ── */}
@@ -697,7 +736,18 @@ function App() {
         <footer>
           <div className="footer-brand">
             <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="footer-logo" />
-            <p>ፎቶ እና ቪዲዮ (VELO)<br /><span>{t.footerTagline}</span></p>
+            <p>
+              ፎቶ እና ቪዲዮ (VELO)<br />
+              <span>{t.footerTagline}</span><br />
+              <a
+                href="https://maps.app.goo.gl/LAsxQjdytUAaCJTw9?g_st=atm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-map-badge"
+              >
+                <MapPin size={13} /> Tigat Building | Hayahulet (ትጋት ህንጻ)
+              </a>
+            </p>
           </div>
           <div className="footer-links">
             <button onClick={() => scrollToSection('home')}>{lang === 'am' ? 'ዋና ገጽ' : 'Home'}</button>
