@@ -730,6 +730,48 @@ function App() {
               <a className="call-light" href={`tel:${PHONE_LINK}`}><Phone size={16} />{PHONE_DISPLAY}</a>
             </div>
           </div>
+        {/* ── BOTTOM EMBEDDED MAP SECTION ── */}
+        <section className="bottom-map-section">
+          <div className="bottom-map-bar">
+            <div className="bottom-map-text">
+              <span className="eyebrow" style={{ color: 'var(--red)', justifyContent: 'flex-start' }}>
+                <MapPin size={14} /> {lang === 'am' ? 'የስቱዲዮችን አድራሻ እና ቦታ' : 'Visit Our Studio'}
+              </span>
+              <h2>
+                Tigat Building | Hayahulet{' '}
+                <small style={{ fontWeight: 700, fontSize: '1.4rem', color: 'var(--red)', display: 'inline-block' }}>
+                  (ትጋት ህንጻ | ሃያሁለት)
+                </small>
+              </h2>
+              <p>
+                {lang === 'am'
+                  ? 'አዲስ አበባ፣ ሃያሁለት፣ ትጋት ህንጻ። በካርታው በቀላሉ ተመልከተው ያግኙን።'
+                  : 'Hayahulet, Tigat Building, Addis Ababa, Ethiopia. Find us easily on the map below.'}
+              </p>
+            </div>
+            <a
+              href="https://maps.app.goo.gl/LAsxQjdytUAaCJTw9?g_st=atm"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="primary-button"
+            >
+              <MapPin size={16} />
+              <span>{lang === 'am' ? 'በጉግል ካርታ ይክፈቱ' : 'Open Google Maps'}</span>
+              <ExternalLink size={15} />
+            </a>
+          </div>
+          <div className="bottom-map-iframe-container">
+            <iframe
+              title="Tigat Building Hayahulet Google Map Location"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d609.2949161350773!2d38.7823598790974!3d9.01489007097957!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x164b85a2696156e1%3A0x673a0abbcb9c8347!2zVGlnYXQgQnVpbGRpbmcgfCBIYXlhaHVsZXQgfCDhibXhjIvhibUg4YiF4YqV4Yy7IHwg4YiD4Yur4YiB4YiI4Ym1!5e1!3m2!1sen!2set!4v1785489984725!5m2!1sen!2set"
+              width="100%"
+              height="450"
+              style={{ border: 0, display: 'block' }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="strict-origin-when-cross-origin"
+            />
+          </div>
         </section>
 
         {/* ── FOOTER ── */}

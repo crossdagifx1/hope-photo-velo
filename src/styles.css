@@ -545,8 +545,40 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   .footer-links { margin:2rem 0; }
   .whatsapp-link { justify-self:auto; font-size:12.5px; }
   .copyright { margin-top:2.2rem; font-size:10.5px; }
-  .booking-panel { padding:4.5rem 1.5rem 2rem; }
-  .booking-success { min-height:65vh; }
+/* ── BOTTOM MAP SECTION ── */
+.bottom-map-section {
+  background: var(--paper);
+  border-top: 2px solid var(--line);
+}
+.bottom-map-bar {
+  padding: 4rem 8vw 2.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.bottom-map-text h2 {
+  font: 800 clamp(2.2rem, 3.8vw, 3.4rem)/1.1 'Playfair Display', serif;
+  margin: .4rem 0 .6rem;
+  color: var(--ink);
+}
+.bottom-map-text p {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #4a3e37;
+  font-weight: 500;
+}
+.bottom-map-iframe-container {
+  width: 100%;
+  height: 450px;
+  position: relative;
+  border-top: 2px solid var(--line);
+}
+@media (max-width: 900px) {
+  .bottom-map-bar { padding: 3rem 1.3rem 2rem; flex-direction: column; align-items: flex-start; }
+  .bottom-map-iframe-container { height: 340px; }
+}
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; transition-duration:.01ms !important; }
