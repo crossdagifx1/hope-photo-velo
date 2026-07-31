@@ -389,11 +389,8 @@ function App() {
             <button onClick={() => nav('work')}>{t.nav.work}</button>
             <button onClick={() => nav('craft')}>{t.nav.craft}</button>
             <button onClick={() => nav('locations')}>{t.nav.locations}</button>
-            <button onClick={() => nav('process')}>{t.nav.process}</button>
             <button onClick={() => nav('pricing')}>{t.nav.pricing}</button>
-            <button onClick={() => nav('testimonials')}>{t.nav.testimonials}</button>
             <button onClick={() => nav('faq')}>{t.nav.faq}</button>
-            <a className="mobile-menu-call" href={`tel:${PHONE_LINK}`}><Phone size={15} /> {PHONE_DISPLAY}</a>
           </nav>
           <div className="header-right">
             <a className="header-call-btn" href={`tel:${PHONE_LINK}`} aria-label="Call HOPE">
