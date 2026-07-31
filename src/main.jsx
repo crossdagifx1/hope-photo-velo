@@ -411,84 +411,90 @@ function App() {
           </div>
         </header>
 
-        {/* ── HERO — Reference design: centered headline + inline photos + strip ── */}
-        <section id="home" className="hero section-anchor">
+        {/* ── HERO — Premium Split Column Wedding Hero ── */}
+        <section id="home" className="hero-split-section section-anchor">
+          <div className="hero-split-container">
+            {/* Left Column Content */}
+            <div className="hero-left-content">
+              {/* Top Chip / Eyebrow */}
+              <div className="hero-badge-chip">
+                <Heart size={13} fill="#9B1D2D" color="#9B1D2D" />
+                <span>{t.heroEyebrow}</span>
+              </div>
 
-          {/* Centered headline */}
-          <div className="hero-text-block">
-            <p className="eyebrow hero-eyebrow"><Heart size={13} fill="currentColor" />{t.heroEyebrow}</p>
-
-            <h1 className="hero-h1-inline">
-              {lang === 'am' ? (
-                <>
-                  <span className="h1-line">
-                    ጊዜያት
-                    <span className="inline-photo" aria-hidden="true">
-                      <img src={galleryImages[3].src} alt="" />
+              {/* Main Headline with embedded circular thumbnail */}
+              <h1 className="hero-title-main">
+                {lang === 'am' ? (
+                  <>
+                    <span className="hero-title-row">
+                      ጊዜያት
+                      <span className="hero-inline-avatar">
+                        <img src={galleryImages[3].src} alt="" />
+                      </span>
                     </span>
-                    ያልፋሉ፤
-                  </span>
-                  <span className="h1-line h1-line-italic">
-                    <em>ትዝታ ይቀራል።</em>
-                  </span>
-                </>
-              ) : (
-                <>
-                  <span className="h1-line">
-                    Moments
-                    <span className="inline-photo" aria-hidden="true">
-                      <img src={galleryImages[3].src} alt="" />
+                    <span className="hero-title-row">ያልፋሉ፤</span>
+                    <span className="hero-title-row hero-title-serif">ትዝታ ይቀራል።</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="hero-title-row">
+                      Moments
+                      <span className="hero-inline-avatar">
+                        <img src={galleryImages[3].src} alt="" />
+                      </span>
                     </span>
-                    pass—
-                  </span>
-                  <span className="h1-line h1-line-italic">
-                    <em>memories remain.</em>
-                  </span>
-                </>
-              )}
-            </h1>
+                    <span className="hero-title-row">Pass—</span>
+                    <span className="hero-title-row hero-title-serif">Memories Remain.</span>
+                  </>
+                )}
+              </h1>
 
-            <p className="hero-sub">{t.heroText}</p>
-          </div>
+              {/* Description Paragraph */}
+              <p className="hero-paragraph-desc">{t.heroText}</p>
 
-          {/* 4-photo bottom strip + rotating badge + bottom-right CTAs */}
-          <div className="hero-strip-wrap">
-            <div className="hero-strip">
-              {galleryImages.slice(0, 4).map((img, i) => (
-                <div key={i} className={`hero-strip-item hero-strip-${i}`}>
-                  <img src={img.src} alt={lang === 'en' ? img.altEn : img.altAm} />
-                  {i === 0 && (
-                    <button
-                      className="rotating-badge"
-                      onClick={() => openBooking()}
-                      aria-label={t.bookNow}
-                    >
-                      <svg className="badge-ring" viewBox="0 0 180 180" aria-hidden="true">
-                        <defs>
-                          <path id="badge-circle" d="M 90,90 m -62,0 a 62,62 0 1,1 124,0 a 62,62 0 1,1 -124,0" />
-                        </defs>
-                        <text className="badge-text">
-                          <textPath href="#badge-circle" startOffset="0%">
-                            {lang === 'am'
-                              ? '✦ ቀን ያስይዙ ✦ ሥራዎቻችን ✦ ቀን ያስይዙ ✦ ሥራዎቻችን'
-                              : '✦ BOOK NOW ✦ OUR WORK ✦ BOOK NOW ✦ OUR WORK'}
-                          </textPath>
-                        </text>
-                      </svg>
-                      <span className="badge-arrow">↗</span>
-                    </button>
-                  )}
+              {/* Action CTA Buttons */}
+              <div className="hero-action-buttons">
+                <a href={`tel:${PHONE_LINK}`} className="hero-btn-primary">
+                  <span>{lang === 'am' ? 'አሁኑኑ ይደውሉ' : 'Call Us Now'}</span>
+                </a>
+                <button onClick={() => nav('story')} className="hero-btn-secondary">
+                  <span>{lang === 'am' ? 'ስለ እኛ ይወቁ' : 'About Us'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right Column Hero Image with Floating Glassmorphism Pills */}
+            <div className="hero-right-visual">
+              <div className="hero-image-card">
+                <img
+                  src="/assets/hero-wedding.jpg"
+                  alt="Cinematic Wedding Portrait"
+                  className="hero-wedding-portrait"
+                />
+
+                {/* 4 Floating Glassmorphism Capsules */}
+                <div className="floating-pill pill-top-left">
+                  <span className="pill-icon icon-cyan"><Camera size={14} /></span>
+                  <span className="pill-text">Professional Quality</span>
                 </div>
-              ))}
-            </div>
 
-            {/* Bottom-right underlined CTA links */}
-            <div className="hero-strip-links">
-              <button className="strip-link" onClick={() => openBooking()}>{t.bookNow}</button>
-              <button className="strip-link" onClick={() => scrollToSection('work')}>{t.heroScrollCta}</button>
+                <div className="floating-pill pill-top-right">
+                  <span className="pill-icon icon-lime"><Sparkles size={14} /></span>
+                  <span className="pill-text">Timeless Memories</span>
+                </div>
+
+                <div className="floating-pill pill-bottom-left">
+                  <span className="pill-icon icon-gold"><Film size={14} /></span>
+                  <span className="pill-text">Creative Vision</span>
+                </div>
+
+                <div className="floating-pill pill-bottom-right">
+                  <span className="pill-icon icon-rose"><Heart size={14} fill="currentColor" /></span>
+                  <span className="pill-text">Real Moments</span>
+                </div>
+              </div>
             </div>
           </div>
-
         </section>
 
 
