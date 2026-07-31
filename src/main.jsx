@@ -405,38 +405,93 @@ function App() {
           <button className="menu-button icon-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">{menuOpen ? <X /> : <Menu />}</button>
         </header>
 
-        {/* ── HERO — inspired by reference image (photo strip below centered text) ── */}
+        {/* ── HERO — Reference design: centered headline + inline photos + strip ── */}
         <section id="home" className="hero section-anchor">
-          <Reveal className="hero-text-block">
-            <p className="eyebrow hero-eyebrow"><Heart size={13} fill="currentColor" />{t.heroEyebrow}</p>
-            <h1>{t.heroH1a}<br /><em>{t.heroH1b}</em></h1>
-            <p className="hero-sub">{t.heroText}</p>
-            <div className="hero-actions">
-              <button className="primary-button" onClick={() => openBooking()}>{t.bookNow} <CalendarDays size={18} /></button>
-              <a className="text-button hero-call" href={`tel:${PHONE_LINK}`}><Phone size={16} />{t.call} <span className="call-number">{PHONE_DISPLAY}</span></a>
-            </div>
-            <div className="hero-proof">
-              <div className="avatar-stack"><span /><span /><span /></div>
-              <p><strong>{t.heroProof[0]}</strong> {t.heroProof[1]}<br />{t.heroProof[2]}</p>
-            </div>
-          </Reveal>
 
-          {/* Photo strip — like the reference design's bottom gallery */}
-          <div className="hero-strip">
-            {galleryImages.slice(0, 4).map((img, i) => (
-              <div key={i} className={`hero-strip-item hero-strip-${i}`}>
-                <img src={img.src} alt={lang === 'en' ? img.altEn : img.altAm} />
-                {i === 0 && (
-                  <div className="hero-strip-badge">
-                    <span>HOPE</span><small>PHOTO & VELO</small><b>✦</b>
-                  </div>
-                )}
-              </div>
-            ))}
-            <button className="hero-strip-cta" onClick={() => scrollToSection('work')}>
-              <span>{t.heroScrollCta}</span><ArrowRight size={16} />
-            </button>
+          {/* Centered headline with inline floating thumbnails */}
+          <div className="hero-text-block">
+            <p className="eyebrow hero-eyebrow"><Heart size={13} fill="currentColor" />{t.heroEyebrow}</p>
+
+            <h1 className="hero-h1-inline">
+              {lang === 'am' ? (
+                <>
+                  <span className="h1-line">
+                    ጊዜያት
+                    <span className="inline-photo" aria-hidden="true">
+                      <img src={galleryImages[3].src} alt="" />
+                    </span>
+                    ያልፋሉ፤
+                  </span>
+                  <span className="h1-line h1-line-italic">
+                    ትዝታ ይቀራል
+                    <span className="inline-photo inline-photo-pill" aria-hidden="true">
+                      <img src={galleryImages[1].src} alt="" />
+                    </span>
+                    ።
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="h1-line">
+                    Moments
+                    <span className="inline-photo" aria-hidden="true">
+                      <img src={galleryImages[3].src} alt="" />
+                    </span>
+                    pass—
+                  </span>
+                  <span className="h1-line h1-line-italic">
+                    memories
+                    <span className="inline-photo inline-photo-pill" aria-hidden="true">
+                      <img src={galleryImages[1].src} alt="" />
+                    </span>
+                    remain.
+                  </span>
+                </>
+              )}
+            </h1>
+
+            <p className="hero-sub">{t.heroText}</p>
           </div>
+
+          {/* 4-photo bottom strip with rotating badge + bottom-right CTAs */}
+          <div className="hero-strip-wrap">
+            <div className="hero-strip">
+              {galleryImages.slice(0, 4).map((img, i) => (
+                <div key={i} className={`hero-strip-item hero-strip-${i}`}>
+                  <img src={img.src} alt={lang === 'en' ? img.altEn : img.altAm} />
+                  {i === 0 && (
+                    /* Rotating circular badge like the reference */
+                    <button
+                      className="rotating-badge"
+                      onClick={() => openBooking()}
+                      aria-label={t.bookNow}
+                    >
+                      <svg className="badge-ring" viewBox="0 0 180 180" aria-hidden="true">
+                        <defs>
+                          <path id="badge-circle" d="M 90,90 m -62,0 a 62,62 0 1,1 124,0 a 62,62 0 1,1 -124,0" />
+                        </defs>
+                        <text className="badge-text">
+                          <textPath href="#badge-circle" startOffset="0%">
+                            {lang === 'am'
+                              ? '✦ ቀን ያስይዙ ✦ ሥራዎቻችን ✦ ቀን ያስይዙ ✦ ሥራዎቻችን'
+                              : '✦ BOOK NOW ✦ OUR WORK ✦ BOOK NOW ✦ OUR WORK'}
+                          </textPath>
+                        </text>
+                      </svg>
+                      <span className="badge-arrow">↗</span>
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Bottom-right underlined CTAs (like the reference image) */}
+            <div className="hero-strip-links">
+              <button className="strip-link" onClick={() => openBooking()}>{t.bookNow}</button>
+              <button className="strip-link" onClick={() => scrollToSection('work')}>{t.heroScrollCta}</button>
+            </div>
+          </div>
+
         </section>
 
         {/* ── STORY / ABOUT ── */}
