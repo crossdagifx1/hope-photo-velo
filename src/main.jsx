@@ -727,9 +727,10 @@ function App() {
             <p>{t.closingBody}</p>
             <div>
               <button className="primary-button light-button" onClick={() => openBooking()}>{t.closingBtn} <CalendarDays size={18} /></button>
-              <a className="call-light" href={`tel:${PHONE_LINK}`}><Phone size={16} />{PHONE_DISPLAY}</a>
             </div>
           </div>
+        </section>
+
         {/* ── BOTTOM EMBEDDED MAP SECTION ── */}
         <section className="bottom-map-section">
           <div className="bottom-map-bar">
