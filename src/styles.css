@@ -486,12 +486,21 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   .site-header { height:72px; padding:0 1rem; }
   .brand img { width:auto; height:44px; }
   .menu-button { display:flex; }
-  .lang-toggle { min-height:38px; padding:0 .65rem; font-size:11px; }
-  .header-call-btn { display:none; }
-  .header-book { min-height:38px; padding:0 .9rem; font-size:11px; }
-  .header-right { gap:.4rem; }
-
-  .header-right { gap:.5rem; }
+  .header-call-btn {
+    min-height: 38px;
+    width: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--line);
+    color: var(--red);
+    background: rgba(185,37,57,.06);
+    border-radius: 4px;
+  }
+  .header-call-btn .call-text { display: none; }
+  .header-book { min-height:38px; padding:0 .8rem; font-size:11px; }
+  .header-right { gap:.45rem; }
   .nav-links {
     width:100%; padding:1.4rem; display:none; position:absolute; top:75px; left:0;
     flex-direction:column; align-items:stretch; gap:0; background:#fffdf9;
