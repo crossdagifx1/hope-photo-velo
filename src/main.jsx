@@ -393,15 +393,25 @@ function App() {
             <button onClick={() => nav('pricing')}>{t.nav.pricing}</button>
             <button onClick={() => nav('testimonials')}>{t.nav.testimonials}</button>
             <button onClick={() => nav('faq')}>{t.nav.faq}</button>
-            <a href={`tel:${PHONE_LINK}`}><Phone size={14} />{t.nav.call}</a>
+            <a className="mobile-menu-call" href={`tel:${PHONE_LINK}`}><Phone size={15} /> {PHONE_DISPLAY}</a>
           </nav>
           <div className="header-right">
+            <a className="header-call-btn" href={`tel:${PHONE_LINK}`} aria-label="Call HOPE">
+              <Phone size={15} />
+              <span className="call-text">{PHONE_DISPLAY}</span>
+            </a>
             <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
-              <Globe size={15} />{lang === 'am' ? 'EN' : 'አማ'}
+              <Globe size={15} />
+              <span>{lang === 'am' ? 'EN' : 'አማ'}</span>
             </button>
-            <button className="header-book" onClick={() => openBooking()}>{t.bookBtn} <ArrowDownRight size={17} /></button>
+            <button className="header-book" onClick={() => openBooking()}>
+              <span>{t.bookBtn}</span>
+              <CalendarDays size={15} />
+            </button>
+            <button className="menu-button icon-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
-          <button className="menu-button icon-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">{menuOpen ? <X /> : <Menu />}</button>
         </header>
 
         {/* ── HERO — Reference design: centered headline + inline photos + strip ── */}

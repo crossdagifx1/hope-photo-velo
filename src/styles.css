@@ -66,13 +66,32 @@ img { display:block; max-width:100%; }
 .nav-links button, .nav-links a, .footer-links button, .footer-links a { padding:0; border:0; background:transparent; font:800 12px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; transition:color .2s; }
 .nav-links a { display:flex; align-items:center; gap:.4rem; color:var(--red); }
 .nav-links button:hover, .nav-links a:hover, .footer-links button:hover, .footer-links a:hover { color:var(--red); }
-.header-right { display:flex; align-items:center; gap:.8rem; }
-.lang-toggle { display:inline-flex; align-items:center; gap:.4rem; min-height:38px; padding:0 .9rem; border:1.5px solid var(--line); background:transparent; color:var(--ink); font:800 11.5px 'DM Mono',monospace; letter-spacing:.07em; text-transform:uppercase; transition:all .2s; }
+.header-right { display:flex; align-items:center; gap:.7rem; }
+.header-call-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 42px;
+  padding: 0 .9rem;
+  border: 1.5px solid var(--line);
+  color: var(--ink);
+  font: 800 12px 'DM Mono', monospace;
+  letter-spacing: .06em;
+  transition: all .2s;
+  background: transparent;
+}
+.header-call-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(185,37,57,.04);
+}
+.lang-toggle { display:inline-flex; align-items:center; gap:.4rem; min-height:42px; padding:0 .9rem; border:1.5px solid var(--line); background:transparent; color:var(--ink); font:800 11.5px 'DM Mono',monospace; letter-spacing:.07em; text-transform:uppercase; transition:all .2s; }
 .lang-toggle:hover { border-color:var(--red); color:var(--red); }
-.header-book, .primary-button { display:inline-flex; align-items:center; justify-content:center; gap:.7rem; min-height:52px; padding:0 1.6rem; border:0; background:var(--ink); color:#fff; font:800 13px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; transition:transform .2s var(--ease), background .2s; }
-.header-book { min-height:44px; padding:0 1.2rem; background:var(--red); font-size:12px; }
+.header-book, .primary-button { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:52px; padding:0 1.4rem; border:0; background:var(--ink); color:#fff; font:800 13px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; transition:transform .2s var(--ease), background .2s; }
+.header-book { min-height:42px; padding:0 1.2rem; background:var(--red); font-size:12px; }
 .header-book:hover, .primary-button:hover { transform:translateY(-2px); background:var(--red-dark); }
-.icon-button, .menu-button { width:46px; height:46px; display:none; align-items:center; justify-content:center; border:1.5px solid var(--line); background:transparent; }
+.icon-button, .menu-button { width:42px; height:42px; display:none; align-items:center; justify-content:center; border:1.5px solid var(--line); background:transparent; }
+
 
 /* ── HERO ── */
 .hero { padding:5.5rem 8vw 0; background:var(--paper); }
@@ -444,7 +463,7 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 /* ── 900px BREAKPOINT ── */
 @media (max-width:900px) {
   .nav-links { gap:1.2rem; }
-  .header-book { display:none; }
+  .header-call-btn .call-text { display: none; }
   .hero { padding:4rem 5vw 0; }
   .hero-strip { grid-template-columns:1fr 1fr; height:auto; gap:8px; }
   .hero-strip-1, .hero-strip-3 { margin-top:0; }
@@ -464,11 +483,14 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 /* ── 680px MOBILE BREAKPOINT ── */
 @media (max-width:680px) {
   .announcement { padding:0 1rem; font-size:10.5px; }
-  .site-header { height:76px; padding:0 1.1rem; }
-  .brand img { width:72px; }
-  .brand span { font-size:9px; }
+  .site-header { height:72px; padding:0 1rem; }
+  .brand img { width:auto; height:44px; }
   .menu-button { display:flex; }
-  .lang-toggle { min-height:34px; padding:0 .7rem; font-size:10.5px; }
+  .lang-toggle { min-height:38px; padding:0 .65rem; font-size:11px; }
+  .header-call-btn { display:none; }
+  .header-book { min-height:38px; padding:0 .9rem; font-size:11px; }
+  .header-right { gap:.4rem; }
+
   .header-right { gap:.5rem; }
   .nav-links {
     width:100%; padding:1.4rem; display:none; position:absolute; top:75px; left:0;
