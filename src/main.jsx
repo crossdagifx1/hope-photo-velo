@@ -382,8 +382,7 @@ function App() {
         {/* ── HEADER ── */}
         <header className="site-header">
           <button className="brand" onClick={() => scrollToSection('home')} aria-label="HOPE">
-            <img src={`${ASSET}/hope-logo.gif`} alt="HOPE" />
-            <span>ፎቶ እና ቪዲዮ</span>
+            <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="brand-logo" />
           </button>
           <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'}>
             <button onClick={() => nav('story')}>{t.nav.about}</button>
@@ -408,7 +407,7 @@ function App() {
         {/* ── HERO — Reference design: centered headline + inline photos + strip ── */}
         <section id="home" className="hero section-anchor">
 
-          {/* Centered headline with inline floating thumbnails */}
+          {/* Centered headline */}
           <div className="hero-text-block">
             <p className="eyebrow hero-eyebrow"><Heart size={13} fill="currentColor" />{t.heroEyebrow}</p>
 
@@ -423,11 +422,7 @@ function App() {
                     ያልፋሉ፤
                   </span>
                   <span className="h1-line h1-line-italic">
-                    ትዝታ ይቀራል
-                    <span className="inline-photo inline-photo-pill" aria-hidden="true">
-                      <img src={galleryImages[1].src} alt="" />
-                    </span>
-                    ።
+                    <em>ትዝታ ይቀራል።</em>
                   </span>
                 </>
               ) : (
@@ -440,11 +435,7 @@ function App() {
                     pass—
                   </span>
                   <span className="h1-line h1-line-italic">
-                    memories
-                    <span className="inline-photo inline-photo-pill" aria-hidden="true">
-                      <img src={galleryImages[1].src} alt="" />
-                    </span>
-                    remain.
+                    <em>memories remain.</em>
                   </span>
                 </>
               )}
@@ -453,14 +444,13 @@ function App() {
             <p className="hero-sub">{t.heroText}</p>
           </div>
 
-          {/* 4-photo bottom strip with rotating badge + bottom-right CTAs */}
+          {/* 4-photo bottom strip + rotating badge + bottom-right CTAs */}
           <div className="hero-strip-wrap">
             <div className="hero-strip">
               {galleryImages.slice(0, 4).map((img, i) => (
                 <div key={i} className={`hero-strip-item hero-strip-${i}`}>
                   <img src={img.src} alt={lang === 'en' ? img.altEn : img.altAm} />
                   {i === 0 && (
-                    /* Rotating circular badge like the reference */
                     <button
                       className="rotating-badge"
                       onClick={() => openBooking()}
@@ -485,7 +475,7 @@ function App() {
               ))}
             </div>
 
-            {/* Bottom-right underlined CTAs (like the reference image) */}
+            {/* Bottom-right underlined CTA links */}
             <div className="hero-strip-links">
               <button className="strip-link" onClick={() => openBooking()}>{t.bookNow}</button>
               <button className="strip-link" onClick={() => scrollToSection('work')}>{t.heroScrollCta}</button>
@@ -493,6 +483,7 @@ function App() {
           </div>
 
         </section>
+
 
         {/* ── STORY / ABOUT ── */}
         <section id="story" className="intro section-anchor">
