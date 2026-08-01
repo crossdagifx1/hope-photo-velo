@@ -376,7 +376,7 @@ function App() {
 
         {/* ── ANNOUNCEMENT ── */}
         <div className="announcement">
-          <Sparkles size={13} /> <span>{t.announce[0]}</span><i /><span>{t.announce[1]}</span>
+          <Heart size={12} fill="currentColor" /> <span>{lang === 'am' ? 'አዲስ አበባ • በፍቅር የተመሠረተ ፎቶግራፊ እና ቪዲዮ' : 'ADDIS ABABA • BUILT ON LOVE PHOTOGRAPHY & VIDEO'}</span>
         </div>
 
         {/* ── HEADER ── */}
@@ -411,88 +411,73 @@ function App() {
           </div>
         </header>
 
-        {/* ── HERO — Premium Split Column Wedding Hero ── */}
-        <section id="home" className="hero-split-section section-anchor">
-          <div className="hero-split-container">
-            {/* Left Column Content */}
-            <div className="hero-left-content">
-              {/* Top Chip / Eyebrow */}
-              <div className="hero-badge-chip">
-                <Heart size={13} fill="#9B1D2D" color="#9B1D2D" />
-                <span>{t.heroEyebrow}</span>
-              </div>
+        {/* ── HERO — Reference Design matching user mock ── */}
+        <section id="home" className="hero hero-ref-design section-anchor">
+          <div className="hero-bg-image" style={{ backgroundImage: `url(${ASSET}/hero-bg.jpg)` }} />
+          <div className="hero-bg-overlay" />
 
-              {/* Main Headline with embedded circular thumbnail */}
-              <h1 className="hero-title-main">
-                {lang === 'am' ? (
-                  <>
-                    <span className="hero-title-row">
-                      ጊዜያት
-                      <span className="hero-inline-avatar">
-                        <img src={galleryImages[3].src} alt="" />
-                      </span>
-                    </span>
-                    <span className="hero-title-row">ያልፋሉ፤</span>
-                    <span className="hero-title-row hero-title-serif">ትዝታ ይቀራል።</span>
-                  </>
-                ) : (
-                  <>
-                    <span className="hero-title-row">
-                      Moments
-                      <span className="hero-inline-avatar">
-                        <img src={galleryImages[3].src} alt="" />
-                      </span>
-                    </span>
-                    <span className="hero-title-row">Pass—</span>
-                    <span className="hero-title-row hero-title-serif">Memories Remain.</span>
-                  </>
-                )}
-              </h1>
-
-              {/* Description Paragraph */}
-              <p className="hero-paragraph-desc">{t.heroText}</p>
-
-              {/* Action CTA Buttons */}
-              <div className="hero-action-buttons">
-                <a href={`tel:${PHONE_LINK}`} className="hero-btn-primary">
-                  <span>{lang === 'am' ? 'አሁኑኑ ይደውሉ' : 'Call Us Now'}</span>
-                </a>
-                <button onClick={() => nav('story')} className="hero-btn-secondary">
-                  <span>{lang === 'am' ? 'ስለ እኛ ይወቁ' : 'About Us'}</span>
-                </button>
-              </div>
+          {/* Left Content Column */}
+          <div className="hero-content-col">
+            <div className="hero-eyebrow-pill">
+              <Heart size={12} fill="#8B1E2D" color="#8B1E2D" />
+              <span>{t.heroEyebrow}</span>
             </div>
 
-            {/* Right Column Hero Image with Floating Glassmorphism Pills */}
-            <div className="hero-right-visual">
-              <div className="hero-image-card">
-                <img
-                  src="/assets/hero-wedding.jpg"
-                  alt="Cinematic Wedding Portrait"
-                  className="hero-wedding-portrait"
-                />
+            <h1 className="hero-h1-ref">
+              {lang === 'am' ? (
+                <>
+                  <span className="h1-row">
+                    ጊዜያት
+                    <span className="h1-circle-avatar">
+                      <img src={galleryImages[0].src} alt="Hope Photo" />
+                    </span>
+                  </span>
+                  <span className="h1-row">ያልፋሉ፤</span>
+                  <span className="h1-row h1-row-highlight">ትዝታ ይቀራል።</span>
+                </>
+              ) : (
+                <>
+                  <span className="h1-row">
+                    Moments
+                    <span className="h1-circle-avatar">
+                      <img src={galleryImages[0].src} alt="Hope Photo" />
+                    </span>
+                  </span>
+                  <span className="h1-row">pass—</span>
+                  <span className="h1-row h1-row-highlight">memories remain.</span>
+                </>
+              )}
+            </h1>
 
-                {/* 4 Floating Glassmorphism Capsules */}
-                <div className="floating-pill pill-top-left">
-                  <span className="pill-icon icon-cyan"><Camera size={14} /></span>
-                  <span className="pill-text">Professional Quality</span>
-                </div>
+            <p className="hero-sub-ref">{t.heroText}</p>
 
-                <div className="floating-pill pill-top-right">
-                  <span className="pill-icon icon-lime"><Sparkles size={14} /></span>
-                  <span className="pill-text">Timeless Memories</span>
-                </div>
+            <div className="hero-cta-group">
+              <button className="hero-btn-primary" onClick={() => openBooking()}>
+                {t.bookNow}
+              </button>
+              <button className="hero-btn-secondary" onClick={() => scrollToSection('story')}>
+                {t.nav.about}
+              </button>
+            </div>
+          </div>
 
-                <div className="floating-pill pill-bottom-left">
-                  <span className="pill-icon icon-gold"><Film size={14} /></span>
-                  <span className="pill-text">Creative Vision</span>
-                </div>
-
-                <div className="floating-pill pill-bottom-right">
-                  <span className="pill-icon icon-rose"><Heart size={14} fill="currentColor" /></span>
-                  <span className="pill-text">Real Moments</span>
-                </div>
-              </div>
+          {/* Floating Pill Badges overlaying background image */}
+          <div className="hero-floating-pills">
+            <div className="hero-pill hero-pill-blue">
+              <span className="pill-icon-circle blue-icon"><Sparkles size={13} /></span>
+              <span>Real Moments</span>
+            </div>
+            <div className="hero-pill hero-pill-lime">
+              <span className="pill-icon-circle lime-icon"><Sparkles size={13} /></span>
+              <span>Timeless Memories</span>
+            </div>
+            <div className="hero-pill hero-pill-green">
+              <span className="pill-icon-circle green-icon"><Camera size={13} /></span>
+              <span>Creative Vision</span>
+            </div>
+            <div className="hero-pill hero-pill-pink">
+              <span className="pill-icon-circle pink-icon"><Film size={13} /></span>
+              <span>Professional Quality</span>
             </div>
           </div>
         </section>
