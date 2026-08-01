@@ -291,22 +291,102 @@ img { display:block; max-width:100%; }
 .hero-pill-green { top: 78%; left: 46%; animation-delay: 2.4s; }
 .hero-pill-pink { top: 82%; left: 66%; animation-delay: 3.6s; }
 
-/* Responsive mobile adjustments */
+/* Responsive mobile & tablet adjustments */
 @media (max-width: 900px) {
   .hero-ref-design {
-    min-height: auto;
-    padding: 3rem 5vw 4rem;
+    min-height: 100vh;
+    padding: 2rem 1.2rem 3rem;
+    display: flex;
     flex-direction: column;
+    justify-content: flex-end;
   }
   .hero-bg-image {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 380px;
-    margin-top: 2rem;
-    border-radius: 16px;
+    height: 100%;
+    background-size: cover;
+    background-position: center top;
+    z-index: 1;
   }
-  .hero-bg-overlay { display: none; }
-  .hero-floating-pills { display: none; }
+  .hero-bg-overlay {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(251, 248, 243, 0.94) 0%,
+      rgba(251, 248, 243, 0.85) 32%,
+      rgba(30, 24, 22, 0.45) 65%,
+      rgba(20, 15, 13, 0.82) 100%
+    );
+    z-index: 2;
+  }
+  .hero-content-col {
+    max-width: 100%;
+    width: 100%;
+    margin-top: 5rem;
+  }
+  .hero-h1-ref {
+    font-size: clamp(2.4rem, 9vw, 3.8rem);
+    color: #1e1816;
+  }
+  .hero-sub-ref {
+    color: #f5f0eb;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    font-size: 1.05rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-floating-pills {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    pointer-events: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: center;
+    margin: 1rem 0 2.2rem;
+    z-index: 4;
+  }
+  .hero-pill {
+    position: relative;
+    top: auto !important;
+    left: auto !important;
+    animation: none;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #ffffff;
+    font-size: 12px;
+    padding: 0.45rem 0.95rem;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+  }
+  .hero-cta-group {
+    width: 100%;
+    display: flex;
+    gap: 0.8rem;
+  }
+  .hero-btn-primary, .hero-btn-secondary {
+    flex: 1;
+    padding: 0.9rem 0.5rem;
+    font-size: 13px;
+    text-align: center;
+    justify-content: center;
+  }
+  .hero-btn-secondary {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+  }
 }
 
 /* ── photo strip wrapper ── */
@@ -642,21 +722,26 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   .site-header { height:72px; padding:0 1rem; }
   .brand img { width:auto; height:44px; }
   .menu-button { display:flex; }
-  .header-call-btn {
-    min-height: 38px;
-    width: 38px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1.5px solid var(--line);
-    color: var(--red);
-    background: rgba(185,37,57,.06);
-    border-radius: 4px;
+  .header-call-btn { display: none; }
+  .header-book { display: none; }
+  .lang-toggle {
+    min-height: 42px;
+    padding: 0 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(30,24,22,0.2);
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(8px);
   }
-  .header-call-btn .call-text { display: none; }
-  .header-book { min-height:38px; padding:0 .8rem; font-size:11px; }
-  .header-right { gap:.45rem; }
+  .menu-button {
+    display: flex;
+    min-height: 42px;
+    width: 42px;
+    border-radius: 8px;
+    border: 1px solid rgba(30,24,22,0.2);
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(8px);
+  }
+  .header-right { gap: 0.6rem; }
   .nav-links {
     width:100%; padding:1.4rem; display:none; position:absolute; top:75px; left:0;
     flex-direction:column; align-items:stretch; gap:0; background:#fffdf9;
