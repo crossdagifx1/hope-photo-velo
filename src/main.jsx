@@ -24,6 +24,12 @@ const T = {
     heroH1a: 'ጊዜያት ያልፋሉ፤',
     heroH1b: 'እኛ ትዝታ አድርገን እናስቀራቸዋለን።',
     heroText: 'ለእርስዎ ልዩ እና የማይረሱ በዓላት የተዘጋጁ ፕሮፌሽናል የፎቶ፣ ቪዲዮ እና የሕትመት አገልግሎቶች።',
+    heroPills: {
+      real: 'እውነተኛ አፍታዎች',
+      timeless: 'ዘላቂ ትዝታዎች',
+      vision: 'ልዩ ፈጠራ',
+      quality: 'ፕሮፌሽናል ጥራት',
+    },
     bookNow: 'ቀንዎን አሁኑኑ ያስይዙ',
     call: 'ደውሉ',
     heroProof: ['የ 9 ዓመታት', 'የውብ ትዝታዎች', 'ማህደር እና ታማኝነት።'],
@@ -128,7 +134,13 @@ const T = {
     heroEyebrow: 'Addis Ababa • Founded in Love',
     heroH1a: 'Moments pass—',
     heroH1b: 'we make them last forever.',
-    heroText: 'Professional photography, videography & print services crafted for your most unforgettable celebrations.',
+    heroText: 'Professional photography, videography, and album printing tailored for your special celebrations.',
+    heroPills: {
+      real: 'Real Moments',
+      timeless: 'Timeless Memories',
+      vision: 'Creative Vision',
+      quality: 'Professional Quality',
+    },
     bookNow: 'Book Your Date Now',
     call: 'Call',
     heroProof: ['9+ Years', 'of Beautiful Memories', 'Preserved with Care.'],
@@ -465,19 +477,19 @@ function App() {
           <div className="hero-floating-pills">
             <div className="hero-pill hero-pill-blue">
               <span className="pill-icon-circle blue-icon"><Sparkles size={13} /></span>
-              <span>Real Moments</span>
+              <span>{t.heroPills.real}</span>
             </div>
             <div className="hero-pill hero-pill-lime">
               <span className="pill-icon-circle lime-icon"><Sparkles size={13} /></span>
-              <span>Timeless Memories</span>
+              <span>{t.heroPills.timeless}</span>
             </div>
             <div className="hero-pill hero-pill-green">
               <span className="pill-icon-circle green-icon"><Camera size={13} /></span>
-              <span>Creative Vision</span>
+              <span>{t.heroPills.vision}</span>
             </div>
             <div className="hero-pill hero-pill-pink">
               <span className="pill-icon-circle pink-icon"><Film size={13} /></span>
-              <span>Professional Quality</span>
+              <span>{t.heroPills.quality}</span>
             </div>
           </div>
         </section>
