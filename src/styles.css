@@ -307,7 +307,7 @@ img { display:block; max-width:100%; }
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: center top;
+    background-position: 82% 0%;
     z-index: 1;
   }
   .hero-bg-overlay {
@@ -319,17 +319,17 @@ img { display:block; max-width:100%; }
     height: 100%;
     background: linear-gradient(
       180deg,
-      rgba(251, 248, 243, 0.94) 0%,
-      rgba(251, 248, 243, 0.85) 32%,
-      rgba(30, 24, 22, 0.45) 65%,
-      rgba(20, 15, 13, 0.82) 100%
+      rgba(251, 248, 243, 0.82) 0%,
+      rgba(251, 248, 243, 0.45) 38%,
+      rgba(20, 15, 13, 0.35) 70%,
+      rgba(15, 10, 8, 0.72) 100%
     );
     z-index: 2;
   }
   .hero-content-col {
-    max-width: 100%;
+    max-width: 86%;
     width: 100%;
-    margin-top: 5rem;
+    margin-top: 4.5rem;
   }
   .hero-h1-ref {
     font-size: clamp(2.4rem, 9vw, 3.8rem);
