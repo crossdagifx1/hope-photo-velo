@@ -308,20 +308,6 @@ img { display:block; max-width:100%; }
   .hero-bg-overlay { display: none; }
   .hero-floating-pills { display: none; }
 }
-  border-radius: 9999px;
-}
-.inline-photo img,
-.inline-photo-pill img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center top;
-  filter: saturate(.88);
-}
-@keyframes float-badge {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
 
 /* ── photo strip wrapper ── */
 .hero-strip-wrap { position: relative; padding-bottom: 3.5rem; }
