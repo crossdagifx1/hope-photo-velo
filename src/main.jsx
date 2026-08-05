@@ -469,9 +469,18 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
   const submit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+
+    const servicesDetails = selectedPackage?.servicesList?.length
+      ? `\n\n📋 Included Services (${selectedPackage.servicesList.length}):\n` + selectedPackage.servicesList.join('\n')
+      : selectedPackage?.includes?.length
+      ? `\n\n📋 Included Features:\n` + selectedPackage.includes.map(inc => `• ${inc}`).join('\n')
+      : '';
+
     const formattedMessage = `📸 NEW BOOKING REQUEST — HOPE PHOTO & VELO\n\n` +
-      `📦 Service/Package: ${pkgName}\n` +
-      `👤 Name: ${form.name}\n` +
+      `📦 Package: ${pkgName}\n` +
+      `💰 Total Price: ${selectedPackage?.price ? selectedPackage.price + ' ETB' : 'Custom'}` +
+      servicesDetails + `\n\n` +
+      `👤 Client Name: ${form.name}\n` +
       `📅 Target Date: ${form.date}\n` +
       `📞 Phone: ${form.phone}\n` +
       `📝 Note / Details: ${form.note || 'N/A'}`;
@@ -563,9 +572,10 @@ function PricingExplorer({ lang, openBooking }) {
 
   const bookPkg = {
     name:   `${lang === 'am' ? 'ካስተም ፓኬጅ' : lang === 'om' ? 'Paakeejii Addaa' : 'Custom Package'} (${selSvcs.length})`,
-    nameEn: `Custom: ${selSvcs.map(s => s.labelEn).join(', ')}`,
-    nameOm: `Paakeejii: ${selSvcs.map(s => s.labelOm).join(', ')}`,
+    nameEn: `Custom Package (${selSvcs.length} Services)`,
+    nameOm: `Paakeejii Addaa (${selSvcs.length})`,
     price:  totalPrice.toLocaleString(),
+    servicesList: selSvcs.map(s => `${lang === 'en' ? s.labelEn : lang === 'om' ? s.labelOm : s.labelAm} (${s.labelAm}) — ${(s.price).toLocaleString()} ETB`),
   };
 
   return (
