@@ -859,7 +859,7 @@ function App() {
 
           {/* Full-width Gallery proof strip at bottom of hero section */}
           <div className="hero-proof-strip">
-            {[galleryImages[0], galleryImages[6], galleryImages[8]].map((img, i) => (
+            {[galleryImages[0], galleryImages[1], galleryImages[3]].map((img, i) => (
               <div key={i} className="hero-proof-tile">
                 <img
                   src={img.src}
