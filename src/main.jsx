@@ -828,6 +828,8 @@ function App() {
                   <img
                     src={img.src}
                     alt={lang === 'en' ? img.altEn : lang === 'om' ? img.altOm : img.altAm}
+                    loading="eager"
+                    decoding="async"
                   />
                 </div>
               ))}
