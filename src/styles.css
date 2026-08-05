@@ -110,10 +110,10 @@ img { display:block; max-width:100%; }
   position: absolute;
   top: 0;
   right: 0;
-  width: 62%;
+  width: 54%;
   height: 100%;
   background-size: cover;
-  background-position: center top;
+  background-position: 68% 10%;
   z-index: 1;
 }
 
@@ -126,9 +126,9 @@ img { display:block; max-width:100%; }
   background: linear-gradient(
     90deg,
     #FBF8F3 0%,
-    #FBF8F3 40%,
-    rgba(251, 248, 243, 0.85) 52%,
-    rgba(251, 248, 243, 0.25) 75%,
+    #FBF8F3 44%,
+    rgba(251, 248, 243, 0.82) 56%,
+    rgba(251, 248, 243, 0.15) 78%,
     transparent 100%
   );
   z-index: 2;
@@ -298,10 +298,10 @@ img { display:block; max-width:100%; }
 .green-icon { background: #81C784; }
 .pink-icon { background: #E91E63; }
 
-.hero-pill-blue { top: 50%; left: 50%; animation-delay: 0s; }
-.hero-pill-lime { top: 64%; right: 4%; animation-delay: 1.2s; }
-.hero-pill-green { top: 74%; left: 49%; animation-delay: 2.4s; }
-.hero-pill-pink { top: 78%; left: 70%; animation-delay: 3.6s; }
+.hero-pill-blue { top: 46%; left: 47%; animation-delay: 0s; }
+.hero-pill-lime { top: 54%; right: 5vw; animation-delay: 1.2s; }
+.hero-pill-green { top: 68%; left: 45%; animation-delay: 2.4s; }
+.hero-pill-pink { top: 74%; left: 62%; animation-delay: 3.6s; }
 
 /* Responsive mobile & tablet adjustments */
 @media (max-width: 900px) {
