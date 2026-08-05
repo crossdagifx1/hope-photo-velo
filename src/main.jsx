@@ -122,10 +122,10 @@ const T = {
     bookingSelectedLabel: 'የመረጡት አገልግሎት',
     bookingLabels: ['ሙሉ ስምዎ', 'የበዓሉ ቀን', 'ስልክ ቁጥር', 'ምን እያከበሩ ነው?'],
     bookingPlaceholders: ['ሙሉ ስምዎን እዚህ ያስገቡ', '', '09…', 'ሰርግ፣ የስታዲዮ ቀረጻ፣ ወይም ሌላ ልዩ በዓል...'],
-    bookingSubmit: 'በቴሌግራም ቀጠሮ ይጀምሩ',
+    bookingSubmit: 'ቀጠሮዎን ይላኩ',
     successEyebrow: 'ለመገናኘት ዝግጁ ነን',
-    successH2: 'መልእክትዎ በመላክ ላይ ነው።',
-    successBody: 'የቀጠሮ ዝርዝርዎ በቴሌግራም ተከፍቷል። መልእክቱን ይላኩ፤ የ HOPE ቡድን ቀንዎን ያረጋግጥልዎታል።',
+    successH2: 'ቀጠሮዎ በስኬት ተልኳል።',
+    successBody: 'የቀጠሮ ዝርዝርዎ ቀጥታ ለ HOPE ቡድን ተልኳል። ቡድናችን በአጭር ጊዜ ውስጥ ደውሎ ያረጋግጥልዎታል።',
     backBtn: 'ወደ ዋናው ገጽ ይመለሱ',
     noteName: 'ሙሉ ስም',
   },
@@ -233,10 +233,10 @@ const T = {
     bookingSelectedLabel: 'Selected Service',
     bookingLabels: ['Full Name', 'Event Date', 'Phone Number', 'What are you celebrating?'],
     bookingPlaceholders: ['Enter your full name', '', '09…', 'Wedding, studio shoot, or another special occasion...'],
-    bookingSubmit: 'Start Booking via Telegram',
+    bookingSubmit: 'Submit Booking Request',
     successEyebrow: 'We\'re Ready to Connect',
-    successH2: 'Your message is on its way.',
-    successBody: 'Your appointment details have opened in Telegram. Send the message and the HOPE team will confirm your date.',
+    successH2: 'Booking Request Sent Successfully',
+    successBody: 'Your appointment details have been sent directly to the HOPE team. We will call you shortly to confirm your date.',
     backBtn: 'Return to Homepage',
     noteName: 'Full Name',
   },
@@ -344,10 +344,10 @@ const T = {
     bookingSelectedLabel: 'Tajaajila Filatame',
     bookingLabels: ['Maqaa Guutuu', 'Guyyaa Ayyaanaa', 'Lakkoofsa Bilbilaa', 'Maaliif Kabajju?'],
     bookingPlaceholders: ['Maqaa guutuu keessan asitti galchaa', '', '09…', 'Cidha, suuraa istuudiyoo, ykn ayyaana addaa biroo...'],
-    bookingSubmit: 'Jalqabbii Qalbee Telegram',
+    bookingSubmit: 'Gaaffii Beellamaa Ergaa',
     successEyebrow: 'Nu Waliin Quqnnamuuf Qophiidha',
-    successH2: 'Ergaa keessan ergaramaa jira.',
-    successBody: 'Bal\'inni beellama keessanii Telegram irratti banameera. Ergaa ergaa; gareen HOPE guyyaa keessan ni mirkaneessa.',
+    successH2: 'Gaaffiin Beellamaa Milkaa\'inaan Ergameera',
+    successBody: 'Bal\'inni beellama keessanii kallattiin garee HOPE tiif ergameera. Gareen keenya yeroo dhiyootti isiniif bilbila.',
     backBtn: 'Gara Fuula Dhiyeenyaatti Deebi\'aa',
     noteName: 'Maqaa Guutuu',
   },
@@ -460,35 +460,35 @@ function PageLoader({ onDone }) {
 
 /* ── BOOKING PANEL ─────────────────────────────────────────────────────── */
 function BookingPanel({ selectedPackage, onClose, lang }) {
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: '', date: '', phone: '', note: '' });
+  const [submitted, setSubmitted]   = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [form, setForm]             = useState({ name: '', date: '', phone: '', note: '' });
   const t = T[lang];
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
   const pkgName = lang === 'en' ? (selectedPackage?.nameEn ?? 'HOPE Service') : lang === 'om' ? (selectedPackage?.nameOm ?? 'Tajaajila HOPE') : (selectedPackage?.name ?? 'የ HOPE አገልግሎት');
   const submit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     const formattedMessage = `📸 NEW BOOKING REQUEST — HOPE PHOTO & VELO\n\n` +
       `📦 Service/Package: ${pkgName}\n` +
       `👤 Name: ${form.name}\n` +
       `📅 Target Date: ${form.date}\n` +
       `📞 Phone: ${form.phone}\n` +
       `📝 Note / Details: ${form.note || 'N/A'}`;
-    const encMsg = encodeURIComponent(formattedMessage);
 
-    // Send direct background notification to admin chat ID (5563466567) via Bot API
     try {
-      fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           text: formattedMessage,
         }),
-      }).catch(() => {});
-    } catch (err) {}
-
-    // Also open Telegram app for client
-    window.open(`https://t.me/${TELEGRAM_BOT_NAME}?start=booking&text=${encMsg}`, '_blank', 'noopener,noreferrer');
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    setSubmitting(false);
     setSubmitted(true);
   };
   return (
@@ -524,7 +524,9 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
                     : <input required name={['name','date','phone'][i]} type={i===1?'date':i===2?'tel':'text'} value={form[['name','date','phone'][i]]} onChange={update} placeholder={t.bookingPlaceholders[i]} />}
                 </label>
               ))}
-              <button className="primary-button form-button" type="submit">{t.bookingSubmit} <Send size={17} /></button>
+              <button className="primary-button form-button" type="submit" disabled={submitting}>
+                {submitting ? (lang === 'am' ? 'በመላክ ላይ...' : lang === 'om' ? 'Ergamaa Jira...' : 'Submitting...') : t.bookingSubmit} <Send size={17} />
+              </button>
             </form>
           </>
         )}
