@@ -109,11 +109,11 @@ img { display:block; max-width:100%; }
 .hero-bg-image {
   position: absolute;
   top: 0;
-  right: 1.5vw;
-  width: 56%;
+  right: 0;
+  width: 62%;
   height: 100%;
   background-size: cover;
-  background-position: 50% 10%;
+  background-position: 30% 12%;
   z-index: 1;
 }
 
@@ -419,9 +419,11 @@ img { display:block; max-width:100%; }
   z-index: 4;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  gap: 14px;
   margin-top: 2.4rem;
   width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 .hero-proof-tile {
   height: 220px;
@@ -429,11 +431,12 @@ img { display:block; max-width:100%; }
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,.15);
   flex-shrink: 0;
+  min-width: 0;
 }
 .hero-proof-tile img {
   width: 100%; height: 100%;
   object-fit: cover;
-  object-position: center 22%;
+  object-position: center 30%;
   transition: transform .5s ease;
 }
 .hero-proof-tile:hover img { transform: scale(1.05); }
