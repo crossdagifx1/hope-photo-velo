@@ -94,12 +94,14 @@ img { display:block; max-width:100%; }
 
 
 /* ── HERO REFERENCE DESIGN ── */
+/* ── HERO REFERENCE DESIGN ── */
 .hero-ref-design {
   position: relative;
-  min-height: 86vh;
-  padding: 4rem 6vw 5rem;
+  min-height: 88vh;
+  padding: 3rem 6vw 2.5rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
   overflow: hidden;
   background: var(--paper);
 }
@@ -108,7 +110,7 @@ img { display:block; max-width:100%; }
   position: absolute;
   top: 0;
   right: 0;
-  width: 65%;
+  width: 62%;
   height: 100%;
   background-size: cover;
   background-position: center top;
@@ -124,12 +126,22 @@ img { display:block; max-width:100%; }
   background: linear-gradient(
     90deg,
     #FBF8F3 0%,
-    #FBF8F3 38%,
-    rgba(251, 248, 243, 0.88) 50%,
-    rgba(251, 248, 243, 0.3) 72%,
+    #FBF8F3 40%,
+    rgba(251, 248, 243, 0.85) 52%,
+    rgba(251, 248, 243, 0.25) 75%,
     transparent 100%
   );
   z-index: 2;
+}
+
+.hero-top-row {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 480px;
 }
 
 .hero-content-col {
@@ -176,8 +188,8 @@ img { display:block; max-width:100%; }
 
 .h1-circle-avatar {
   display: inline-block;
-  width: clamp(48px, 5vw, 68px);
-  height: clamp(48px, 5vw, 68px);
+  width: clamp(52px, 5vw, 68px);
+  height: clamp(52px, 5vw, 68px);
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid #fff;
@@ -260,12 +272,12 @@ img { display:block; max-width:100%; }
   align-items: center;
   gap: 0.65rem;
   padding: 0.55rem 1.1rem;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.76);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.9);
   border-radius: 9999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   font: 600 13px 'DM Sans', sans-serif;
   color: #2b231f;
   animation: float-badge 5s ease-in-out infinite alternate;
@@ -286,19 +298,24 @@ img { display:block; max-width:100%; }
 .green-icon { background: #81C784; }
 .pink-icon { background: #E91E63; }
 
-.hero-pill-blue { top: 52%; left: 47%; animation-delay: 0s; }
-.hero-pill-lime { top: 68%; left: 82%; animation-delay: 1.2s; }
-.hero-pill-green { top: 78%; left: 46%; animation-delay: 2.4s; }
-.hero-pill-pink { top: 82%; left: 66%; animation-delay: 3.6s; }
+.hero-pill-blue { top: 50%; left: 50%; animation-delay: 0s; }
+.hero-pill-lime { top: 64%; right: 4%; animation-delay: 1.2s; }
+.hero-pill-green { top: 74%; left: 49%; animation-delay: 2.4s; }
+.hero-pill-pink { top: 78%; left: 70%; animation-delay: 3.6s; }
 
 /* Responsive mobile & tablet adjustments */
 @media (max-width: 900px) {
   .hero-ref-design {
     min-height: 100vh;
-    padding: 6.5rem 1.2rem 3.5rem;
+    padding: 6rem 1.2rem 2.5rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+  }
+  .hero-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: auto;
   }
   .hero-bg-image {
     position: absolute;
@@ -395,20 +412,21 @@ img { display:block; max-width:100%; }
   }
 }
 
-/* ── HERO GALLERY PROOF STRIP ─────────────────────────────────────── */
+/* ── HERO GALLERY PROOF STRIP — Full Width Bottom Grid ── */
 .hero-proof-strip {
+  position: relative;
+  z-index: 4;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 2.5rem;
+  gap: 16px;
+  margin-top: 2.4rem;
   width: 100%;
-  max-width: 520px;
 }
 .hero-proof-tile {
-  height: 160px;
-  border-radius: 10px;
+  height: 220px;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 8px 22px rgba(0,0,0,.14);
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
   flex-shrink: 0;
 }
 .hero-proof-tile img {
@@ -417,20 +435,20 @@ img { display:block; max-width:100%; }
   object-position: center top;
   transition: transform .5s ease;
 }
-.hero-proof-tile:hover img { transform: scale(1.06); }
-.hero-proof-tile:nth-child(2) { margin-top: 14px; }
+.hero-proof-tile:hover img { transform: scale(1.05); }
+.hero-proof-tile:nth-child(2) { margin-top: 0; }
+
 @media (max-width: 900px) {
   .hero-proof-strip {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     margin-top: 1.6rem;
-    max-width: 100%;
+    width: 100%;
   }
   .hero-proof-tile {
-    height: 110px;
+    height: 140px;
   }
-  .hero-proof-tile:nth-child(2) { margin-top: 0; }
 }
 
 /* ── photo strip wrapper ── */

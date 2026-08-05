@@ -766,94 +766,97 @@ function App() {
           <div className="hero-bg-image" style={{ backgroundImage: `url(${ASSET}/hero-bg.jpg)` }} />
           <div className="hero-bg-overlay" />
 
-          {/* Left Content Column */}
-          <div className="hero-content-col">
-            <div className="hero-eyebrow-pill">
-              <Heart size={12} fill="#8B1E2D" color="#8B1E2D" />
-              <span>{t.heroEyebrow}</span>
+          {/* Top Row: Left Text + Right Couple Photo */}
+          <div className="hero-top-row">
+            {/* Left Content Column */}
+            <div className="hero-content-col">
+              <div className="hero-eyebrow-pill">
+                <Heart size={12} fill="#8B1E2D" color="#8B1E2D" />
+                <span>{t.heroEyebrow}</span>
+              </div>
+
+              <h1 className="hero-h1-ref">
+                {lang === 'am' ? (
+                  <>
+                    <span className="h1-row">
+                      ጊዜያት
+                      <span className="h1-circle-avatar">
+                        <img src={galleryImages[0].src} alt="Hope Photo" />
+                      </span>
+                    </span>
+                    <span className="h1-row">ያልፋሉ፤</span>
+                    <span className="h1-row h1-row-highlight">ትዝታ ይቀራል።</span>
+                  </>
+                ) : lang === 'om' ? (
+                  <>
+                    <span className="h1-row">
+                      Yeroon
+                      <span className="h1-circle-avatar">
+                        <img src={galleryImages[0].src} alt="Hope Photo" />
+                      </span>
+                    </span>
+                    <span className="h1-row">ni darba;</span>
+                    <span className="h1-row h1-row-highlight">yaadannoon ni tura.</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="h1-row">
+                      Moments
+                      <span className="h1-circle-avatar">
+                        <img src={galleryImages[0].src} alt="Hope Photo" />
+                      </span>
+                    </span>
+                    <span className="h1-row">pass—</span>
+                    <span className="h1-row h1-row-highlight">memories remain.</span>
+                  </>
+                )}
+              </h1>
+
+              <p className="hero-sub-ref">{t.heroText}</p>
+
+              <div className="hero-cta-group">
+                <button className="hero-btn-primary" onClick={() => openBooking()}>
+                  {t.bookNow}
+                </button>
+                <button className="hero-btn-secondary" onClick={() => scrollToSection('story')}>
+                  {t.nav.about}
+                </button>
+              </div>
             </div>
 
-            <h1 className="hero-h1-ref">
-              {lang === 'am' ? (
-                <>
-                  <span className="h1-row">
-                    ጊዜያት
-                    <span className="h1-circle-avatar">
-                      <img src={galleryImages[0].src} alt="Hope Photo" />
-                    </span>
-                  </span>
-                  <span className="h1-row">ያልፋሉ፤</span>
-                  <span className="h1-row h1-row-highlight">ትዝታ ይቀራል።</span>
-                </>
-              ) : lang === 'om' ? (
-                <>
-                  <span className="h1-row">
-                    Yeroon
-                    <span className="h1-circle-avatar">
-                      <img src={galleryImages[0].src} alt="Hope Photo" />
-                    </span>
-                  </span>
-                  <span className="h1-row">ni darba;</span>
-                  <span className="h1-row h1-row-highlight">yaadannoon ni tura.</span>
-                </>
-              ) : (
-                <>
-                  <span className="h1-row">
-                    Moments
-                    <span className="h1-circle-avatar">
-                      <img src={galleryImages[0].src} alt="Hope Photo" />
-                    </span>
-                  </span>
-                  <span className="h1-row">pass—</span>
-                  <span className="h1-row h1-row-highlight">memories remain.</span>
-                </>
-              )}
-            </h1>
-
-            <p className="hero-sub-ref">{t.heroText}</p>
-
-            <div className="hero-cta-group">
-              <button className="hero-btn-primary" onClick={() => openBooking()}>
-                {t.bookNow}
-              </button>
-              <button className="hero-btn-secondary" onClick={() => scrollToSection('story')}>
-                {t.nav.about}
-              </button>
-            </div>
-
-            {/* Gallery proof strip */}
-            <div className="hero-proof-strip">
-              {[galleryImages[0], galleryImages[6], galleryImages[8]].map((img, i) => (
-                <div key={i} className="hero-proof-tile">
-                  <img
-                    src={img.src}
-                    alt={lang === 'en' ? img.altEn : lang === 'om' ? img.altOm : img.altAm}
-                    loading="eager"
-                    decoding="async"
-                  />
-                </div>
-              ))}
+            {/* Floating Pill Badges overlaying background image */}
+            <div className="hero-floating-pills">
+              <div className="hero-pill hero-pill-blue">
+                <span className="pill-icon-circle blue-icon"><Sparkles size={13} /></span>
+                <span>{t.heroPills.real}</span>
+              </div>
+              <div className="hero-pill hero-pill-lime">
+                <span className="pill-icon-circle lime-icon"><Sparkles size={13} /></span>
+                <span>{t.heroPills.timeless}</span>
+              </div>
+              <div className="hero-pill hero-pill-green">
+                <span className="pill-icon-circle green-icon"><Camera size={13} /></span>
+                <span>{t.heroPills.vision}</span>
+              </div>
+              <div className="hero-pill hero-pill-pink">
+                <span className="pill-icon-circle pink-icon"><Film size={13} /></span>
+                <span>{t.heroPills.quality}</span>
+              </div>
             </div>
           </div>
 
-          {/* Floating Pill Badges overlaying background image */}
-          <div className="hero-floating-pills">
-            <div className="hero-pill hero-pill-blue">
-              <span className="pill-icon-circle blue-icon"><Sparkles size={13} /></span>
-              <span>{t.heroPills.real}</span>
-            </div>
-            <div className="hero-pill hero-pill-lime">
-              <span className="pill-icon-circle lime-icon"><Sparkles size={13} /></span>
-              <span>{t.heroPills.timeless}</span>
-            </div>
-            <div className="hero-pill hero-pill-green">
-              <span className="pill-icon-circle green-icon"><Camera size={13} /></span>
-              <span>{t.heroPills.vision}</span>
-            </div>
-            <div className="hero-pill hero-pill-pink">
-              <span className="pill-icon-circle pink-icon"><Film size={13} /></span>
-              <span>{t.heroPills.quality}</span>
-            </div>
+          {/* Full-width Gallery proof strip at bottom of hero section */}
+          <div className="hero-proof-strip">
+            {[galleryImages[0], galleryImages[6], galleryImages[8]].map((img, i) => (
+              <div key={i} className="hero-proof-tile">
+                <img
+                  src={img.src}
+                  alt={lang === 'en' ? img.altEn : lang === 'om' ? img.altOm : img.altAm}
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+            ))}
           </div>
         </section>
 
