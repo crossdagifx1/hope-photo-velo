@@ -110,10 +110,10 @@ img { display:block; max-width:100%; }
   position: absolute;
   top: 0;
   right: 0;
-  width: 62%;
+  width: 70%;
   height: 100%;
   background-size: cover;
-  background-position: 50% 10%;
+  background-position: 68% 25%;
   z-index: 1;
 }
 
@@ -126,9 +126,9 @@ img { display:block; max-width:100%; }
   background: linear-gradient(
     90deg,
     #FBF8F3 0%,
-    #FBF8F3 40%,
-    rgba(251, 248, 243, 0.85) 50%,
-    rgba(251, 248, 243, 0.2) 70%,
+    #FBF8F3 34%,
+    rgba(251, 248, 243, 0.78) 46%,
+    rgba(251, 248, 243, 0.12) 66%,
     transparent 100%
   );
   z-index: 2;
@@ -158,8 +158,8 @@ img { display:block; max-width:100%; }
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 1.1rem;
-  background: rgba(139, 30, 45, 0.08);
-  border: 1px solid rgba(139, 30, 45, 0.2);
+  background: rgba(168, 27, 52, 0.12);
+  border: 1px solid rgba(168, 27, 52, 0.28);
   border-radius: 9999px;
   color: var(--red);
   font: 700 12px 'DM Sans', sans-serif;
@@ -272,14 +272,15 @@ img { display:block; max-width:100%; }
   align-items: center;
   gap: 0.65rem;
   padding: 0.55rem 1.1rem;
-  background: rgba(255, 255, 255, 0.76);
+  background: rgba(30, 42, 24, 0.68);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.32);
   border-radius: 9999px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
   font: 600 13px 'DM Sans', sans-serif;
-  color: #2b231f;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
   animation: float-badge 5s ease-in-out infinite alternate;
 }
 
@@ -298,10 +299,10 @@ img { display:block; max-width:100%; }
 .green-icon { background: #81C784; }
 .pink-icon { background: #E91E63; }
 
-.hero-pill-blue { top: 44%; left: 45%; animation-delay: 0s; }
-.hero-pill-lime { top: 52%; left: 59%; animation-delay: 1.2s; }
-.hero-pill-green { top: 68%; left: 42%; animation-delay: 2.4s; }
-.hero-pill-pink { top: 76%; left: 56%; animation-delay: 3.6s; }
+.hero-pill-blue { top: 48%; left: 46%; animation-delay: 0s; }
+.hero-pill-lime { top: 56%; left: 64%; animation-delay: 1.2s; }
+.hero-pill-green { top: 70%; left: 45%; animation-delay: 2.4s; }
+.hero-pill-pink { top: 78%; left: 62%; animation-delay: 3.6s; }
 
 /* Responsive mobile & tablet adjustments */
 @media (max-width: 900px) {
@@ -325,7 +326,7 @@ img { display:block; max-width:100%; }
     width: 100%;
     height: 100%;
     background-size: cover;
-    background-position: 52% 10%;
+    background-position: 72% 15%;
     z-index: 1;
   }
   .hero-bg-overlay {
@@ -337,10 +338,10 @@ img { display:block; max-width:100%; }
     height: 100%;
     background: linear-gradient(
       180deg,
-      rgba(251, 248, 243, 0.85) 0%,
-      rgba(251, 248, 243, 0.45) 30%,
-      rgba(20, 15, 13, 0.45) 60%,
-      rgba(251, 248, 243, 0.95) 90%,
+      rgba(251, 248, 243, 0.35) 0%,
+      rgba(251, 248, 243, 0.1) 20%,
+      rgba(15, 12, 10, 0.38) 55%,
+      rgba(251, 248, 243, 0.92) 90%,
       #FBF8F3 100%
     );
     z-index: 2;
@@ -351,13 +352,15 @@ img { display:block; max-width:100%; }
     margin-top: 2rem;
   }
   .hero-eyebrow-pill {
-    background: rgba(168, 27, 52, 0.14);
-    color: var(--red);
-    border: 1px solid rgba(168, 27, 52, 0.3);
+    background: rgba(168, 27, 52, 0.85);
+    color: #ffffff;
+    border: 0;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
   }
   .hero-h1-ref {
     font-size: clamp(2.5rem, 9.5vw, 3.6rem);
-    color: var(--ink);
+    color: #ffffff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.7);
     margin-bottom: 1.2rem;
   }
   .h1-circle-avatar {
@@ -365,8 +368,8 @@ img { display:block; max-width:100%; }
     height: 52px;
   }
   .hero-sub-ref {
-    color: #4a3e36;
-    text-shadow: none;
+    color: #f7f2ed;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.75);
     font-size: 1.05rem;
     margin-bottom: 1.2rem;
     max-width: 100%;
@@ -425,10 +428,10 @@ img { display:block; max-width:100%; }
     box-shadow: 0 6px 20px rgba(168, 27, 52, 0.4);
   }
   .hero-btn-secondary {
-    color: var(--red);
-    border-color: var(--red);
-    background: rgba(139, 30, 45, 0.05);
-    backdrop-filter: blur(8px);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(30, 42, 24, 0.68);
+    backdrop-filter: blur(12px);
   }
 }
 
