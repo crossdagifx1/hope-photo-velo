@@ -110,10 +110,10 @@ img { display:block; max-width:100%; }
   position: absolute;
   top: 0;
   right: 0;
-  width: 70%;
+  width: 65%;
   height: 100%;
   background-size: cover;
-  background-position: 68% 25%;
+  background-position: 70% 20%;
   z-index: 1;
 }
 
@@ -126,12 +126,13 @@ img { display:block; max-width:100%; }
   background: linear-gradient(
     90deg,
     #FBF8F3 0%,
-    #FBF8F3 34%,
-    rgba(251, 248, 243, 0.78) 46%,
-    rgba(251, 248, 243, 0.12) 66%,
+    #FBF8F3 35%,
+    rgba(251, 248, 243, 0.8) 48%,
+    rgba(251, 248, 243, 0.1) 68%,
     transparent 100%
   );
   z-index: 2;
+  pointer-events: none;
 }
 
 .hero-top-row {
