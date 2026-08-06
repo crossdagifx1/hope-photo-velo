@@ -862,22 +862,6 @@ function App() {
           </div>
         </section>
 
-        {/* ── HERO PROOF TILES STRIP — Clean section below hero ── */}
-        <div className="hero-proof-section">
-          <div className="hero-proof-strip">
-            {[galleryImages[0], galleryImages[1], galleryImages[3]].map((img, i) => (
-              <div key={i} className="hero-proof-tile">
-                <img
-                  src={img.src}
-                  alt={lang === 'en' ? img.altEn : lang === 'om' ? img.altOm : img.altAm}
-                  loading="eager"
-                  decoding="async"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
 
         {/* ── STORY / ABOUT ── */}
         <section id="story" className="intro section-anchor">
