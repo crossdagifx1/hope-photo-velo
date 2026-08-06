@@ -12,7 +12,7 @@ const PHONE_DISPLAY     = '09 10 52 69 62';
 const PHONE_LINK        = '+251910526962';
 const TELEGRAM_BOT_TOKEN = '8911456945:AAHHDlGW6-7KPsUwMZvLbAX2EHDXDxAwIzw';
 const TELEGRAM_BOT_NAME  = 'HoopStudioSystemBot';
-const TELEGRAM_CHAT_ID   = '5563466567';
+const TELEGRAM_CHAT_IDS  = ['5563466567', '5473210957'];
 const TELEGRAM_LINK      = 'https://t.me/HoopStudioSystemBot';
 const ASSET             = '/assets';
 
@@ -486,14 +486,18 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
       `📝 Note / Details: ${form.note || 'N/A'}`;
 
     try {
-      await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: formattedMessage,
-        }),
-      });
+      await Promise.all(
+        TELEGRAM_CHAT_IDS.map(chat_id =>
+          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id,
+              text: formattedMessage,
+            }),
+          })
+        )
+      );
     } catch (err) {
       console.error(err);
     }
