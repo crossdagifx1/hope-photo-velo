@@ -98,7 +98,7 @@ img { display:block; max-width:100%; }
 .hero-ref-design {
   position: relative;
   min-height: 88vh;
-  padding: 3rem 6vw 2.5rem;
+  padding: 1.2rem 6vw 2.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -114,7 +114,7 @@ img { display:block; max-width:100%; }
   width: 100%;
   height: 100%;
   background-size: cover;
-  background-position: 60% center;
+  background-position: 58% center;
   z-index: 1;
 }
 
@@ -126,10 +126,10 @@ img { display:block; max-width:100%; }
   height: 100%;
   background: linear-gradient(
     90deg,
-    rgba(251, 248, 243, 0.94) 0%,
-    rgba(251, 248, 243, 0.72) 28%,
-    rgba(251, 248, 243, 0.22) 48%,
-    transparent 72%
+    rgba(251, 248, 243, 0.62) 0%,
+    rgba(251, 248, 243, 0.32) 25%,
+    rgba(251, 248, 243, 0.08) 50%,
+    transparent 75%
   );
   z-index: 2;
   pointer-events: none;
