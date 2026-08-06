@@ -779,7 +779,7 @@ function App() {
 
         {/* ── HERO — Reference Design matching user mock ── */}
         <section id="home" className="hero hero-ref-design section-anchor">
-          <div className="hero-bg-image" style={{ backgroundImage: `url(${ASSET}/hero-bg.jpg)` }} />
+          <div className="hero-bg-image" style={{ backgroundImage: `url(${ASSET}/bg.png)` }} />
           <div className="hero-bg-overlay" />
 
           {/* Top Row: Left Text + Right Couple Photo */}
