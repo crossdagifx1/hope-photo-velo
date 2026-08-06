@@ -860,8 +860,10 @@ function App() {
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Full-width Gallery proof strip at bottom of hero section */}
+        {/* ── HERO PROOF TILES STRIP — Clean section below hero ── */}
+        <div className="hero-proof-section">
           <div className="hero-proof-strip">
             {[galleryImages[0], galleryImages[1], galleryImages[3]].map((img, i) => (
               <div key={i} className="hero-proof-tile">
@@ -874,7 +876,7 @@ function App() {
               </div>
             ))}
           </div>
-        </section>
+        </div>
 
 
         {/* ── STORY / ABOUT ── */}
