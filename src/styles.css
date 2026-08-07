@@ -436,14 +436,17 @@ img { display:block; max-width:100%; }
   }
 }
 
-/* ── STORY PROOF STRIP — Full Width Grid at Top of Story Section ── */
-.story-proof-strip {
-  grid-column: 1 / -1;
+/* ── HERO PROOF STRIP — Directly Connected inside Hero Section ── */
+.hero-proof-strip {
+  position: relative;
+  z-index: 4;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+  margin-top: 1.8rem;
   width: 100%;
-  margin-bottom: 3.5rem;
+  max-width: 100%;
+  overflow: hidden;
 }
 .hero-proof-tile {
   height: 230px;

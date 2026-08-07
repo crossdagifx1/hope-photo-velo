@@ -860,13 +860,9 @@ function App() {
               </div>
             </div>
           </div>
-        </section>
 
-
-        {/* ── STORY / ABOUT ── */}
-        <section id="story" className="intro section-anchor">
-          {/* 3 Featured Proof Images Row at top of story section */}
-          <div className="story-proof-strip">
+          {/* Connected 3 Proof Tiles at bottom of hero section */}
+          <div className="hero-proof-strip">
             {[galleryImages[0], galleryImages[1], galleryImages[3]].map((img, i) => (
               <div key={i} className="hero-proof-tile">
                 <img
@@ -878,7 +874,10 @@ function App() {
               </div>
             ))}
           </div>
+        </section>
 
+        {/* ── STORY / ABOUT ── */}
+        <section id="story" className="intro section-anchor">
           <div className="intro-side"><p className="eyebrow">{t.storyEyebrow}</p><span className="tall-line" /></div>
           <Reveal className="intro-copy">
             <p className="script">{t.storyScript}</p>
