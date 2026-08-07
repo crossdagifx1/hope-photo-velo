@@ -865,6 +865,20 @@ function App() {
 
         {/* ── STORY / ABOUT ── */}
         <section id="story" className="intro section-anchor">
+          {/* 3 Featured Proof Images Row at top of story section */}
+          <div className="story-proof-strip">
+            {[galleryImages[0], galleryImages[1], galleryImages[3]].map((img, i) => (
+              <div key={i} className="hero-proof-tile">
+                <img
+                  src={img.src}
+                  alt={lang === 'en' ? img.altEn : lang === 'om' ? img.altOm : img.altAm}
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+            ))}
+          </div>
+
           <div className="intro-side"><p className="eyebrow">{t.storyEyebrow}</p><span className="tall-line" /></div>
           <Reveal className="intro-copy">
             <p className="script">{t.storyScript}</p>
