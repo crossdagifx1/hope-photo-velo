@@ -85,10 +85,16 @@ const T = {
       { num: '03', title: 'የሰርጉ ቀን ሙሉ ሽፋን', desc: 'ፕሮፌሽናል ቡድናችን የሰርጉን ቀን ውበት፣ ደስታ እና ድንቅ አፍታዎች ሙሉ በሙሉ ይቀርጻል።' },
       { num: '04', title: 'የሕትመት እና ኤዲቲንግ ማስረከብ', desc: 'ከፍተኛ ጥራት ያላቸው ላሚኔት አልበሞች፣ የቦርድ ፎቶዎች እና የተቀነባበሩ ቪዲዮዎችን ማስረከብ።' },
     ],
-    pricingEyebrow: 'የ HOPE ይፋዊ የዋጋ እና የፓኬጅ ዝርዝር',
-    pricingH2a: 'የተሟሉ እና ደረጃቸውን የጠበቁ',
-    pricingH2b: 'የአገልግሎት ፓኬጆች።',
-    pricingNote: 'የሰርግ ቪዲዮ፣ የስቱዲዮ ቀረጻ፣ የመስክ የቅንጦት እና ልዩ ፓኬጆችን ይመልከቱ። ሁሉም ፓኬጆች በግልጽ የተቀመጡ አገልግሎቶችና ጥራት ያላቸው ናቸው።',
+    pricingEyebrow: 'የእኛ ፓኬጆች • OUR PACKAGES',
+    pricingH2a: 'ለታሪክዎ የሚመጥን',
+    pricingH2b: 'ፍጹም ፓኬጅ ይምረጡ።',
+    pricingNote: 'ሰርግ፣ ልዩ በዓል፣ የስታዲዮ ቀረጻ ወይም የቪዲዮ ፕሮዳክሽን — ለእርስዎ ፍላጎት የሚሆን ትክክለኛ ፓኬጅ አዘጋጅተናል።',
+    pricingScript: 'ለእያንዳንዱ ልዩ አፍታዎ የተዘጋጀ ፕሮፌሽናል ፎቶ እና ቪዲዮ',
+    pricingStartingFrom: 'መነሻ ዋጋ',
+    pricingBookBtn: 'ይህንን ፓኬጅ ያስይዙ',
+    pricingNeedSpecial: 'ልዩ ፍላጎት አለዎት?',
+    pricingCustomNote: 'ለሰርግ፣ ለትላልቅ ሁነቶች እና ለድርጅቶች የሚሆኑ አማራጮችንም እናዘጋጃለን።',
+    pricingContactBtn: 'አግኙን',
     pkgPopular: 'በጣም የተወደደ',
     pkgCta: 'ይህንን ፓኬጅ ያስይዙ',
     priceDisclaimer: 'ሁሉም ዋጋዎች ይፋዊ የ HOPE ዋጋዎች ናቸው። ቀን ሲያስይዙ የቡድናችን አባላት ደውለው ቀጠሮዎን ያረጋግጣሉ።',
@@ -196,10 +202,16 @@ const T = {
       { num: '03', title: 'Full Wedding Day Coverage', desc: 'Our professional team fully captures the beauty, joy, and special moments of your wedding day.' },
       { num: '04', title: 'Albums, Editing & Delivery', desc: 'High-quality laminated albums, board photos, and edited videos delivered to you.' },
     ],
-    pricingEyebrow: 'HOPE Official Packages & Pricing',
-    pricingH2a: 'Curated & Complete',
-    pricingH2b: 'Service Packages.',
-    pricingNote: 'Browse our fixed, all-inclusive packages for Wedding Video, Studio, Luxury Mesk, and Special Keepsakes.',
+    pricingEyebrow: 'OUR PACKAGES',
+    pricingH2a: 'Choose the perfect',
+    pricingH2b: 'package for your story.',
+    pricingNote: 'Whether it\'s a wedding, event, photoshoot or video production, we have the right package to fit your needs.',
+    pricingScript: 'Professional photography & videography for every special moment.',
+    pricingStartingFrom: 'Starting from',
+    pricingBookBtn: 'Book This Package',
+    pricingNeedSpecial: 'Need something special?',
+    pricingCustomNote: 'We also offer custom packages for weddings, events, corporate and more.',
+    pricingContactBtn: 'Contact Us',
     pkgPopular: 'Most Popular',
     pkgCta: 'Book This Package',
     priceDisclaimer: 'All packages are official HOPE standard rates. Upon booking, our team will contact you to confirm your date and schedule.',
@@ -307,10 +319,16 @@ const T = {
       { num: '03', title: 'Uwwisa Guyyaa Cidhaa Guutuu', desc: 'Gareen pirofeeshiinaala keenya bareedina, gammachuu fi yeroowwan addaa guyyaa cidhaa guutummaatti waraaba.' },
       { num: '04', title: 'Albaama, Gulaala fi Kenniinsa', desc: 'Albaamota laamineetii qulqullina ol\'aanaa, suuraa boordii fi viidiyoo gulaalame isiniif kennuu.' },
     ],
-    pricingEyebrow: 'Tarree Gatiiwwan HOPE',
-    pricingH2a: 'Qulqullina Ol\'aanaa fi Guutuu',
-    pricingH2b: 'Paakeejiiwwan Tajaajilaa.',
-    pricingNote: 'Paakeejiiwwan viidiyoo cidhaa, istuudiyoo, mesk qananii fi tajaajiloota addaa filadhaa.',
+    pricingEyebrow: 'PAAKEEJIIWWAN KEENYA',
+    pricingH2a: 'Seenaa keessaniif',
+    pricingH2b: 'paakeejii mudaa hin qabne filadhaa.',
+    pricingNote: 'Cidha, ayyaana addaa, waraabsa istuudiyoo ykn oomisha viidiyoo — fedhii keessaniif kan ta\'u qopheessineerra.',
+    pricingScript: 'Yeroowwan addaa hundumaaf suuraa fi viidiyoo pirofeeshiinaalaa.',
+    pricingStartingFrom: 'Gatii Jalqabaa',
+    pricingBookBtn: 'Paakeejii Kana Qabadhaa',
+    pricingNeedSpecial: 'Waan addaa barbaadduu?',
+    pricingCustomNote: 'Cidhaaf, ayyaanota gurguddoo fi dhaabbataaf qophii addaa ni dhiheessina.',
+    pricingContactBtn: 'Nu Quunnamaa',
     pkgPopular: 'Baay\'ee Kan Jaallatame',
     pkgCta: 'Paakeejii Kana Qabadhaa',
     priceDisclaimer: 'Gatiin hundinuu gatii idilee HOPE ti. Guyyaa qabsiisuun dura gareen keenya isiniif bilbila.',
@@ -353,424 +371,387 @@ const T = {
   },
 };
 
-/* ── OFFICIAL PACKAGES DATA (NO CUSTOMIZER) ────────────────────────────── */
-const PACKAGES_DATA = [
-  // ── WEDDING VIDEO ──
-  {
-    id: 'wedding-bronze',
-    category: 'wedding',
-    catAm: 'የሰርግ ቪዲዮ',
-    catEn: 'Wedding Video',
-    catOm: 'Viidiyoo Cidhaa',
-    nameAm: 'ብሮንዝ ፓኬጅ (Bronze Package)',
-    nameEn: 'Bronze Package — Wedding Video',
-    nameOm: 'Paakeejii Bironzii — Viidiyoo Cidhaa',
-    price: '45,000',
-    priceNum: 45000,
-    featured: false,
-    badgeAm: 'ተመራጭ',
-    badgeEn: 'Essential Choice',
-    badgeOm: 'Barbaachisaa',
-    deliverablesAm: [
-      '2 ፕሮፌሽናል ካሜራዎች (2 Cameras)',
-      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
-      'አመራን ላይቲንግ (Ameran Light)',
-      'ትሬለር ቪዲዮ (Trailer Video)',
-      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
-      'ከለር ግሬዲንግ (Color Grading)',
-      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
-    ],
-    deliverablesEn: [
-      '2 Professional Cameras',
-      'Ronin Gimbal Stabilization',
-      'Ameran Lighting System',
-      'Trailer Video (Highlight Reel)',
-      'Full Edited Cinema Video',
-      'Professional Color Grading',
-      'All Soft Copies Free',
-    ],
-    deliverablesOm: [
-      'Kaameraawwan Pirofeeshiinaalaa 2',
-      'Ronin Gimbal Stabilization',
-      'Ibsaa Ameran Light',
-      'Viidiyoo Trailer (Highlight)',
-      'Viidiyoo Guutummaatti Gulaalame',
-      'Gulaala Halluu (Color Grading)',
-      'Soofti Koppii Hundumtuu Bilisaan',
-    ],
-  },
-  {
-    id: 'wedding-silver',
-    category: 'wedding',
-    catAm: 'የሰርግ ቪዲዮ',
-    catEn: 'Wedding Video',
-    catOm: 'Viidiyoo Cidhaa',
-    nameAm: 'ሲልቨር ፓኬጅ (Silver Package)',
-    nameEn: 'Silver Package — Wedding Video',
-    nameOm: 'Paakeejii Siilvarii — Viidiyoo Cidhaa',
-    price: '60,000',
-    priceNum: 60000,
-    featured: false,
-    badgeAm: 'ተወዳጅ',
-    badgeEn: 'Popular Choice',
-    badgeOm: 'Jaallatamaa',
-    deliverablesAm: [
-      '3 ፕሮፌሽናል ካሜራዎች (3 Cameras)',
-      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
-      'አመራን ላይቲንግ (Ameran Light)',
-      'ትሬለር ቪዲዮ (Trailer Video)',
-      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
-      'ከለር ግሬዲንግ (Color Grading)',
-      '40×60 ቦርድ ፎቶ (40x60 Board)',
-      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
-    ],
-    deliverablesEn: [
-      '3 Professional Cameras',
-      'Ronin Gimbal Stabilization',
-      'Ameran Lighting System',
-      'Trailer Video (Highlight Reel)',
-      'Full Edited Cinema Video',
-      'Professional Color Grading',
-      '40×60 Board Photo',
-      'All Soft Copies Free',
-    ],
-    deliverablesOm: [
-      'Kaameraawwan Pirofeeshiinaalaa 3',
-      'Ronin Gimbal Stabilization',
-      'Ibsaa Ameran Light',
-      'Viidiyoo Trailer (Highlight)',
-      'Viidiyoo Guutummaatti Gulaalame',
-      'Gulaala Halluu (Color Grading)',
-      'Suuraa Boordii 40×60',
-      'Soofti Koppii Hundumtuu Bilisaan',
-    ],
-  },
-  {
-    id: 'wedding-golden-70',
-    category: 'wedding',
-    catAm: 'የሰርግ ቪዲዮ',
-    catEn: 'Wedding Video',
-    catOm: 'Viidiyoo Cidhaa',
-    nameAm: 'ጎልደን ፓኬጅ (Golden Package — 70K)',
-    nameEn: 'Golden Package — 70,000 ETB',
-    nameOm: 'Paakeejii Warqee — 70,000 ETB',
-    price: '70,000',
-    priceNum: 70000,
-    featured: false,
-    badgeAm: 'ፕሪሚየም',
-    badgeEn: 'Premium Choice',
-    badgeOm: 'Piromiyami',
-    deliverablesAm: [
-      '4 ፕሮፌሽናል ካሜራዎች (4 Cameras)',
-      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
-      'አመራን ላይቲንግ (Ameran Light)',
-      'ትሬለር ቪዲዮ (Trailer Video)',
-      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
-      'ከለር ግሬዲንግ (Color Grading)',
-      '30×90 ላሚኔት አልበም (30x90 Laminate Album)',
-      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
-    ],
-    deliverablesEn: [
-      '4 Professional Cameras',
-      'Ronin Gimbal Stabilization',
-      'Ameran Lighting System',
-      'Trailer Video (Highlight Reel)',
-      'Full Edited Cinema Video',
-      'Professional Color Grading',
-      '30×90 Laminate Album',
-      'All Soft Copies Free',
-    ],
-    deliverablesOm: [
-      'Kaameraawwan Pirofeeshiinaalaa 4',
-      'Ronin Gimbal Stabilization',
-      'Ibsaa Ameran Light',
-      'Viidiyoo Trailer (Highlight)',
-      'Viidiyoo Guutummaatti Gulaalame',
-      'Gulaala Halluu (Color Grading)',
-      'Albaama Laamineetii 30×90',
-      'Soofti Koppii Hundumtuu Bilisaan',
-    ],
-  },
-  {
-    id: 'wedding-golden-75',
-    category: 'wedding',
-    catAm: 'የሰርግ ቪዲዮ',
-    catEn: 'Wedding Video',
-    catOm: 'Viidiyoo Cidhaa',
-    nameAm: 'ጎልደን ፕላስ ፓኬጅ (Golden Plus — 75K)',
-    nameEn: 'Golden Plus Package — 75,000 ETB',
-    nameOm: 'Paakeejii Warqee Plus — 75,000 ETB',
-    price: '75,000',
-    priceNum: 75000,
-    featured: true,
-    badgeAm: 'ሙሉ ሽፋን • ምርጥ ምርጫ',
-    badgeEn: 'Most Complete • VIP',
-    badgeOm: 'Guutuu • Filatamaa',
-    deliverablesAm: [
-      '4 ፕሮፌሽናል ካሜራዎች (4 Cameras)',
-      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
-      'አመራን ላይቲንግ (Ameran Light)',
-      'ትሬለር ቪዲዮ (Trailer Video)',
-      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
-      'ከለር ግሬዲንግ (Color Grading)',
-      '30×90 ላሚኔት አልበም (30x90 Laminate Album)',
-      '50×80 ላሚኔት ቦርድ (50x80 Laminate Board)',
-      '40×60 ቦርድ ፎቶ (40x60 Board Photo)',
-      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
-    ],
-    deliverablesEn: [
-      '4 Professional Cameras',
-      'Ronin Gimbal Stabilization',
-      'Ameran Lighting System',
-      'Trailer Video (Highlight Reel)',
-      'Full Edited Cinema Video',
-      'Professional Color Grading',
-      '30×90 Laminate Album',
-      '50×80 Laminate Board',
-      '40×60 Board Photo',
-      'All Soft Copies Free',
-    ],
-    deliverablesOm: [
-      'Kaameraawwan Pirofeeshiinaalaa 4',
-      'Ronin Gimbal Stabilization',
-      'Ibsaa Ameran Light',
-      'Viidiyoo Trailer (Highlight)',
-      'Viidiyoo Guutummaatti Gulaalame',
-      'Gulaala Halluu (Color Grading)',
-      'Albaama Laamineetii 30×90',
-      'Boordii Laamineetii 50×80',
-      'Suuraa Boordii 40×60',
-      'Soofti Koppii Hundumtuu Bilisaan',
-    ],
-  },
-
-  // ── STUDIO PACKAGES ──
-  {
-    id: 'studio-10k',
-    category: 'studio',
-    catAm: 'ስቱዲዮ ቀረጻ',
-    catEn: 'Studio Shoot',
-    catOm: 'Istuudiyoo',
-    nameAm: 'ቤሲክ ስቱዲዮ ፓኬጅ (Studio — 10,000)',
-    nameEn: 'Basic Studio Package — 10,000 ETB',
-    nameOm: 'Paakeejii Istuudiyoo Bu\'uuraa — 10,000 ETB',
-    price: '10,000',
-    priceNum: 10000,
-    featured: false,
-    badgeAm: 'የመነሻ ፓኬጅ',
-    badgeEn: 'Starter Value',
-    badgeOm: 'Jalqabaa',
-    deliverablesAm: [
-      '20 የታተሙ ፎቶዎች (20 Print Photos)',
-      '10 ፖስት ፎቶዎች (10 Post Photos)',
-      'ሜካፕ የተካተተ (Professional Makeup)',
-      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
-    ],
-    deliverablesEn: [
-      '20 Printed Photos',
-      '10 Post-Processed Photos',
-      'Professional Makeup Included',
-      '150 Soft Copies',
-    ],
-    deliverablesOm: [
-      'Suuraawwan Maxxanfaman 20',
-      'Suuraawwan Post 10',
-      'Makeup Pirofeeshiinaalaa',
-      'Soofti Koppii 150',
-    ],
-  },
-  {
-    id: 'studio-145k',
-    category: 'studio',
-    catAm: 'ስቱዲዮ ቀረጻ',
-    catEn: 'Studio Shoot',
-    catOm: 'Istuudiyoo',
-    nameAm: 'ስታንዳርድ ስቱዲዮ ፓኬጅ (Studio — 14,500)',
-    nameEn: 'Standard Studio Package — 14,500 ETB',
-    nameOm: 'Paakeejii Istuudiyoo Istaanfaardii — 14,500 ETB',
-    price: '14,500',
-    priceNum: 14500,
-    featured: false,
-    badgeAm: 'ተወዳጅ',
-    badgeEn: 'Popular Choice',
-    badgeOm: 'Jaallatamaa',
-    deliverablesAm: [
-      '200 የምስጋና ካርዶች (200 Thank-You Cards)',
-      '40×60 ቦርድ ፎቶ (40x60 Board Photo)',
-      'ሜካፕ የተካተተ (Professional Makeup)',
-      '10 ፖስት ፎቶዎች (10 Post Photos)',
-      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
-    ],
-    deliverablesEn: [
-      '200 Thank-You Cards',
-      '40×60 Board Photo',
-      'Professional Makeup Included',
-      '10 Post-Processed Photos',
-      '150 Soft Copies',
-    ],
-    deliverablesOm: [
-      'Kaardiiwwan Galateeffannaa 200',
-      'Suuraa Boordii 40×60',
-      'Makeup Pirofeeshiinaalaa',
-      'Suuraawwan Post 10',
-      'Soofti Koppii 150',
-    ],
-  },
-  {
-    id: 'studio-185k',
-    category: 'studio',
-    catAm: 'ስቱዲዮ ቀረጻ',
-    catEn: 'Studio Shoot',
-    catOm: 'Istuudiyoo',
-    nameAm: 'ፕሪሚየም ስቱዲዮ ፓኬጅ (Studio — 18,500)',
-    nameEn: 'Premium Studio Package — 18,500 ETB',
-    nameOm: 'Paakeejii Istuudiyoo Piromiyami — 18,500 ETB',
-    price: '18,500',
-    priceNum: 18500,
-    featured: true,
-    badgeAm: 'ሙሉ አልበም • ተወዳጅ',
-    badgeEn: 'Best Studio Value',
-    badgeOm: 'Albaama Guutuu',
-    deliverablesAm: [
-      '30×45 ላሚኔት አልበም (10/20 ገጽ)',
-      '1 ሳይን ቦርድ (Sign Board)',
-      '200 የምስጋና ካርዶች (200 Thank-You Cards)',
-      'ሜካፕ የተካተተ (Professional Makeup)',
-      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
-    ],
-    deliverablesEn: [
-      '30×45 Laminate Album (10/20 Pages)',
-      '1 Sign Board',
-      '200 Thank-You Cards',
-      'Professional Makeup Included',
-      '150 Soft Copies',
-    ],
-    deliverablesOm: [
-      'Albaama Laamineetii 30×45 (Fuula 10/20)',
-      'Sign Board 1',
-      'Kaardiiwwan Galateeffannaa 200',
-      'Makeup Pirofeeshiinaalaa',
-      'Soofti Koppii 150',
-    ],
-  },
-
-  // ── LUXURY (MESK) PACKAGES ──
-  {
-    id: 'mesk-16k',
-    category: 'mesk',
-    catAm: 'የመስክ ቀረጻ',
-    catEn: 'Luxury Mesk',
-    catOm: 'Mesk Qananii',
-    nameAm: 'የመስክ የቅንጦት ፓኬጅ (Mesk — 16,000)',
-    nameEn: 'Luxury Mesk Package — 16,000 ETB',
-    nameOm: 'Paakeejii Mesk Qananii — 16,000 ETB',
-    price: '16,000',
-    priceNum: 16000,
-    featured: false,
-    badgeAm: 'የመስክ ቪዲዮ',
-    badgeEn: 'Nature & Outdoor',
-    badgeOm: 'Waraabsa Mesk',
-    deliverablesAm: [
-      'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Video)',
-      '1 ሳይን ቦርድ (Sign Board)',
-      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
-    ],
-    deliverablesEn: [
-      'Cinematic Mesk (Outdoor) Video',
-      '1 Sign Board',
-      '150 Soft Copies',
-    ],
-    deliverablesOm: [
-      'Viidiyoo Sinimaatiikii Mesk (Alaa)',
-      'Sign Board 1',
-      'Soofti Koppii 150',
-    ],
-  },
-  {
-    id: 'mesk-20k',
-    category: 'mesk',
-    catAm: 'የመስክ ቀረጻ',
-    catEn: 'Luxury Mesk',
-    catOm: 'Mesk Qananii',
-    nameAm: 'የመስክ የቅንጦት አልበም ፓኬጅ (Mesk — 20,000)',
-    nameEn: 'Luxury Mesk + Album — 20,000 ETB',
-    nameOm: 'Paakeejii Mesk + Albaama — 20,000 ETB',
-    price: '20,000',
-    priceNum: 20000,
-    featured: true,
-    badgeAm: 'ቪዲዮ + አልበም',
-    badgeEn: 'Video + Album Set',
-    badgeOm: 'Viidiyoo + Albaama',
-    deliverablesAm: [
-      'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Video)',
-      '30×45 ላሚኔት አልበም (30x45 Laminate Album)',
-      '1 ሳይን ቦርድ (Sign Board)',
-      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
-    ],
-    deliverablesEn: [
-      'Cinematic Mesk (Outdoor) Video',
-      '30×45 Laminate Album',
-      '1 Sign Board',
-      '150 Soft Copies',
-    ],
-    deliverablesOm: [
-      'Viidiyoo Sinimaatiikii Mesk (Alaa)',
-      'Albaama Laamineetii 30×45',
-      'Sign Board 1',
-      'Soofti Koppii 150',
-    ],
-  },
-
-  // ── PHOTO / SPECIAL PACKAGE ──
-  {
-    id: 'special-23k',
-    category: 'special',
-    catAm: 'ልዩ ፓኬጅ',
-    catEn: 'Special Keepsake',
-    catOm: 'Paakeejii Addaa',
-    nameAm: 'ልዩ የፎቶ ፓኬጅ (Special Package — 23,000)',
-    nameEn: 'Special Photo Package (2) — 23,000 ETB',
-    nameOm: 'Paakeejii Addaa Suuraa — 23,000 ETB',
-    price: '23,000',
-    priceNum: 23000,
-    featured: true,
-    badgeAm: 'ልዩ ማስታወሻ ስብስብ',
-    badgeEn: 'Complete Keepsake Suite',
-    badgeOm: 'Yaadannoo Addaa',
-    deliverablesAm: [
-      '30×90 ላሚኔት አልበም (10/20 ገጽ)',
-      '50×80 ቦርድ ፎቶ (50x80 Board Photo)',
-      '1 ሳይን ቦርድ (Sign Board)',
-      '200 የምስጋና ካርዶች (200 Thank-You Cards)',
-      '5 ሴቭ ዘ ዴት ፎቶዎች (5 Save-the-Date Photos)',
-      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
-    ],
-    deliverablesEn: [
-      '30×90 Laminate Album (10/20 Pages)',
-      '50×80 Wall Board',
-      '1 Sign Board',
-      '200 Thank-You Cards',
-      '5 Save-the-Date Photos',
-      '150 Soft Copies',
-    ],
-    deliverablesOm: [
-      'Albaama Laamineetii 30×90 (Fuula 10/20)',
-      'Suuraa Boordii 50×80',
-      'Sign Board 1',
-      'Kaardiiwwan Galateeffannaa 200',
-      'Suuraawwan Save-the-date 5',
-      'Soofti Koppii 150',
-    ],
-  },
+/* ── OFFICIAL 3-TIER PACKAGES DATA (CATEGORIZED BY 3) ───────────────────── */
+const CATEGORIES_TABS = [
+  { id: 'studio',       labelAm: 'ስቱዲዮ',              labelEn: 'Studio',                  labelOm: 'Istuudiyoo' },
+  { id: 'wedding',      labelAm: 'የሰርግ ቪዲዮ',          labelEn: 'Wedding Video',           labelOm: 'Viidiyoo Cidhaa' },
+  { id: 'mesk_special', labelAm: 'የመስክ እና ልዩ',         labelEn: 'Luxury Mesk & Special',   labelOm: 'Mesk & Addaa' },
 ];
 
-const PACKAGE_CATEGORIES = [
-  { id: 'all',     Icon: Sparkles, labelAm: 'ሁሉም ፓኬጆች',       labelEn: 'All Packages',      labelOm: 'Hundumaa'        },
-  { id: 'wedding', Icon: Video,    labelAm: 'የሰርግ ቪዲዮ',         labelEn: 'Wedding Video',     labelOm: 'Viidiyoo Cidhaa' },
-  { id: 'studio',  Icon: Camera,   labelAm: 'ስቱዲዮ ቀረጻ',         labelEn: 'Studio Packages',   labelOm: 'Istuudiyoo'      },
-  { id: 'mesk',    Icon: Film,     labelAm: 'የመስክ ቀረጻ (Luxury)', labelEn: 'Luxury (Mesk)',    labelOm: 'Mesk Qananii'    },
-  { id: 'special', Icon: Layers,   labelAm: 'ልዩ ፓኬጅ (Special)',   labelEn: 'Special Package',   labelOm: 'Paakeejii Addaa' },
-];
+const PACKAGES_BY_CATEGORY = {
+  studio: [
+    {
+      id: 'studio-10k',
+      tierAm: 'ቤሲክ',
+      tierEn: 'BASIC',
+      tierOm: 'BU\'UURAA',
+      badgeAm: 'ተወዳጅ',
+      badgeEn: 'Most Popular',
+      badgeOm: 'Jaallatamaa',
+      titleAm: 'የስታዲዮ ቀረጻ (Studio Session)',
+      titleEn: 'Studio Session',
+      titleOm: 'Tajaajila Istuudiyoo',
+      descAm: 'ለጥቃቅን እና ለቀላል የፎቶ ቀረጻዎች ፍጹም ተስማሚ።',
+      descEn: 'Great for small shoots and simple needs.',
+      descOm: 'Waraabsa xixxiqqoo fi fedhii salphaaf mijataa.',
+      price: '10,000',
+      priceNum: 10000,
+      btnStyle: 'dark',
+      isDark: false,
+      deliverablesAm: [
+        '20 የታተሙ ፎቶዎች (20 Print Photos)',
+        '10 ፖስት ፎቶዎች (10 Post Photos)',
+        'ሜካፕ የተካተተ (Professional Makeup)',
+        '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+      ],
+      deliverablesEn: [
+        '20 Print Photos (20 Print Photos)',
+        '10 Post Photos (10 Post Photos)',
+        'Professional Makeup Included',
+        '150 Soft Copies (150 Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Suuraa Maxxanfame 20 (20 Print Photos)',
+        'Suuraa Post 10 (10 Post Photos)',
+        'Makeup Pirofeeshiinaalaa',
+        'Soofti Koppii 150 (150 Soft Copies)',
+      ],
+    },
+    {
+      id: 'studio-145k',
+      tierAm: 'ስታንዳርድ',
+      tierEn: 'STANDARD',
+      tierOm: 'ISTAANDAARDII',
+      badgeAm: 'ምርጥ ዋጋ',
+      badgeEn: 'Best Value',
+      badgeOm: 'Gatii Gaarii',
+      titleAm: 'ስታንዳርድ ስቱዲዮ (Event Coverage)',
+      titleEn: 'Event Coverage',
+      titleOm: 'Uwwisa Ayyaanaa',
+      descAm: 'ለልዩ በዓላት፣ ለፓርቲዎች እና ለፎቶ ቀረጻዎች ተመራጭ።',
+      descEn: 'Perfect for events, parties and special occasions.',
+      descOm: 'Ayyaanota addaa fi qophiilee garaagaraaf kan ta\'u.',
+      price: '14,500',
+      priceNum: 14500,
+      btnStyle: 'outline',
+      isDark: false,
+      deliverablesAm: [
+        '200 የምስጋና ካርዶች (200 Thank-You Cards)',
+        '40×60 ቦርድ ፎቶ (40×60 Board Photo)',
+        'ሜካፕ የተካተተ (Professional Makeup)',
+        '10 ፖስት ፎቶዎች (10 Post Photos)',
+        '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+      ],
+      deliverablesEn: [
+        '200 Print Photos (200 Thank-You Cards)',
+        '40×60 cm Photo (40×60 Board Photo)',
+        'Professional Makeup Included',
+        '10 Post Photos (10 Post Photos)',
+        '150 Soft Copies (150 Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Kaardii Galateeffannaa 200 (Thank-You Cards)',
+        'Suuraa Boordii 40×60 cm',
+        'Makeup Pirofeeshiinaalaa',
+        'Suuraa Post 10 (10 Post Photos)',
+        'Soofti Koppii 150 (150 Soft Copies)',
+      ],
+    },
+    {
+      id: 'studio-185k',
+      tierAm: 'ፕሪሚየም',
+      tierEn: 'PREMIUM',
+      tierOm: 'PIROMIYAMI',
+      badgeAm: 'ምርጥ ምርጫ',
+      badgeEn: 'Best Choice',
+      badgeOm: 'Filatamaa',
+      titleAm: 'ሙሉ ፕሮዳክሽን (Full Production)',
+      titleEn: 'Full Production',
+      titleOm: 'Oomisha Guutuu',
+      descAm: 'የተሟላ እና ደረጃውን የጠበቀ የአልበም ተሞክሮ ለሚፈልጉ።',
+      descEn: 'For those who want the complete experience.',
+      descOm: 'Muuxannoo albaama guutuu fi qulqullina olaanaa barbaadaniif.',
+      price: '18,500',
+      priceNum: 18500,
+      btnStyle: 'red',
+      isDark: true,
+      deliverablesAm: [
+        '30×45 ላሚኔት አልበም (10/20 ገጽ)',
+        '1 ሳይን ቦርድ (Sign Board)',
+        '200 የምስጋና ካርዶች (200 Thank-You Cards)',
+        'ሜካፕ የተካተተ (Professional Makeup)',
+        '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+      ],
+      deliverablesEn: [
+        '30×45 cm Photo Album (10/20 Page)',
+        '1 Sign Board (Sign Board)',
+        '200 Print Photos (200 Thank-You Cards)',
+        'Professional Makeup Included',
+        '150 Soft Copies (150 Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Albaama Laamineetii 30×45 (Fuula 10/20)',
+        'Sign Board 1 (Sign Board)',
+        'Kaardii Galateeffannaa 200 (Thank-You Cards)',
+        'Makeup Pirofeeshiinaalaa',
+        'Soofti Koppii 150 (150 Soft Copies)',
+      ],
+    },
+  ],
+  wedding: [
+    {
+      id: 'wedding-bronze',
+      tierAm: 'ቤሲክ',
+      tierEn: 'BASIC',
+      tierOm: 'BU\'UURAA',
+      badgeAm: 'ተመራጭ',
+      badgeEn: 'Most Popular',
+      badgeOm: 'Barbaachisaa',
+      titleAm: 'ብሮንዝ ፓኬጅ (2 ካሜራ)',
+      titleEn: 'Bronze Package',
+      titleOm: 'Paakeejii Bironzii',
+      descAm: 'የተሟላ የ2 ካሜራ ሲኒማቲክ ሽፋን ለሰርግ በዓል።',
+      descEn: 'Essential 2-camera cinematic coverage for intimate ceremonies.',
+      descOm: 'Uwwisa viidiyoo sinimaatiikii kaameraa 2 cidhaaf.',
+      price: '45,000',
+      priceNum: 45000,
+      btnStyle: 'dark',
+      isDark: false,
+      deliverablesAm: [
+        '2 ፕሮፌሽናል ካሜራዎች (2 Cameras)',
+        'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
+        'አመራን ላይቲንግ (Ameran Light)',
+        'ትሬለር ቪዲዮ + ሙሉ ቪዲዮ (Trailer & Full Edit)',
+        'ከለር ግሬዲንግ (Color Grading)',
+        'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copies Free)',
+      ],
+      deliverablesEn: [
+        '2 Professional Cameras (2 Cameras)',
+        'Ronin Gimbal Stabilization',
+        'Ameran Lighting System',
+        'Trailer Video + Full Edited Cinema Video',
+        'Professional Color Grading',
+        'All Soft Copies Free (Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Kaameraawwan Pirofeeshiinaalaa 2',
+        'Ronin Gimbal Stabilization',
+        'Ibsaa Ameran Light',
+        'Viidiyoo Trailer + Viidiyoo Guutuu',
+        'Gulaala Halluu (Color Grading)',
+        'Soofti Koppii Hundumtuu Bilisaan',
+      ],
+    },
+    {
+      id: 'wedding-silver',
+      tierAm: 'ስታንዳርድ',
+      tierEn: 'STANDARD',
+      tierOm: 'ISTAANDAARDII',
+      badgeAm: 'ተወዳጅ',
+      badgeEn: 'Best Value',
+      badgeOm: 'Jaallatamaa',
+      titleAm: 'ሲልቨር ፓኬጅ (3 ካሜራ + ቦርድ)',
+      titleEn: 'Silver Package',
+      titleOm: 'Paakeejii Siilvarii',
+      descAm: 'በበርካታ አቅጣጫዎች የሚቀረጽ ባለ 3 ካሜራ ሽፋን ከቦርድ ፎቶ ጋር።',
+      descEn: '3-camera multi-angle coverage with wall board photo.',
+      descOm: 'Uwwisa kaameraa 3 suuraa boordii 40×60 waliin.',
+      price: '60,000',
+      priceNum: 60000,
+      btnStyle: 'outline',
+      isDark: false,
+      deliverablesAm: [
+        '3 ፕሮፌሽናል ካሜራዎች (3 Cameras)',
+        'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
+        'አመራን ላይቲንግ (Ameran Light)',
+        'ትሬለር ቪዲዮ + ሙሉ ቪዲዮ (Trailer & Full Edit)',
+        'ከለር ግሬዲንግ (Color Grading)',
+        '40×60 ቦርድ ፎቶ (40×60 Board Photo)',
+        'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copies Free)',
+      ],
+      deliverablesEn: [
+        '3 Professional Cameras (3 Cameras)',
+        'Ronin Gimbal Stabilization',
+        'Ameran Lighting System',
+        'Trailer Video + Full Edited Cinema Video',
+        'Professional Color Grading',
+        '40×60 cm Photo (40×60 Board Photo)',
+        'All Soft Copies Free (Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Kaameraawwan Pirofeeshiinaalaa 3',
+        'Ronin Gimbal Stabilization',
+        'Ibsaa Ameran Light',
+        'Viidiyoo Trailer + Viidiyoo Guutuu',
+        'Gulaala Halluu (Color Grading)',
+        'Suuraa Boordii 40×60 cm',
+        'Soofti Koppii Hundumtuu Bilisaan',
+      ],
+    },
+    {
+      id: 'wedding-golden-75',
+      tierAm: 'ፕሪሚየም',
+      tierEn: 'PREMIUM',
+      tierOm: 'PIROMIYAMI',
+      badgeAm: 'ምርጥ ምርጫ',
+      badgeEn: 'Best Choice',
+      badgeOm: 'Filatamaa',
+      titleAm: 'ጎልደን ፕላስ ፓኬጅ (4 ካሜራ + አልበም + 2 ቦርድ)',
+      titleEn: 'Golden Plus Suite',
+      titleOm: 'Paakeejii Warqee Plus',
+      descAm: 'የተሟላ የ4 ካሜራ ሲኒማቲክ ፊልም ከትልቅ ላሚኔት አልበም እና ሁለት ቦርዶች ጋር።',
+      descEn: 'Ultimate 4-camera cinematic story with luxury album & dual boards.',
+      descOm: 'Viidiyoo sinimaatiikii kaameraa 4, albaama 30×90 fi boordii 2 waliin.',
+      price: '75,000',
+      priceNum: 75000,
+      btnStyle: 'red',
+      isDark: true,
+      deliverablesAm: [
+        '4 ፕሮፌሽናል ካሜራዎች (4 Cameras)',
+        'ሮኒን ጊምባል + አመራን ላይት (Ronin & Ameran)',
+        'ትሬለር ቪዲዮ + ሙሉ ሲኒማ ቪዲዮ (Trailer & Film)',
+        '30×90 ላሚኔት አልበም (30×90 Laminate Album)',
+        '50×80 ላሚኔት ቦርድ + 40×60 ቦርድ (2 Boards)',
+        'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copies Free)',
+      ],
+      deliverablesEn: [
+        '4 Professional Cameras (4 Cameras)',
+        'Ronin Gimbal & Ameran Lighting System',
+        'Trailer Video + Full Edited Cinema Film',
+        '30×90 cm Photo Album (Laminate)',
+        '50×80 cm + 40×60 cm Board Photos',
+        'All Soft Copies Free (Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Kaameraawwan Pirofeeshiinaalaa 4',
+        'Ronin Gimbal & Ameran Light',
+        'Viidiyoo Trailer + Fiilmii Guutuu',
+        'Albaama Laamineetii 30×90 cm',
+        'Boordii Laamineetii 50×80 + Boordii 40×60',
+        'Soofti Koppii Hundumtuu Bilisaan',
+      ],
+    },
+  ],
+  mesk_special: [
+    {
+      id: 'mesk-16k',
+      tierAm: 'ቤሲክ',
+      tierEn: 'BASIC',
+      tierOm: 'BU\'UURAA',
+      badgeAm: 'የመስክ ቪዲዮ',
+      badgeEn: 'Most Popular',
+      badgeOm: 'Waraabsa Mesk',
+      titleAm: 'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Session)',
+      titleEn: 'Mesk Video Session',
+      titleOm: 'Viidiyoo Mesk (Alaa)',
+      descAm: 'ከተፈጥሮ ጋር የተዋሃደ ውብ የመስክ የቪዲዮ ቀረጻ።',
+      descEn: 'Cinematic outdoor video story in scenic landscapes.',
+      descOm: 'Waraabsa viidiyoo sinimaatiikii uumamaa bareedaa.',
+      price: '16,000',
+      priceNum: 16000,
+      btnStyle: 'dark',
+      isDark: false,
+      deliverablesAm: [
+        'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Video)',
+        '1 ሳይን ቦርድ (1 Sign Board)',
+        '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+        'ከለር ግሬዲንግ (Color Grading)',
+      ],
+      deliverablesEn: [
+        'Cinematic Mesk (Outdoor) Video',
+        '1 Sign Board (Sign Board)',
+        '150 Soft Copies (150 Soft Copies)',
+        'Professional Color Grading',
+      ],
+      deliverablesOm: [
+        'Viidiyoo Sinimaatiikii Mesk (Alaa)',
+        'Sign Board 1 (Sign Board)',
+        'Soofti Koppii 150 (150 Soft Copies)',
+        'Gulaala Halluu (Color Grading)',
+      ],
+    },
+    {
+      id: 'mesk-20k',
+      tierAm: 'ስታንዳርድ',
+      tierEn: 'STANDARD',
+      tierOm: 'ISTAANDAARDII',
+      badgeAm: 'ቪዲዮ + አልበም',
+      badgeEn: 'Best Value',
+      badgeOm: 'Gatii Gaarii',
+      titleAm: 'የመስክ ቪዲዮ እና አልበም (Mesk + Album)',
+      titleEn: 'Mesk Video & Album',
+      titleOm: 'Viidiyoo Mesk + Albaama',
+      descAm: 'የመስክ ሲኒማቲክ ቪዲዮ ከተመረጠ ላሚኔት አልበም ጋር።',
+      descEn: 'Outdoor cinematic film paired with fine-art laminate album.',
+      descOm: 'Viidiyoo sinimaatiikii mesk albaama laamineetii waliin.',
+      price: '20,000',
+      priceNum: 20000,
+      btnStyle: 'outline',
+      isDark: false,
+      deliverablesAm: [
+        'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Video)',
+        '30×45 ላሚኔት አልበም (30×45 Laminate Album)',
+        '1 ሳይን ቦርድ (1 Sign Board)',
+        '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+      ],
+      deliverablesEn: [
+        'Cinematic Mesk (Outdoor) Video',
+        '30×45 cm Photo Album (Laminate)',
+        '1 Sign Board (Sign Board)',
+        '150 Soft Copies (150 Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Viidiyoo Sinimaatiikii Mesk (Alaa)',
+        'Albaama Laamineetii 30×45 cm',
+        'Sign Board 1 (Sign Board)',
+        'Soofti Koppii 150 (150 Soft Copies)',
+      ],
+    },
+    {
+      id: 'special-23k',
+      tierAm: 'ፕሪሚየም',
+      tierEn: 'PREMIUM',
+      tierOm: 'PIROMIYAMI',
+      badgeAm: 'ምርጥ ምርጫ',
+      badgeEn: 'Best Choice',
+      badgeOm: 'Filatamaa',
+      titleAm: 'ልዩ የፎቶ ማስታወሻ ፓኬጅ (Special 2)',
+      titleEn: 'Grand Keepsake Suite',
+      titleOm: 'Paakeejii Addaa Suuraa',
+      descAm: 'ትልቅ 30×90 አልበም፣ 50×80 ቦርድ፣ ሴቭ ዘ ዴት እና የምስጋና ካርዶች።',
+      descEn: 'Exclusive 30×90 laminate album, large 50×80 board & save-the-date.',
+      descOm: 'Albaama 30×90, boordii 50×80, kaardiiwwan galateeffannaa fi suuraa addaa.',
+      price: '23,000',
+      priceNum: 23000,
+      btnStyle: 'red',
+      isDark: true,
+      deliverablesAm: [
+        '30×90 ላሚኔት አልበም (10/20 ገጽ)',
+        '50×80 ቦርድ ፎቶ (50×80 Wall Board)',
+        '1 ሳይን ቦርድ (1 Sign Board)',
+        '200 የምስጋና ካርዶች (200 Thank-You Cards)',
+        '5 ሴቭ ዘ ዴት ፎቶዎች (5 Save-the-Date Photos)',
+        '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+      ],
+      deliverablesEn: [
+        '30×90 cm Photo Album (10/20 Page)',
+        '50×80 cm Wall Board (50×80 Board)',
+        '1 Sign Board (Sign Board)',
+        '200 Print Photos (200 Thank-You Cards)',
+        '5 Save-the-Date Photos',
+        '150 Soft Copies (150 Soft Copies)',
+      ],
+      deliverablesOm: [
+        'Albaama Laamineetii 30×90 (Fuula 10/20)',
+        'Suuraa Boordii 50×80 cm',
+        'Sign Board 1 (Sign Board)',
+        'Kaardii Galateeffannaa 200',
+        'Suuraa Save-the-Date 5',
+        'Soofti Koppii 150 (150 Soft Copies)',
+      ],
+    },
+  ],
+};
 
 const galleryImages = [
   ['photo_2026-07-03_20-31-22_7668160935271833600.jpg', 'Golden Hour Love', 'የፀሐይ መግቢያ ፍቅር', 'Jaalala Yeroo Aduu'],
@@ -833,10 +814,10 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const pkgName = lang === 'en'
-    ? (selectedPackage?.nameEn ?? selectedPackage?.name ?? 'HOPE Package')
+    ? (selectedPackage?.titleEn ?? selectedPackage?.nameEn ?? selectedPackage?.name ?? 'HOPE Package')
     : lang === 'om'
-    ? (selectedPackage?.nameOm ?? selectedPackage?.name ?? 'Paakeejii HOPE')
-    : (selectedPackage?.nameAm ?? selectedPackage?.name ?? 'የ HOPE ፓኬጅ');
+    ? (selectedPackage?.titleOm ?? selectedPackage?.nameOm ?? selectedPackage?.name ?? 'Paakeejii HOPE')
+    : (selectedPackage?.titleAm ?? selectedPackage?.nameAm ?? selectedPackage?.name ?? 'የ HOPE ፓኬጅ');
 
   const deliverables = lang === 'en'
     ? (selectedPackage?.deliverablesEn ?? selectedPackage?.deliverablesAm ?? [])
@@ -940,120 +921,114 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
   );
 }
 
-/* ── PACKAGES SECTION (FIXED PACKAGES — NO CUSTOMIZER) ──────────────────── */
+/* ── PACKAGES SECTION (EXACT 3-CARD LAYOUT WITH TOP CATEGORY BUTTONS) ────── */
 function PackagesSection({ lang, openBooking }) {
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState('studio');
   const t = T[lang];
 
-  const filteredPackages = activeCategory === 'all'
-    ? PACKAGES_DATA
-    : PACKAGES_DATA.filter(pkg => pkg.category === activeCategory);
+  const currentCards = PACKAGES_BY_CATEGORY[activeCategory] || PACKAGES_BY_CATEGORY.studio;
 
   return (
     <section id="pricing" className="pricing-packages-section section-anchor">
-      {/* ── Heading ── */}
+      {/* ── Top Header Section (Matching Design Image) ── */}
       <div className="packages-section-head">
         <div className="packages-head-left">
-          <p className="eyebrow">{t.pricingEyebrow}</p>
-          <h2>
+          <p className="pricing-eyebrow-red">{t.pricingEyebrow}</p>
+          <h2 className="pricing-main-h2">
             {t.pricingH2a}
             <br />
-            <em>{t.pricingH2b}</em>
+            <span className="pricing-h2-muted">{t.pricingH2b}</span>
           </h2>
+          <p className="pricing-sub-desc">{t.pricingNote}</p>
         </div>
-        <p className="packages-section-note">{t.pricingNote}</p>
-      </div>
 
-      {/* ── Category Filter Tabs ── */}
-      <div className="pkg-tabs-container">
-        <div className="pkg-tabs-wrapper">
-          {PACKAGE_CATEGORIES.map(cat => {
-            const isActive = activeCategory === cat.id;
-            const count = cat.id === 'all'
-              ? PACKAGES_DATA.length
-              : PACKAGES_DATA.filter(p => p.category === cat.id).length;
-            const label = lang === 'en' ? cat.labelEn : lang === 'om' ? cat.labelOm : cat.labelAm;
-            const Icon = cat.Icon;
-
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                className={`pkg-tab-pill ${isActive ? 'pkg-tab-active' : ''}`}
-                onClick={() => setActiveCategory(cat.id)}
-              >
-                <Icon size={16} />
-                <span>{label}</span>
-                <span className="pkg-tab-count">{count}</span>
-              </button>
-            );
-          })}
+        <div className="packages-head-right">
+          <p className="pricing-script-tag">{t.pricingScript}</p>
+          <div className="pricing-category-pill-nav">
+            {CATEGORIES_TABS.map(cat => {
+              const isActive = activeCategory === cat.id;
+              const label = lang === 'en' ? cat.labelEn : lang === 'om' ? cat.labelOm : cat.labelAm;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  className={`pricing-cat-btn ${isActive ? 'active' : ''}`}
+                  onClick={() => setActiveCategory(cat.id)}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* ── Packages Grid ── */}
-      <div className="packages-cards-grid">
-        {filteredPackages.map((pkg) => {
-          const name = lang === 'en' ? pkg.nameEn : lang === 'om' ? pkg.nameOm : pkg.nameAm;
-          const categoryTag = lang === 'en' ? pkg.catEn : lang === 'om' ? pkg.catOm : pkg.catAm;
+      {/* ── 3 Cards Grid (Categorized by 3) ── */}
+      <div className="pricing-3cards-grid" key={activeCategory}>
+        {currentCards.map((pkg) => {
+          const tier = lang === 'en' ? pkg.tierEn : lang === 'om' ? pkg.tierOm : pkg.tierAm;
           const badge = lang === 'en' ? pkg.badgeEn : lang === 'om' ? pkg.badgeOm : pkg.badgeAm;
+          const title = lang === 'en' ? pkg.titleEn : lang === 'om' ? pkg.titleOm : pkg.titleAm;
+          const desc = lang === 'en' ? pkg.descEn : lang === 'om' ? pkg.descOm : pkg.descAm;
           const deliverables = lang === 'en' ? pkg.deliverablesEn : lang === 'om' ? pkg.deliverablesOm : pkg.deliverablesAm;
 
           return (
             <article
               key={pkg.id}
-              className={`pkg-card ${pkg.featured ? 'pkg-card-featured' : ''}`}
+              className={`pricing-v2-card ${pkg.isDark ? 'card-premium-dark' : 'card-light-tier'}`}
             >
-              {/* Top Meta Bar */}
-              <div className="pkg-card-top">
-                <span className="pkg-card-cat">{categoryTag}</span>
+              {/* Card Header: Tier Label & Pill Badge */}
+              <div className="card-v2-top-bar">
+                <span className="card-v2-tier-tag">{tier}</span>
                 {badge && (
-                  <span className={`pkg-card-badge ${pkg.featured ? 'badge-featured' : ''}`}>
-                    {pkg.featured && <Sparkles size={12} />}
+                  <span className={`card-v2-pill-badge ${pkg.isDark ? 'badge-red-solid' : 'badge-light-subtle'}`}>
                     {badge}
                   </span>
                 )}
               </div>
 
-              {/* Package Title */}
-              <h3 className="pkg-card-title">{name}</h3>
+              {/* Title & Description */}
+              <h3 className="card-v2-title">{title}</h3>
+              <p className="card-v2-desc">{desc}</p>
 
-              {/* Price Tag */}
-              <div className="pkg-card-price-box">
-                <div className="pkg-card-price-row">
-                  <strong className="pkg-card-price-num">{pkg.price}</strong>
-                  <span className="pkg-card-price-currency">ETB</span>
+              {/* Price Display */}
+              <div className="card-v2-price-wrap">
+                <div className="price-number-row">
+                  <span className="price-amount">{pkg.price}</span>
+                  <span className="price-currency-unit">ETB</span>
                 </div>
-                <span className="pkg-card-price-sub">
-                  {lang === 'am' ? 'ይፋዊ ዋጋ' : lang === 'om' ? 'Gatii Idilee' : 'Official Package Rate'}
-                </span>
+                <span className="price-starting-label">{t.pricingStartingFrom}</span>
               </div>
 
-              {/* Deliverables List */}
-              <div className="pkg-card-deliverables">
-                <span className="pkg-deliverables-header">
-                  {lang === 'am' ? 'የተካተቱ ዋና ዋና አገልግሎቶች' : lang === 'om' ? 'Waan Dabalame' : 'Deliverables & Inclusions'}
-                </span>
-                <ul className="pkg-deliverables-list">
-                  {deliverables.map((item, idx) => (
-                    <li key={idx}>
-                      <span className="deliverable-check">
-                        <Check size={13} strokeWidth={2.8} />
-                      </span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              {/* Divider Line */}
+              <hr className="card-v2-divider" />
+
+              {/* Deliverables / Features List */}
+              <ul className="card-v2-features-list">
+                {deliverables.map((item, idx) => (
+                  <li key={idx}>
+                    <span className={`feature-check-icon ${pkg.isDark ? 'check-red' : 'check-grey'}`}>
+                      <Check size={12} strokeWidth={3} />
+                    </span>
+                    <span className="feature-text">{item}</span>
+                  </li>
+                ))}
+              </ul>
 
               {/* Action Button */}
-              <div className="pkg-card-action">
+              <div className="card-v2-cta-wrap">
                 <button
                   type="button"
-                  className={`pkg-select-btn ${pkg.featured ? 'btn-featured' : ''}`}
+                  className={`card-v2-action-btn ${
+                    pkg.btnStyle === 'red'
+                      ? 'btn-style-red'
+                      : pkg.btnStyle === 'outline'
+                      ? 'btn-style-outline'
+                      : 'btn-style-dark'
+                  }`}
                   onClick={() => openBooking(pkg)}
                 >
-                  <span>{t.pkgCta}</span>
+                  <span>{t.pricingBookBtn}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -1062,22 +1037,21 @@ function PackagesSection({ lang, openBooking }) {
         })}
       </div>
 
-      {/* ── Disclaimer & Direct Call Strip ── */}
-      <div className="pkg-footer-strip">
-        <div className="pkg-footer-guarantee">
-          <Check size={16} />
-          <span>{t.priceDisclaimer}</span>
+      {/* ── Bottom Strip (Need Something Special?) ── */}
+      <div className="pricing-bottom-special-bar">
+        <div className="bottom-bar-left">
+          <Sparkles size={20} className="bottom-bar-sparkle-icon" />
+          <span className="bottom-bar-bold-title">{t.pricingNeedSpecial}</span>
+          <span className="bottom-bar-desc-text">{t.pricingCustomNote}</span>
         </div>
-        <div className="pkg-footer-contacts">
-          <a href={`tel:${PHONE_LINK}`} className="pkg-quick-call">
-            <Phone size={14} />
-            <span>{PHONE_DISPLAY}</span>
-          </a>
-          <a href={TELEGRAM_LINK} target="_blank" rel="noreferrer" className="pkg-quick-tg">
-            <Send size={14} />
-            <span>{lang === 'am' ? 'በቴሌግራም ይጠይቁን' : lang === 'om' ? 'Telegram Irratti' : 'Telegram Booking'}</span>
-          </a>
-        </div>
+        <button
+          type="button"
+          className="bottom-bar-contact-btn"
+          onClick={() => openBooking({ titleEn: 'Custom / Special Inquiry', titleAm: 'ልዩ ጥያቄ', price: 'Custom' })}
+        >
+          <span>{t.pricingContactBtn}</span>
+          <ArrowRight size={16} />
+        </button>
       </div>
     </section>
   );

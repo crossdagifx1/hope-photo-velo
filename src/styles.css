@@ -770,367 +770,482 @@ img { display:block; max-width:100%; }
 .featured-price .package-source { opacity:.13; filter:grayscale(1) brightness(2); }
 .price-note { display:flex; justify-content:center; align-items:center; gap:.5rem; margin-top:1.8rem; color:#42362f; font:600 11px 'DM Mono',monospace; letter-spacing:.05em; text-align:center; }
 
-/* ── PACKAGES & PRICING (OFFICIAL FIXED PACKAGES) ── */
+/* ── PACKAGES & PRICING (EXACT 3-CARD CATEGORIZED LAYOUT) ── */
 .pricing-packages-section {
-  padding: 8rem 8vw 7.5rem;
-  background: #fbf8f4;
+  padding: 7rem 8vw 6.5rem;
+  background: #fbf9f6;
   border-top: 1.5px solid var(--line);
   position: relative;
 }
 
 .packages-section-head {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 2.5rem;
   margin-bottom: 3.5rem;
 }
-.packages-head-left h2 {
-  font-size: clamp(3rem, 5.2vw, 5.2rem);
-  font-weight: 800;
-  line-height: 1.02;
-  margin: 0;
-  color: var(--ink);
+
+.packages-head-left {
+  max-width: 620px;
 }
-.packages-head-left h2 em {
-  color: var(--red);
-  font-style: italic;
+
+.pricing-eyebrow-red {
+  font: 800 12.5px 'DM Mono', monospace;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #b92539;
+  margin: 0 0 0.8rem;
 }
-.packages-section-note {
-  max-width: 440px;
-  color: #4a3e37;
-  font-size: 1.15rem;
+
+.pricing-main-h2 {
+  font: 800 clamp(2.4rem, 4.2vw, 4.2rem)/1.08 'Playfair Display', Georgia, serif;
+  color: #0f172a;
+  margin: 0 0 1.2rem;
+  letter-spacing: -0.03em;
+}
+
+.pricing-h2-muted {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.pricing-sub-desc {
+  color: #475569;
+  font-size: 1.05rem;
+  line-height: 1.65;
   font-weight: 500;
-  line-height: 1.75;
   margin: 0;
 }
 
-/* ── TABS BAR ── */
-.pkg-tabs-container {
-  margin-bottom: 3.2rem;
-  padding-bottom: 1.2rem;
-  border-bottom: 2px solid rgba(30, 24, 22, 0.12);
-}
-.pkg-tabs-wrapper {
+.packages-head-right {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
 }
-.pkg-tab-pill {
+
+.pricing-script-tag {
+  font-family: 'Playfair Display', Georgia, cursive;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: #64748b;
+  text-align: right;
+  max-width: 320px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pricing-category-pill-nav {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.75rem 1.4rem;
-  border-radius: 9999px;
-  border: 1.5px solid rgba(30, 24, 22, 0.16);
   background: #ffffff;
-  color: #55443c;
+  padding: 5px;
+  border-radius: 9999px;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  gap: 4px;
+}
+
+.pricing-cat-btn {
+  padding: 0.65rem 1.4rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  color: #475569;
   font: 700 13.5px 'DM Sans', sans-serif;
   cursor: pointer;
-  transition: all 0.22s var(--ease);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-.pkg-tab-pill:hover {
-  border-color: var(--red);
-  color: var(--red);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(185, 37, 57, 0.12);
-}
-.pkg-tab-pill.pkg-tab-active {
-  background: linear-gradient(135deg, #b92539 0%, #8b1e2d 100%);
-  color: #ffffff;
-  border-color: #8b1e2d;
-  font-weight: 800;
-  box-shadow: 0 6px 20px rgba(185, 37, 57, 0.32);
-  transform: translateY(-2px);
-}
-.pkg-tab-pill.pkg-tab-active svg {
-  color: #ffffff;
-}
-.pkg-tab-count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 9999px;
-  background: rgba(0, 0, 0, 0.08);
-  font: 800 11px 'DM Mono', monospace;
-}
-.pkg-tab-active .pkg-tab-count {
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
 }
 
-/* ── PACKAGES GRID ── */
-.packages-cards-grid {
+.pricing-cat-btn:hover {
+  color: #0f172a;
+}
+
+.pricing-cat-btn.active {
+  background: #b92539;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(185, 37, 57, 0.32);
+}
+
+/* ── 3 CARDS GRID ── */
+.pricing-3cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1.8rem;
   align-items: stretch;
 }
 
-.pkg-card {
+.pricing-v2-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
-  border: 1.5px solid rgba(30, 24, 22, 0.14);
-  border-radius: 20px;
-  padding: 2.2rem 2rem 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  border-radius: 24px;
+  padding: 2.4rem 2.2rem 2.2rem;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
 }
-.pkg-card:hover {
+
+/* Light Cards */
+.card-light-tier {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+  color: #0f172a;
+}
+
+.card-light-tier:hover {
   transform: translateY(-6px);
-  border-color: rgba(185, 37, 57, 0.4);
-  box-shadow: 0 20px 48px rgba(185, 37, 57, 0.14);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
 }
 
-.pkg-card-featured {
-  border: 2px solid var(--red);
-  background: linear-gradient(180deg, #fffbfb 0%, #ffffff 100%);
-  box-shadow: 0 16px 44px rgba(185, 37, 57, 0.18);
-}
-.pkg-card-featured::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, #b92539, #d4af37, #b92539);
+/* Premium Dark Card */
+.card-premium-dark {
+  background: #0d0f17;
+  border: 1.5px solid #1e2230;
+  box-shadow: 0 20px 50px rgba(13, 15, 23, 0.35);
+  color: #ffffff;
 }
 
-/* Meta top bar */
-.pkg-card-top {
+.card-premium-dark:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 28px 60px rgba(185, 37, 57, 0.22);
+  border-color: rgba(185, 37, 57, 0.5);
+}
+
+/* Card Header: Tier Label & Pill Badge */
+.card-v2-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-  margin-bottom: 1.1rem;
-}
-.pkg-card-cat {
-  font: 800 11px 'DM Mono', monospace;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.pkg-card-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 9999px;
-  background: rgba(30, 24, 22, 0.06);
-  color: var(--ink);
-  font: 800 11px 'DM Mono', monospace;
-  letter-spacing: 0.04em;
-}
-.badge-featured {
-  background: linear-gradient(135deg, #b92539, #8b1e2d);
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(185, 37, 57, 0.28);
+  margin-bottom: 1.2rem;
 }
 
-/* Title */
-.pkg-card-title {
-  font: 800 1.65rem/1.22 'Playfair Display', Georgia, serif;
-  color: var(--ink);
-  margin: 0 0 1.2rem;
+.card-v2-tier-tag {
+  font: 800 12px 'DM Mono', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.card-premium-dark .card-v2-tier-tag {
+  color: #cbd5e1;
+}
+
+.card-v2-pill-badge {
+  font: 700 11.5px 'DM Sans', sans-serif;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+
+.badge-light-subtle {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badge-red-solid {
+  background: #b92539;
+  color: #ffffff;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(185, 37, 57, 0.35);
+}
+
+/* Card Title & Description */
+.card-v2-title {
+  font: 800 1.75rem/1.2 'Playfair Display', Georgia, serif;
+  margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
 }
 
-/* Price Box */
-.pkg-card-price-box {
-  background: #f7f3ee;
-  border: 1px solid rgba(30, 24, 22, 0.08);
-  border-radius: 14px;
-  padding: 1.1rem 1.3rem;
+.card-light-tier .card-v2-title {
+  color: #0f172a;
+}
+
+.card-premium-dark .card-v2-title {
+  color: #ffffff;
+}
+
+.card-v2-desc {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1.8rem;
+  font-weight: 500;
+  min-height: 2.8rem;
+}
+
+.card-light-tier .card-v2-desc {
+  color: #64748b;
+}
+
+.card-premium-dark .card-v2-desc {
+  color: #94a3b8;
+}
+
+/* Price Display */
+.card-v2-price-wrap {
   margin-bottom: 1.6rem;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.25rem;
 }
-.pkg-card-featured .pkg-card-price-box {
-  background: rgba(185, 37, 57, 0.06);
-  border-color: rgba(185, 37, 57, 0.18);
-}
-.pkg-card-price-row {
+
+.price-number-row {
   display: flex;
   align-items: baseline;
   gap: 0.45rem;
 }
-.pkg-card-price-num {
-  font: 800 2.8rem/1 'Playfair Display', Georgia, serif;
-  color: var(--ink);
+
+.price-amount {
+  font: 800 3.2rem/1 'Playfair Display', Georgia, serif;
   letter-spacing: -0.04em;
 }
-.pkg-card-featured .pkg-card-price-num {
-  color: var(--red);
-}
-.pkg-card-price-currency {
-  font: 800 13.5px 'DM Mono', monospace;
-  color: var(--red);
-  letter-spacing: 0.06em;
-}
-.pkg-card-price-sub {
-  font: 600 11px 'DM Mono', monospace;
-  color: #7a6a60;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+
+.card-light-tier .price-amount {
+  color: #0f172a;
 }
 
-/* Deliverables Section */
-.pkg-card-deliverables {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
+.card-premium-dark .price-amount {
+  color: #ffffff;
 }
-.pkg-deliverables-header {
-  font: 800 10.5px 'DM Mono', monospace;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 0.9rem;
-  padding-bottom: 0.45rem;
-  border-bottom: 1px dashed rgba(30, 24, 22, 0.15);
+
+.price-currency-unit {
+  font: 800 14px 'DM Mono', monospace;
+  letter-spacing: 0.05em;
 }
-.pkg-deliverables-list {
+
+.card-light-tier .price-currency-unit {
+  color: #0f172a;
+}
+
+.card-premium-dark .price-currency-unit {
+  color: #ffffff;
+}
+
+.price-starting-label {
+  font: 600 12px 'DM Mono', monospace;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+
+/* Divider Line */
+.card-v2-divider {
+  border: none;
+  margin: 0 0 1.8rem;
+}
+
+.card-light-tier .card-v2-divider {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.card-premium-dark .card-v2-divider {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Deliverables / Features List */
+.card-v2-features-list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 2.2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-}
-.pkg-deliverables-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  font-size: 0.98rem;
-  font-weight: 600;
-  color: #382c26;
-  line-height: 1.45;
-}
-.deliverable-check {
-  flex-shrink: 0;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(185, 37, 57, 0.12);
-  color: var(--red);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px;
-}
-.pkg-card-featured .deliverable-check {
-  background: var(--red);
-  color: #ffffff;
+  gap: 0.85rem;
+  flex: 1;
 }
 
-/* Card Button */
-.pkg-card-action {
-  margin-top: auto;
-}
-.pkg-select-btn {
-  width: 100%;
-  min-height: 52px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  padding: 0 1.4rem;
-  border-radius: 12px;
-  border: 2px solid var(--ink);
-  background: var(--ink);
-  color: #ffffff;
-  font: 800 13px 'DM Mono', monospace;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.25s var(--ease);
-}
-.pkg-select-btn:hover {
-  background: var(--red);
-  border-color: var(--red);
-  color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(185, 37, 57, 0.32);
-}
-.pkg-select-btn.btn-featured {
-  background: linear-gradient(135deg, #b92539 0%, #8b1e2d 100%);
-  border-color: #8b1e2d;
-  box-shadow: 0 6px 20px rgba(185, 37, 57, 0.35);
-}
-.pkg-select-btn.btn-featured:hover {
-  background: linear-gradient(135deg, #d42b43 0%, #a81b34 100%);
-  box-shadow: 0 10px 28px rgba(185, 37, 57, 0.48);
-}
-
-/* Footer Guarantee Strip */
-.pkg-footer-strip {
-  margin-top: 4rem;
-  padding: 1.8rem 2.4rem;
-  background: #ffffff;
-  border: 1.5px solid rgba(30, 24, 22, 0.14);
-  border-radius: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.03);
-}
-.pkg-footer-guarantee {
+.card-v2-features-list li {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #382c26;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  line-height: 1.4;
 }
-.pkg-footer-guarantee svg {
-  color: var(--red);
-  flex-shrink: 0;
+
+.card-light-tier .card-v2-features-list li {
+  color: #334155;
 }
-.pkg-footer-contacts {
+
+.card-premium-dark .card-v2-features-list li {
+  color: #f1f5f9;
+}
+
+.feature-check-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.check-grey {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.check-red {
+  background: #b92539;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(185, 37, 57, 0.35);
+}
+
+/* Action Buttons */
+.card-v2-cta-wrap {
+  margin-top: auto;
+}
+
+.card-v2-action-btn {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 12px;
+  font: 700 14px 'DM Sans', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.btn-style-dark {
+  background: #111827;
+  color: #ffffff;
+  border: 1.5px solid #111827;
+}
+
+.btn-style-dark:hover {
+  background: #b92539;
+  border-color: #b92539;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(185, 37, 57, 0.3);
+}
+
+.btn-style-outline {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+}
+
+.btn-style-outline:hover {
+  border-color: #0f172a;
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.btn-style-red {
+  background: #b92539;
+  color: #ffffff;
+  border: 1.5px solid #b92539;
+  font-weight: 800;
+  box-shadow: 0 6px 20px rgba(185, 37, 57, 0.35);
+}
+
+.btn-style-red:hover {
+  background: #d42b43;
+  border-color: #d42b43;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(185, 37, 57, 0.5);
+}
+
+/* ── BOTTOM SPECIAL STRIP ── */
+.pricing-bottom-special-bar {
+  margin-top: 3.5rem;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.4rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.bottom-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   flex-wrap: wrap;
 }
-.pkg-quick-call, .pkg-quick-tg {
+
+.bottom-bar-sparkle-icon {
+  color: #b92539;
+  flex-shrink: 0;
+}
+
+.bottom-bar-bold-title {
+  font: 800 1.05rem 'DM Sans', sans-serif;
+  color: #0f172a;
+}
+
+.bottom-bar-desc-text {
+  font: 500 0.98rem 'DM Sans', sans-serif;
+  color: #64748b;
+}
+
+.bottom-bar-contact-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.65rem 1.25rem;
+  padding: 0.65rem 1.4rem;
   border-radius: 9999px;
-  border: 1.5px solid var(--line);
-  font: 800 12px 'DM Mono', monospace;
-  letter-spacing: 0.05em;
-  transition: all 0.2s;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  color: #0f172a;
+  font: 700 13px 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
-.pkg-quick-call {
-  background: #f7f3ee;
-  color: var(--ink);
+
+.bottom-bar-contact-btn:hover {
+  border-color: #b92539;
+  color: #b92539;
+  transform: translateX(3px);
 }
-.pkg-quick-call:hover {
-  border-color: var(--red);
-  color: var(--red);
+
+/* Responsive Rules for 3-Card Layout */
+@media (max-width: 1080px) {
+  .packages-section-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .packages-head-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+  .pricing-script-tag {
+    text-align: left;
+  }
+  .pricing-3cards-grid {
+    grid-template-columns: 1fr;
+    max-width: 540px;
+    margin: 0 auto;
+  }
 }
-.pkg-quick-tg {
-  background: var(--red);
-  border-color: var(--red);
-  color: #ffffff;
-}
-.pkg-quick-tg:hover {
-  background: var(--red-dark);
-  border-color: var(--red-dark);
+
+@media (max-width: 768px) {
+  .pricing-category-pill-nav {
+    flex-wrap: wrap;
+    border-radius: 16px;
+    width: 100%;
+  }
+  .pricing-cat-btn {
+    flex: 1;
+    text-align: center;
+    padding: 0.6rem 0.8rem;
+  }
+  .pricing-bottom-special-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+  }
 }
 
 /* Booking Modal Inclusions Display */
