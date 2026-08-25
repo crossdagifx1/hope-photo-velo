@@ -85,13 +85,13 @@ const T = {
       { num: '03', title: 'የሰርጉ ቀን ሙሉ ሽፋን', desc: 'ፕሮፌሽናል ቡድናችን የሰርጉን ቀን ውበት፣ ደስታ እና ድንቅ አፍታዎች ሙሉ በሙሉ ይቀርጻል።' },
       { num: '04', title: 'የሕትመት እና ኤዲቲንግ ማስረከብ', desc: 'ከፍተኛ ጥራት ያላቸው ላሚኔት አልበሞች፣ የቦርድ ፎቶዎች እና የተቀነባበሩ ቪዲዮዎችን ማስረከብ።' },
     ],
-    pricingEyebrow: 'የሽፋን አማራጭዎን ይምረጡ',
-    pricingH2a: 'እያንዳንዱ የፍቅር ታሪክ',
-    pricingH2b: 'የሚገባው ውበት አለው።',
-    pricingNote: 'ከዚህ በታች የቀረቡት ዋጋዎች በ HOPE የዋጋ ዝርዝር መሠረት የተዘጋጁ ናቸው። የሚፈልጉትን የአገልግሎት አይነት ይምረጡ፤ ዝርዝሩን ለበዓልዎ በሚሆን መልኩ እናስተካክላለን።',
+    pricingEyebrow: 'የ HOPE ይፋዊ የዋጋ እና የፓኬጅ ዝርዝር',
+    pricingH2a: 'የተሟሉ እና ደረጃቸውን የጠበቁ',
+    pricingH2b: 'የአገልግሎት ፓኬጆች።',
+    pricingNote: 'የሰርግ ቪዲዮ፣ የስቱዲዮ ቀረጻ፣ የመስክ የቅንጦት እና ልዩ ፓኬጆችን ይመልከቱ። ሁሉም ፓኬጆች በግልጽ የተቀመጡ አገልግሎቶችና ጥራት ያላቸው ናቸው።',
     pkgPopular: 'በጣም የተወደደ',
-    pkgCta: 'ይህንን አገልግሎት ይምረጡ',
-    priceDisclaimer: 'ሁሉም የአገልግሎት ዝርዝሮች እና ዋጋዎች ከ HOPE ቡድን ጋር በሚደረግ የመጨረሻ ማረጋገጫ የሚጸኑ ይሆናሉ።',
+    pkgCta: 'ይህንን ፓኬጅ ያስይዙ',
+    priceDisclaimer: 'ሁሉም ዋጋዎች ይፋዊ የ HOPE ዋጋዎች ናቸው። ቀን ሲያስይዙ የቡድናችን አባላት ደውለው ቀጠሮዎን ያረጋግጣሉ።',
     testimonialEyebrow: 'የደንበኞቻችን ምስክርነት',
     testimonialH2a: 'ሙሽሮቻችን',
     testimonialH2b: 'ስለ እኛ የሚሉት።',
@@ -106,7 +106,7 @@ const T = {
     faqs: [
       { q: 'ከሰርጋችን ምን ያህል ጊዜ በፊት ማስያዝ አለብን?', a: 'የሰርግ ቀናት በፍጥነት ስለሚያዙ፣ ቢያንስ ከ 1 እስከ 3 ወራት በፊት ማስያዝ ይመከራል። ሆኖም ክፍት ቀናት ካሉ በቅርብ ጊዜም ማስተናገድ እንችላለን።' },
       { q: 'የፎቶ እና ቪዲዮ ማስረከቢያ ጊዜው ምን ያህል ነው?', a: 'የመጀመሪያዎቹ ሶፍት ኮፒ ፎቶዎች በ 3-5 ቀናት ውስጥ የሚረከቡ ሲሆን፤ የተዘጋጁ አልበሞች እና ሙሉ ኤዲት የተደረጉ ቪዲዮዎች እንደ ፓኬጁ አይነት በ 2-4 ሳምንታት ውስጥ ይረከባሉ።' },
-      { q: 'ከቀረቡት ፓኬጆች ውጭ እንደፍላጎታችን ማስተካከል እንችላለን?', a: 'አዎ! የቀረቡት ፓኬጆች እንደ መነሻ የሚያገለግሉ ሲሆን፤ እንደ ፍላጎትዎ እና እንደ በዓልዎ አይነት ካሜራዎችን፣ አልበሞችን እና ሌሎች አገልግሎቶችን ማስተካከል እንችላለን።' },
+      { q: 'ፓኬጆቹ ምን ምን አገልግሎቶችን ያካትታሉ?', a: 'እያንዳንዱ ፓኬጅ ካሜራዎችን፣ የቪዲዮ ኤዲቲንግ፣ ላሚኔት አልበሞችን፣ ቦርዶችን፣ ሜካፕ እና ሶፍት ኮፒዎችን በግልጽ ያካተተ ነው። የትኛውንም ፓኬጅ ሲመርጡ ቡድናችን ከበዓልዎ ሰዓት ጋር በሚስማማ መልኩ ያቀናጅልዎታል።' },
       { q: 'ክፍያ በምን መልኩ ይፈጸማል?', a: 'ቀን ሲያስይዙ ቅድመ ክፍያ (Advance payment) የሚከፈል ሲሆን፤ ቀሪው ክፍያ በቀረጻው ቀን እና ምርቶችን በተረከቡበት ወቅት የሚጠናቀቅ ይሆናል።' },
     ],
     closingEyebrow: 'ልዩ ቀንዎ ሁልጊዜ ከእርስዎ ጋር',
@@ -119,7 +119,7 @@ const T = {
     bookingEyebrow: 'ቀንዎን ያስይዙ',
     bookingH2: 'ለድንቅ አፍታዎችዎ\nቦታ እንስጥ።',
     bookingIntro: 'ስለ በዓልዎ ጥቂት ነገሮችን ይንገሩን፤ እኛ ከእዚያ እንቀጥላለን።',
-    bookingSelectedLabel: 'የመረጡት አገልግሎት',
+    bookingSelectedLabel: 'የመረጡት ፓኬጅ',
     bookingLabels: ['ሙሉ ስምዎ', 'የበዓሉ ቀን', 'ስልክ ቁጥር', 'ምን እያከበሩ ነው?'],
     bookingPlaceholders: ['ሙሉ ስምዎን እዚህ ያስገቡ', '', '09…', 'ሰርግ፣ የስታዲዮ ቀረጻ፣ ወይም ሌላ ልዩ በዓል...'],
     bookingSubmit: 'ቀጠሮዎን ይላኩ',
@@ -132,7 +132,7 @@ const T = {
   en: {
     lang: 'English',
     announce: ['Wedding Season is Here', 'Booking Dates Now Open'],
-    nav: { about: 'About Us', work: 'Our Work', craft: 'Our Craft', locations: 'Locations', process: 'Process', pricing: 'Services', testimonials: 'Reviews', faq: 'FAQ', call: 'Call Us' },
+    nav: { about: 'About Us', work: 'Our Work', craft: 'Our Craft', locations: 'Locations', process: 'Process', pricing: 'Packages', testimonials: 'Reviews', faq: 'FAQ', call: 'Call Us' },
     bookBtn: 'Book Your Date',
     heroEyebrow: 'Addis Ababa • Founded in Love',
     heroH1a: 'Moments pass—',
@@ -196,13 +196,13 @@ const T = {
       { num: '03', title: 'Full Wedding Day Coverage', desc: 'Our professional team fully captures the beauty, joy, and special moments of your wedding day.' },
       { num: '04', title: 'Albums, Editing & Delivery', desc: 'High-quality laminated albums, board photos, and edited videos delivered to you.' },
     ],
-    pricingEyebrow: 'Choose Your Coverage',
-    pricingH2a: 'Every love story',
-    pricingH2b: 'deserves its own beauty.',
-    pricingNote: 'The prices below are based on HOPE\'s standard pricing list. Choose the service type you want — we can adjust the details to suit your celebration.',
+    pricingEyebrow: 'HOPE Official Packages & Pricing',
+    pricingH2a: 'Curated & Complete',
+    pricingH2b: 'Service Packages.',
+    pricingNote: 'Browse our fixed, all-inclusive packages for Wedding Video, Studio, Luxury Mesk, and Special Keepsakes.',
     pkgPopular: 'Most Popular',
-    pkgCta: 'Choose This Service',
-    priceDisclaimer: 'All service details and prices are subject to final confirmation with the HOPE team.',
+    pkgCta: 'Book This Package',
+    priceDisclaimer: 'All packages are official HOPE standard rates. Upon booking, our team will contact you to confirm your date and schedule.',
     testimonialEyebrow: 'Client Testimonials',
     testimonialH2a: 'What our couples',
     testimonialH2b: 'say about us.',
@@ -217,7 +217,7 @@ const T = {
     faqs: [
       { q: 'How far in advance should we book?', a: 'Wedding dates are taken quickly, so we recommend booking at least 1–3 months in advance. However, if dates are available, we can accommodate closer bookings too.' },
       { q: 'How long does photo and video delivery take?', a: 'Initial soft-copy photos are delivered within 3–5 days. Finished albums and fully edited videos are delivered within 2–4 weeks depending on the package.' },
-      { q: 'Can we customize a package?', a: 'Yes! The listed packages are starting points — we can adjust cameras, albums, and other services to suit your needs and celebration type.' },
+      { q: 'What deliverables are included in each package?', a: 'Every package clearly specifies its cameras, cinematic video editing, laminate albums, boards, makeup, and soft copies. Once you select your package, our team coordinates the schedule to seamlessly match your celebration.' },
       { q: 'How does payment work?', a: 'An advance payment is required when booking. The remaining balance is settled on the day of the shoot and upon receiving your deliverables.' },
     ],
     closingEyebrow: 'Your special day, always with you',
@@ -230,7 +230,7 @@ const T = {
     bookingEyebrow: 'Book Your Date',
     bookingH2: 'Let\'s make space\nfor your special moments.',
     bookingIntro: 'Tell us a little about your celebration and we\'ll take it from there.',
-    bookingSelectedLabel: 'Selected Service',
+    bookingSelectedLabel: 'Selected Package',
     bookingLabels: ['Full Name', 'Event Date', 'Phone Number', 'What are you celebrating?'],
     bookingPlaceholders: ['Enter your full name', '', '09…', 'Wedding, studio shoot, or another special occasion...'],
     bookingSubmit: 'Submit Booking Request',
@@ -243,7 +243,7 @@ const T = {
   om: {
     lang: 'Afaan Oromoo',
     announce: ['Waggaa Cidhaa Ni Ga\'e', 'Guyyaa Galmeessuun Amma Banamaadha'],
-    nav: { about: 'Waa\'ee Keenya', work: 'Hojiiwwan Keenya', craft: 'Teknoolojii Keenya', locations: 'Bakka Keenya', process: 'Adeemsa Keenya', pricing: 'Tajaajiloota', testimonials: 'Yaada Maamiltootaa', faq: 'GAF (FAQ)', call: 'Nuu Bilbilaa' },
+    nav: { about: 'Waa\'ee Keenya', work: 'Hojiiwwan Keenya', craft: 'Teknoolojii Keenya', locations: 'Bakka Keenya', process: 'Adeemsa Keenya', pricing: 'Paakeejiiwwan', testimonials: 'Yaada Maamiltootaa', faq: 'GAF (FAQ)', call: 'Nuu Bilbilaa' },
     bookBtn: 'Guyyaa Keessan Qabadhaa',
     heroEyebrow: 'Finfinnee • Jaalalaan Hundeeffame',
     heroH1a: 'Yeroon ni darba;',
@@ -307,13 +307,13 @@ const T = {
       { num: '03', title: 'Uwwisa Guyyaa Cidhaa Guutuu', desc: 'Gareen pirofeeshiinaala keenya bareedina, gammachuu fi yeroowwan addaa guyyaa cidhaa guutummaatti waraaba.' },
       { num: '04', title: 'Albaama, Gulaala fi Kenniinsa', desc: 'Albaamota laamineetii qulqullina ol\'aanaa, suuraa boordii fi viidiyoo gulaalame isiniif kennuu.' },
     ],
-    pricingEyebrow: 'Filannoo Uwwisa Keessanii Filadhaa',
-    pricingH2a: 'Seenaan jaalalaa hundinuu',
-    pricingH2b: 'bareedina isaa kan maluudha.',
-    pricingNote: 'Gatiin gadii tarree gatii HOPE irratti kan hundaa\'edha. Tajaajila barbaaddan filadhaa — bal\'ina isaa ayyaana keessaniif akka mijaatutti ni sirreessina.',
+    pricingEyebrow: 'Tarree Gatiiwwan HOPE',
+    pricingH2a: 'Qulqullina Ol\'aanaa fi Guutuu',
+    pricingH2b: 'Paakeejiiwwan Tajaajilaa.',
+    pricingNote: 'Paakeejiiwwan viidiyoo cidhaa, istuudiyoo, mesk qananii fi tajaajiloota addaa filadhaa.',
     pkgPopular: 'Baay\'ee Kan Jaallatame',
-    pkgCta: 'Tajaajila Kana Filadhaa',
-    priceDisclaimer: 'Bal\'inni tajaajilaa fi gatiin hundinuu mirkaneessa dhumaa garee HOPE waliin ta\'uun kan cimu ta\'a.',
+    pkgCta: 'Paakeejii Kana Qabadhaa',
+    priceDisclaimer: 'Gatiin hundinuu gatii idilee HOPE ti. Guyyaa qabsiisuun dura gareen keenya isiniif bilbila.',
     testimonialEyebrow: 'Yaada Maamiltoota Keenyaa',
     testimonialH2a: 'Misirroonni keenya',
     testimonialH2b: 'waa\'ee keenya waan jedhan.',
@@ -328,7 +328,7 @@ const T = {
     faqs: [
       { q: 'Cidha keenya dura yoom qabsiisuu qabna?', a: 'Guyyoonni cidhaa dafanii waan qabatamaniif, ji\'a 1–3 dura qabsiisuun gorfama. Ta\'us, guyyoonni duwwaan yoo jiraatan yeroo dhiyoos simachuu ni dandeenya.' },
       { q: 'Yeroon suuraa fi viidiyoo kennuu hammami?', a: 'Suuraawwan soofti koppii jalqabaa guyyoota 3–5 keessatti kan kennaman ta\'a; albaamonni fi viidiyoon guutummaatti gulaalaman torban 2–4 keessatti ni kennamu.' },
-      { q: 'Paakeejiiwwan keessaa akka fedhii keenyaatti sirreessuu ni dandeenya?', a: 'Eeyyee! Paakeejiiwwan dhihaatan akka ka\'umsaatti kan tajaajilan yoo ta\'u; akka fedhii fi gosa ayyaana keessaniitti kaameraawwan, albaamota fi tajaajiloota biroo sirreessuu ni dandeenya.' },
+      { q: 'Paakeejiiwwan keessatti maaltu dabalameera?', a: 'Paakeejiin hundi kaameraawwan, gulaala viidiyoo, albaamota laamineetii, boordii, makeup fi soofti koppiiwwan ifatti of keessatti qaba.' },
       { q: 'Kaffaltiin akkamitti raawwatama?', a: 'Yeroo guyyaa qabsiiftan kaffaltiin dursaa (Advance payment) kan kaffalamu yoo ta\'u; kaffaltiin hafe guyyaa waraabsaa fi yeroo meeshaalee fudhattan kan xumuramu ta\'a.' },
     ],
     closingEyebrow: 'Guyyaan keessan isa addaa yeroo hunda isin waliin',
@@ -341,7 +341,7 @@ const T = {
     bookingEyebrow: 'Guyyaa Keessan Qabadhaa',
     bookingH2: 'Yeroowwan keessan kan addaatiif\nbakka nuu kenninaa.',
     bookingIntro: 'Waa\'ee ayyaana keessanii xiqqoo nuu tsisaa; nuti achii itti fufna.',
-    bookingSelectedLabel: 'Tajaajila Filatame',
+    bookingSelectedLabel: 'Paakeejii Filatame',
     bookingLabels: ['Maqaa Guutuu', 'Guyyaa Ayyaanaa', 'Lakkoofsa Bilbilaa', 'Maaliif Kabajju?'],
     bookingPlaceholders: ['Maqaa guutuu keessan asitti galchaa', '', '09…', 'Cidha, suuraa istuudiyoo, ykn ayyaana addaa biroo...'],
     bookingSubmit: 'Gaaffii Beellamaa Ergaa',
@@ -353,57 +353,423 @@ const T = {
   },
 };
 
-const packages = [
-  { name: 'የስታዲዮ ፎቶ አገልግሎት', nameEn: 'Studio Photography Service', nameOm: 'Tajaajila Suuraa Istuudiyoo', price: '18,500', type: 'የስታዲዮ ፎቶግራፍ', typeEn: 'Studio Photography', typeOm: 'Suuraa Istuudiyoo', note: 'ለሚያምር የስታዲዮ ታሪክ', noteEn: 'For a beautiful studio story', noteOm: 'Seenaa istuudiyoo bareedaaf', details: ['የስታዲዮ ቀረጻ session', 'ሜካፕ የተካተተ (Makeup)', '30×45 ላሚኔት አልበም', 'የምስጋና ካርዶች', '150 ሶፍት ኮፒ ፎቶዎች'], detailsEn: ['Studio shoot session', 'Makeup included', '30×45 laminate album', 'Thank-you cards', '150 soft-copy photos'], detailsOm: ['Tursiisa waraabsa istuudiyoo', 'Makeup kan dhihaate', 'Albaama laamineetii 30×45', 'Kaardii galateeffannaa', 'Suuraa soofti koppii 150'], source: 'photo_2026-07-03_14-14-17_7668160832798825472.jpg' },
-  { name: 'የሰርግ ፎቶ እና ቪዲዮ (2 ካሜራ)', nameEn: 'Wedding Photo & Video (2 Cameras)', nameOm: 'Suuraa & Viidiyoo Cidhaa (Kaameraa 2)', price: '45,000', type: 'የሰርግ ፎቶ እና ቪዲዮ', typeEn: 'Wedding Photo & Video', typeOm: 'Suuraa & Viidiyoo Cidhaa', note: 'ለተዋበ የሰርግ በዓል', noteEn: 'For an elegant wedding celebration', noteOm: 'Ayyaana cidha miidhagaaf', details: ['2 ካሜራ + ሮኒን ጊምባል', 'የአየር ላይ መብራት', 'ሙሉ ኤዲት የተደረገ ቪዲዮ', 'ከለር ግሬዲንግ', 'ሁሉም ሶፍት ኮፒ ፎቶዎች'], detailsEn: ['2 cameras + Ronin gimbal', 'Aerial lighting', 'Fully edited video', 'Colour grading', 'All soft-copy photos'], detailsOm: ['Kaameraa 2 + Ronin gimbal', 'Ibsaa gubbaa (Aerial lighting)', 'Viidiyoo guutummaatti gulaalame', 'Gulaala halluu (Colour grading)', 'Suuraa soofti koppii hundumaa'], source: 'photo_2026-07-03_14-14-17_7668160799898782720.jpg' },
-  { name: 'የሰርግ ፎቶ፣ ቪዲዮ እና ሙዚቃ ቪዲዮ', nameEn: 'Wedding Photo, Video & Music Video', nameOm: 'Suuraa, Viidiyoo Cidhaa & Viidiyoo Muuziqaa', price: '50,000', type: 'የሰርግ ፎቶ + ሙዚቃ ቪዲዮ', typeEn: 'Wedding + Music Video', typeOm: 'Suuraa Cidhaa + Viidiyoo Muuziqaa', note: 'ለልዩ እና ትልልቅ አፍታዎችዎ', noteEn: 'For your special milestone moments', noteOm: 'Yeroowwan keessan isa addaatiif', details: ['ሙዚቃ ቪዲዮ', '30×90 ላሚኔት አልበም', 'ቦርድ ፎቶ + ሳይን ቦርድ', 'የምስጋና ካርዶች', 'ሴቭ ዘ ዴት ፎቶዎች'], detailsEn: ['Music video', '30×90 laminate album', 'Board photo + sign board', 'Thank-you cards', 'Save-the-date photos'], detailsOm: ['Viidiyoo muuziqaa', 'Albaama laamineetii 30×90', 'Suuraa boordii + Sign board', 'Kaardii galateeffannaa', 'Suuraa Save-the-date'], source: 'photo_2026-07-03_14-14-19_7668160870092520448.jpg' },
-  { name: 'የሰርግ ፎቶ እና ቪዲዮ (3 ካሜራ)', nameEn: 'Wedding Photo & Video (3 Cameras)', nameOm: 'Suuraa & Viidiyoo Cidhaa (Kaameraa 3)', price: '60,000', type: 'የሰርግ ፎቶ እና ቪዲዮ', typeEn: 'Wedding Photo & Video', typeOm: 'Suuraa & Viidiyoo Cidhaa', note: 'ተጨማሪ እይታዎች፣ ዘላቂ ትዝታዎች', noteEn: 'More angles, lasting memories', noteOm: 'Mula\'ata dabalataa, yaadannoo bara baraa', details: ['3 ካሜራ + ሮኒን ጊምባል', 'የአየር ላይ መብራት', 'ትሬለር + ሙሉ ኤዲት ቪዲዮ', 'ከለር ግሬዲንግ', '40×60 ቦርድ ፎቶ'], detailsEn: ['3 cameras + Ronin gimbal', 'Aerial lighting', 'Trailer + fully edited video', 'Colour grading', '40×60 board photo'], detailsOm: ['Kaameraa 3 + Ronin gimbal', 'Ibsaa gubbaa (Aerial lighting)', 'Trailer + Viidiyoo guutummaatti gulaalame', 'Gulaala halluu (Colour grading)', 'Suuraa boordii 40×60'], source: 'photo_2026-07-03_14-14-18_7668160879386824704.jpg' },
-  { name: 'የሰርግ ፎቶ እና ቪዲዮ (4 ካሜራ)', nameEn: 'Wedding Photo & Video (4 Cameras)', nameOm: 'Suuraa & Viidiyoo Cidhaa (Kaameraa 4)', price: '70,000', type: 'የሰርግ ፎቶ እና ቪዲዮ', typeEn: 'Wedding Photo & Video', typeOm: 'Suuraa & Viidiyoo Cidhaa', note: 'ሙሉ እና አጠቃላይ ሽፋን', noteEn: 'Full & comprehensive coverage', noteOm: 'Uwwisa guutuu fi waliigalaa', details: ['4 ካሜራ ሽፋን', 'ሮኒን ጊምባል + አየር ላይ መብራት', 'ትሬለር + ሙሉ ኤዲት ቪዲዮ', '30×90 ላሚኔት አልበም', 'ፕሪሚየም ማስታወሻዎች'], detailsEn: ['4 camera coverage', 'Ronin gimbal + aerial lighting', 'Trailer + fully edited video', '30×90 laminate album', 'Premium keepsakes'], detailsOm: ['Uwwisa kaameraa 4', 'Ronin gimbal + ibsaa gubbaa', 'Trailer + Viidiyoo guutummaatti gulaalame', 'Albaama laamineetii 30×90', 'Yaadannoo pirofeeshiinaalaa'], source: 'photo_2026-07-03_14-14-18_7668160851399477248.jpg' },
-  { name: 'ሙሉ የሰርግ ፎቶ እና ቪዲዮ (4 ካሜራ ፕላስ)', nameEn: 'Full Wedding Photo & Video (4 Camera Plus)', nameOm: 'Suuraa & Viidiyoo Cidhaa Guutuu (Kaameraa 4 Plus)', price: '75,000', type: 'የሰርግ ፎቶ እና ቪዲዮ', typeEn: 'Wedding Photo & Video', typeOm: 'Suuraa & Viidiyoo Cidhaa', note: 'ሙሉው የሰርግዎ ድንቅ ታሪክ', noteEn: 'The complete cinematic story of your wedding', noteOm: 'Seenaa cidha keessanii isa guutuu sinimaatiikii', details: ['4 ካሜራ ሽፋን', 'ሙሉ የቪዲዮ ኤዲቲንግ', '30×90 ላሚኔት አልበም', '50×80 ቦርድ ፎቶ', 'ፕሪሚየም ሳጥን'], detailsEn: ['4 camera coverage', 'Full video editing', '30×90 laminate album', '50×80 board photo', 'Premium delivery box'], detailsOm: ['Uwwisa kaameraa 4', 'Gulaala viidiyoo guutuu', 'Albaama laamineetii 30×90', 'Suuraa boordii 50×80', 'Saanduqa delivery piromiyami'], source: 'photo_2026-07-03_14-14-18_7668160860798849024.jpg' },
+/* ── OFFICIAL PACKAGES DATA (NO CUSTOMIZER) ────────────────────────────── */
+const PACKAGES_DATA = [
+  // ── WEDDING VIDEO ──
+  {
+    id: 'wedding-bronze',
+    category: 'wedding',
+    catAm: 'የሰርግ ቪዲዮ',
+    catEn: 'Wedding Video',
+    catOm: 'Viidiyoo Cidhaa',
+    nameAm: 'ብሮንዝ ፓኬጅ (Bronze Package)',
+    nameEn: 'Bronze Package — Wedding Video',
+    nameOm: 'Paakeejii Bironzii — Viidiyoo Cidhaa',
+    price: '45,000',
+    priceNum: 45000,
+    featured: false,
+    badgeAm: 'ተመራጭ',
+    badgeEn: 'Essential Choice',
+    badgeOm: 'Barbaachisaa',
+    deliverablesAm: [
+      '2 ፕሮፌሽናል ካሜራዎች (2 Cameras)',
+      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
+      'አመራን ላይቲንግ (Ameran Light)',
+      'ትሬለር ቪዲዮ (Trailer Video)',
+      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
+      'ከለር ግሬዲንግ (Color Grading)',
+      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
+    ],
+    deliverablesEn: [
+      '2 Professional Cameras',
+      'Ronin Gimbal Stabilization',
+      'Ameran Lighting System',
+      'Trailer Video (Highlight Reel)',
+      'Full Edited Cinema Video',
+      'Professional Color Grading',
+      'All Soft Copies Free',
+    ],
+    deliverablesOm: [
+      'Kaameraawwan Pirofeeshiinaalaa 2',
+      'Ronin Gimbal Stabilization',
+      'Ibsaa Ameran Light',
+      'Viidiyoo Trailer (Highlight)',
+      'Viidiyoo Guutummaatti Gulaalame',
+      'Gulaala Halluu (Color Grading)',
+      'Soofti Koppii Hundumtuu Bilisaan',
+    ],
+  },
+  {
+    id: 'wedding-silver',
+    category: 'wedding',
+    catAm: 'የሰርግ ቪዲዮ',
+    catEn: 'Wedding Video',
+    catOm: 'Viidiyoo Cidhaa',
+    nameAm: 'ሲልቨር ፓኬጅ (Silver Package)',
+    nameEn: 'Silver Package — Wedding Video',
+    nameOm: 'Paakeejii Siilvarii — Viidiyoo Cidhaa',
+    price: '60,000',
+    priceNum: 60000,
+    featured: false,
+    badgeAm: 'ተወዳጅ',
+    badgeEn: 'Popular Choice',
+    badgeOm: 'Jaallatamaa',
+    deliverablesAm: [
+      '3 ፕሮፌሽናል ካሜራዎች (3 Cameras)',
+      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
+      'አመራን ላይቲንግ (Ameran Light)',
+      'ትሬለር ቪዲዮ (Trailer Video)',
+      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
+      'ከለር ግሬዲንግ (Color Grading)',
+      '40×60 ቦርድ ፎቶ (40x60 Board)',
+      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
+    ],
+    deliverablesEn: [
+      '3 Professional Cameras',
+      'Ronin Gimbal Stabilization',
+      'Ameran Lighting System',
+      'Trailer Video (Highlight Reel)',
+      'Full Edited Cinema Video',
+      'Professional Color Grading',
+      '40×60 Board Photo',
+      'All Soft Copies Free',
+    ],
+    deliverablesOm: [
+      'Kaameraawwan Pirofeeshiinaalaa 3',
+      'Ronin Gimbal Stabilization',
+      'Ibsaa Ameran Light',
+      'Viidiyoo Trailer (Highlight)',
+      'Viidiyoo Guutummaatti Gulaalame',
+      'Gulaala Halluu (Color Grading)',
+      'Suuraa Boordii 40×60',
+      'Soofti Koppii Hundumtuu Bilisaan',
+    ],
+  },
+  {
+    id: 'wedding-golden-70',
+    category: 'wedding',
+    catAm: 'የሰርግ ቪዲዮ',
+    catEn: 'Wedding Video',
+    catOm: 'Viidiyoo Cidhaa',
+    nameAm: 'ጎልደን ፓኬጅ (Golden Package — 70K)',
+    nameEn: 'Golden Package — 70,000 ETB',
+    nameOm: 'Paakeejii Warqee — 70,000 ETB',
+    price: '70,000',
+    priceNum: 70000,
+    featured: false,
+    badgeAm: 'ፕሪሚየም',
+    badgeEn: 'Premium Choice',
+    badgeOm: 'Piromiyami',
+    deliverablesAm: [
+      '4 ፕሮፌሽናል ካሜራዎች (4 Cameras)',
+      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
+      'አመራን ላይቲንግ (Ameran Light)',
+      'ትሬለር ቪዲዮ (Trailer Video)',
+      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
+      'ከለር ግሬዲንግ (Color Grading)',
+      '30×90 ላሚኔት አልበም (30x90 Laminate Album)',
+      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
+    ],
+    deliverablesEn: [
+      '4 Professional Cameras',
+      'Ronin Gimbal Stabilization',
+      'Ameran Lighting System',
+      'Trailer Video (Highlight Reel)',
+      'Full Edited Cinema Video',
+      'Professional Color Grading',
+      '30×90 Laminate Album',
+      'All Soft Copies Free',
+    ],
+    deliverablesOm: [
+      'Kaameraawwan Pirofeeshiinaalaa 4',
+      'Ronin Gimbal Stabilization',
+      'Ibsaa Ameran Light',
+      'Viidiyoo Trailer (Highlight)',
+      'Viidiyoo Guutummaatti Gulaalame',
+      'Gulaala Halluu (Color Grading)',
+      'Albaama Laamineetii 30×90',
+      'Soofti Koppii Hundumtuu Bilisaan',
+    ],
+  },
+  {
+    id: 'wedding-golden-75',
+    category: 'wedding',
+    catAm: 'የሰርግ ቪዲዮ',
+    catEn: 'Wedding Video',
+    catOm: 'Viidiyoo Cidhaa',
+    nameAm: 'ጎልደን ፕላስ ፓኬጅ (Golden Plus — 75K)',
+    nameEn: 'Golden Plus Package — 75,000 ETB',
+    nameOm: 'Paakeejii Warqee Plus — 75,000 ETB',
+    price: '75,000',
+    priceNum: 75000,
+    featured: true,
+    badgeAm: 'ሙሉ ሽፋን • ምርጥ ምርጫ',
+    badgeEn: 'Most Complete • VIP',
+    badgeOm: 'Guutuu • Filatamaa',
+    deliverablesAm: [
+      '4 ፕሮፌሽናል ካሜራዎች (4 Cameras)',
+      'ሮኒን ጊምባል ስቴቢላይዘር (Ronin Gimbal)',
+      'አመራን ላይቲንግ (Ameran Light)',
+      'ትሬለር ቪዲዮ (Trailer Video)',
+      'ሙሉ ኤዲት የተደረገ ቪዲዮ (Full Edited Video)',
+      'ከለር ግሬዲንግ (Color Grading)',
+      '30×90 ላሚኔት አልበም (30x90 Laminate Album)',
+      '50×80 ላሚኔት ቦርድ (50x80 Laminate Board)',
+      '40×60 ቦርድ ፎቶ (40x60 Board Photo)',
+      'ሁሉም ሶፍት ኮፒ በነጻ (All Soft Copy Free)',
+    ],
+    deliverablesEn: [
+      '4 Professional Cameras',
+      'Ronin Gimbal Stabilization',
+      'Ameran Lighting System',
+      'Trailer Video (Highlight Reel)',
+      'Full Edited Cinema Video',
+      'Professional Color Grading',
+      '30×90 Laminate Album',
+      '50×80 Laminate Board',
+      '40×60 Board Photo',
+      'All Soft Copies Free',
+    ],
+    deliverablesOm: [
+      'Kaameraawwan Pirofeeshiinaalaa 4',
+      'Ronin Gimbal Stabilization',
+      'Ibsaa Ameran Light',
+      'Viidiyoo Trailer (Highlight)',
+      'Viidiyoo Guutummaatti Gulaalame',
+      'Gulaala Halluu (Color Grading)',
+      'Albaama Laamineetii 30×90',
+      'Boordii Laamineetii 50×80',
+      'Suuraa Boordii 40×60',
+      'Soofti Koppii Hundumtuu Bilisaan',
+    ],
+  },
+
+  // ── STUDIO PACKAGES ──
+  {
+    id: 'studio-10k',
+    category: 'studio',
+    catAm: 'ስቱዲዮ ቀረጻ',
+    catEn: 'Studio Shoot',
+    catOm: 'Istuudiyoo',
+    nameAm: 'ቤሲክ ስቱዲዮ ፓኬጅ (Studio — 10,000)',
+    nameEn: 'Basic Studio Package — 10,000 ETB',
+    nameOm: 'Paakeejii Istuudiyoo Bu\'uuraa — 10,000 ETB',
+    price: '10,000',
+    priceNum: 10000,
+    featured: false,
+    badgeAm: 'የመነሻ ፓኬጅ',
+    badgeEn: 'Starter Value',
+    badgeOm: 'Jalqabaa',
+    deliverablesAm: [
+      '20 የታተሙ ፎቶዎች (20 Print Photos)',
+      '10 ፖስት ፎቶዎች (10 Post Photos)',
+      'ሜካፕ የተካተተ (Professional Makeup)',
+      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+    ],
+    deliverablesEn: [
+      '20 Printed Photos',
+      '10 Post-Processed Photos',
+      'Professional Makeup Included',
+      '150 Soft Copies',
+    ],
+    deliverablesOm: [
+      'Suuraawwan Maxxanfaman 20',
+      'Suuraawwan Post 10',
+      'Makeup Pirofeeshiinaalaa',
+      'Soofti Koppii 150',
+    ],
+  },
+  {
+    id: 'studio-145k',
+    category: 'studio',
+    catAm: 'ስቱዲዮ ቀረጻ',
+    catEn: 'Studio Shoot',
+    catOm: 'Istuudiyoo',
+    nameAm: 'ስታንዳርድ ስቱዲዮ ፓኬጅ (Studio — 14,500)',
+    nameEn: 'Standard Studio Package — 14,500 ETB',
+    nameOm: 'Paakeejii Istuudiyoo Istaanfaardii — 14,500 ETB',
+    price: '14,500',
+    priceNum: 14500,
+    featured: false,
+    badgeAm: 'ተወዳጅ',
+    badgeEn: 'Popular Choice',
+    badgeOm: 'Jaallatamaa',
+    deliverablesAm: [
+      '200 የምስጋና ካርዶች (200 Thank-You Cards)',
+      '40×60 ቦርድ ፎቶ (40x60 Board Photo)',
+      'ሜካፕ የተካተተ (Professional Makeup)',
+      '10 ፖስት ፎቶዎች (10 Post Photos)',
+      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+    ],
+    deliverablesEn: [
+      '200 Thank-You Cards',
+      '40×60 Board Photo',
+      'Professional Makeup Included',
+      '10 Post-Processed Photos',
+      '150 Soft Copies',
+    ],
+    deliverablesOm: [
+      'Kaardiiwwan Galateeffannaa 200',
+      'Suuraa Boordii 40×60',
+      'Makeup Pirofeeshiinaalaa',
+      'Suuraawwan Post 10',
+      'Soofti Koppii 150',
+    ],
+  },
+  {
+    id: 'studio-185k',
+    category: 'studio',
+    catAm: 'ስቱዲዮ ቀረጻ',
+    catEn: 'Studio Shoot',
+    catOm: 'Istuudiyoo',
+    nameAm: 'ፕሪሚየም ስቱዲዮ ፓኬጅ (Studio — 18,500)',
+    nameEn: 'Premium Studio Package — 18,500 ETB',
+    nameOm: 'Paakeejii Istuudiyoo Piromiyami — 18,500 ETB',
+    price: '18,500',
+    priceNum: 18500,
+    featured: true,
+    badgeAm: 'ሙሉ አልበም • ተወዳጅ',
+    badgeEn: 'Best Studio Value',
+    badgeOm: 'Albaama Guutuu',
+    deliverablesAm: [
+      '30×45 ላሚኔት አልበም (10/20 ገጽ)',
+      '1 ሳይን ቦርድ (Sign Board)',
+      '200 የምስጋና ካርዶች (200 Thank-You Cards)',
+      'ሜካፕ የተካተተ (Professional Makeup)',
+      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+    ],
+    deliverablesEn: [
+      '30×45 Laminate Album (10/20 Pages)',
+      '1 Sign Board',
+      '200 Thank-You Cards',
+      'Professional Makeup Included',
+      '150 Soft Copies',
+    ],
+    deliverablesOm: [
+      'Albaama Laamineetii 30×45 (Fuula 10/20)',
+      'Sign Board 1',
+      'Kaardiiwwan Galateeffannaa 200',
+      'Makeup Pirofeeshiinaalaa',
+      'Soofti Koppii 150',
+    ],
+  },
+
+  // ── LUXURY (MESK) PACKAGES ──
+  {
+    id: 'mesk-16k',
+    category: 'mesk',
+    catAm: 'የመስክ ቀረጻ',
+    catEn: 'Luxury Mesk',
+    catOm: 'Mesk Qananii',
+    nameAm: 'የመስክ የቅንጦት ፓኬጅ (Mesk — 16,000)',
+    nameEn: 'Luxury Mesk Package — 16,000 ETB',
+    nameOm: 'Paakeejii Mesk Qananii — 16,000 ETB',
+    price: '16,000',
+    priceNum: 16000,
+    featured: false,
+    badgeAm: 'የመስክ ቪዲዮ',
+    badgeEn: 'Nature & Outdoor',
+    badgeOm: 'Waraabsa Mesk',
+    deliverablesAm: [
+      'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Video)',
+      '1 ሳይን ቦርድ (Sign Board)',
+      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+    ],
+    deliverablesEn: [
+      'Cinematic Mesk (Outdoor) Video',
+      '1 Sign Board',
+      '150 Soft Copies',
+    ],
+    deliverablesOm: [
+      'Viidiyoo Sinimaatiikii Mesk (Alaa)',
+      'Sign Board 1',
+      'Soofti Koppii 150',
+    ],
+  },
+  {
+    id: 'mesk-20k',
+    category: 'mesk',
+    catAm: 'የመስክ ቀረጻ',
+    catEn: 'Luxury Mesk',
+    catOm: 'Mesk Qananii',
+    nameAm: 'የመስክ የቅንጦት አልበም ፓኬጅ (Mesk — 20,000)',
+    nameEn: 'Luxury Mesk + Album — 20,000 ETB',
+    nameOm: 'Paakeejii Mesk + Albaama — 20,000 ETB',
+    price: '20,000',
+    priceNum: 20000,
+    featured: true,
+    badgeAm: 'ቪዲዮ + አልበም',
+    badgeEn: 'Video + Album Set',
+    badgeOm: 'Viidiyoo + Albaama',
+    deliverablesAm: [
+      'የመስክ ሲኒማቲክ ቪዲዮ (Mesk Video)',
+      '30×45 ላሚኔት አልበም (30x45 Laminate Album)',
+      '1 ሳይን ቦርድ (Sign Board)',
+      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+    ],
+    deliverablesEn: [
+      'Cinematic Mesk (Outdoor) Video',
+      '30×45 Laminate Album',
+      '1 Sign Board',
+      '150 Soft Copies',
+    ],
+    deliverablesOm: [
+      'Viidiyoo Sinimaatiikii Mesk (Alaa)',
+      'Albaama Laamineetii 30×45',
+      'Sign Board 1',
+      'Soofti Koppii 150',
+    ],
+  },
+
+  // ── PHOTO / SPECIAL PACKAGE ──
+  {
+    id: 'special-23k',
+    category: 'special',
+    catAm: 'ልዩ ፓኬጅ',
+    catEn: 'Special Keepsake',
+    catOm: 'Paakeejii Addaa',
+    nameAm: 'ልዩ የፎቶ ፓኬጅ (Special Package — 23,000)',
+    nameEn: 'Special Photo Package (2) — 23,000 ETB',
+    nameOm: 'Paakeejii Addaa Suuraa — 23,000 ETB',
+    price: '23,000',
+    priceNum: 23000,
+    featured: true,
+    badgeAm: 'ልዩ ማስታወሻ ስብስብ',
+    badgeEn: 'Complete Keepsake Suite',
+    badgeOm: 'Yaadannoo Addaa',
+    deliverablesAm: [
+      '30×90 ላሚኔት አልበም (10/20 ገጽ)',
+      '50×80 ቦርድ ፎቶ (50x80 Board Photo)',
+      '1 ሳይን ቦርድ (Sign Board)',
+      '200 የምስጋና ካርዶች (200 Thank-You Cards)',
+      '5 ሴቭ ዘ ዴት ፎቶዎች (5 Save-the-Date Photos)',
+      '150 ሶፍት ኮፒ ፎቶዎች (150 Soft Copies)',
+    ],
+    deliverablesEn: [
+      '30×90 Laminate Album (10/20 Pages)',
+      '50×80 Wall Board',
+      '1 Sign Board',
+      '200 Thank-You Cards',
+      '5 Save-the-Date Photos',
+      '150 Soft Copies',
+    ],
+    deliverablesOm: [
+      'Albaama Laamineetii 30×90 (Fuula 10/20)',
+      'Suuraa Boordii 50×80',
+      'Sign Board 1',
+      'Kaardiiwwan Galateeffannaa 200',
+      'Suuraawwan Save-the-date 5',
+      'Soofti Koppii 150',
+    ],
+  },
 ];
 
-/* ── PRICING EXPLORER DATA ─────────────────────────────────────────────── */
-const PRICING_CATS = [
-  { id: 'wedding',  Icon: Heart,    labelAm: 'ሰርግ',       labelEn: 'Wedding',       labelOm: 'Cidha'            },
-  { id: 'outdoor',  Icon: MapPin,   labelAm: 'ውጭ ቀረጻ',    labelEn: 'Outdoor Shoot', labelOm: 'Waraabsa Alaa'    },
-  { id: 'indoor',   Icon: Sliders,  labelAm: 'ቤት ውስጥ',    labelEn: 'Indoor Shoot',  labelOm: 'Waraabsa Keessaa' },
-  { id: 'studio',   Icon: Film,     labelAm: 'ስቱዲዮ ቀረጻ',  labelEn: 'Studio Shoot',  labelOm: 'Istuudiyoo'       },
-  { id: 'velo',     Icon: Video,    labelAm: 'ቬሎ (ቪዲዮ)', labelEn: 'Velo (Video)',  labelOm: 'Viidiyoo'         },
-  { id: 'makeup',   Icon: Sparkles, labelAm: 'ሜካፕ',       labelEn: 'Makeup',        labelOm: 'Makeup'           },
-  { id: 'decor',    Icon: Layers,   labelAm: 'ዲኮሬሽን',     labelEn: 'Decor & Setup', labelOm: 'Miidhagina'       },
-];
-
-// null = not included in this category
-const PKG_INCLUDES = {
-  wedding: ['photo','video','car','suit','studio','makeup','board','album','decor'],
-  outdoor: ['photo','video','car',  null,    null, 'makeup',   null, 'album',  null],
-  indoor:  ['photo','video',  null, 'suit', 'studio','makeup',  null, 'album',  null],
-  studio:  ['photo',   null,  null, 'suit', 'studio','makeup',  null, 'album',  null],
-  velo:    ['photo','video','car',   null,    null,    null, 'board', 'album',  null],
-  makeup:  ['photo',   null,  null, 'suit',   null, 'makeup',   null, 'album',  null],
-  decor:   ['photo','video','car',   null,    null, 'makeup', 'board','album', 'decor'],
-};
-
-const PKG_CAT_META = {
-  wedding: { pkgIdx: 2, imgIdx: 1 },
-  outdoor: { pkgIdx: 1, imgIdx: 0 },
-  indoor:  { pkgIdx: 0, imgIdx: 3 },
-  studio:  { pkgIdx: 0, imgIdx: 3 },
-  velo:    { pkgIdx: 1, imgIdx: 5 },
-  makeup:  { pkgIdx: 0, imgIdx: 3 },
-  decor:   { pkgIdx: 2, imgIdx: 4 },
-};
-
-const SVC_MODULES = [
-  { id: 'photo',  price: 15000, bg: 'linear-gradient(145deg,#d4956c,#8b5e3c)', Icon: Camera,  labelAm: 'ፎቶ',        labelEn: 'Photography',   labelOm: 'Suuraa',      imgIdx: 0 },
-  { id: 'video',  price: 15000, bg: 'linear-gradient(145deg,#6b8cba,#3a5882)', Icon: Video,   labelAm: 'ቬሎ (ቪዲዮ)', labelEn: 'Velo (Video)',  labelOm: 'Viidiyoo',    imgIdx: 5 },
-  { id: 'car',    price:  5000, bg: 'linear-gradient(145deg,#8a9e7a,#556644)', Icon: Play,    labelAm: 'ሰርግ ካር',    labelEn: 'Wedding Car',   labelOm: 'Konkolaataa', imgIdx: 1 },
-  { id: 'suit',   price:  8000, bg: 'linear-gradient(145deg,#b07090,#7a4560)', Icon: Layers,  labelAm: 'ልብስ',       labelEn: 'Suit & Dress',  labelOm: 'Uffata',      imgIdx: 3 },
-  { id: 'studio', price:  8000, bg: 'linear-gradient(145deg,#8a7ab0,#5a4a80)', Icon: Film,    labelAm: 'ስቱዲዮ',     labelEn: 'Studio Session',labelOm: 'Istuudiyoo',  imgIdx: 6 },
-  { id: 'makeup', price:  5000, bg: 'linear-gradient(145deg,#c07880,#8a4a52)', Icon: Sparkles,labelAm: 'ሜካፕ',      labelEn: 'Makeup',        labelOm: 'Makeup',      imgIdx: 3 },
-  { id: 'board',  price:  3000, bg: 'linear-gradient(145deg,#6a9090,#3a6060)', Icon: Quote,   labelAm: 'ሳይን ቦርድ',  labelEn: 'Signing Board', labelOm: 'Boordii',     imgIdx: 7 },
-  { id: 'album',  price:  7000, bg: 'linear-gradient(145deg,#9a7060,#6a4030)', Icon: Sliders, labelAm: 'ፎቶ አልበም',  labelEn: 'Photo Album',   labelOm: 'Albaama',     imgIdx: 8 },
-  { id: 'decor',  price: 12000, bg: 'linear-gradient(145deg,#b87894,#885060)', Icon: Heart,   labelAm: 'ዲኮሬሽን',    labelEn: 'Decor & Setup', labelOm: 'Miidhagina',  imgIdx: 2 },
+const PACKAGE_CATEGORIES = [
+  { id: 'all',     Icon: Sparkles, labelAm: 'ሁሉም ፓኬጆች',       labelEn: 'All Packages',      labelOm: 'Hundumaa'        },
+  { id: 'wedding', Icon: Video,    labelAm: 'የሰርግ ቪዲዮ',         labelEn: 'Wedding Video',     labelOm: 'Viidiyoo Cidhaa' },
+  { id: 'studio',  Icon: Camera,   labelAm: 'ስቱዲዮ ቀረጻ',         labelEn: 'Studio Packages',   labelOm: 'Istuudiyoo'      },
+  { id: 'mesk',    Icon: Film,     labelAm: 'የመስክ ቀረጻ (Luxury)', labelEn: 'Luxury (Mesk)',    labelOm: 'Mesk Qananii'    },
+  { id: 'special', Icon: Layers,   labelAm: 'ልዩ ፓኬጅ (Special)',   labelEn: 'Special Package',   labelOm: 'Paakeejii Addaa' },
 ];
 
 const galleryImages = [
@@ -465,21 +831,33 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
   const [form, setForm]             = useState({ name: '', date: '', phone: '', note: '' });
   const t = T[lang];
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const pkgName = lang === 'en' ? (selectedPackage?.nameEn ?? 'HOPE Service') : lang === 'om' ? (selectedPackage?.nameOm ?? 'Tajaajila HOPE') : (selectedPackage?.name ?? 'የ HOPE አገልግሎት');
+
+  const pkgName = lang === 'en'
+    ? (selectedPackage?.nameEn ?? selectedPackage?.name ?? 'HOPE Package')
+    : lang === 'om'
+    ? (selectedPackage?.nameOm ?? selectedPackage?.name ?? 'Paakeejii HOPE')
+    : (selectedPackage?.nameAm ?? selectedPackage?.name ?? 'የ HOPE ፓኬጅ');
+
+  const deliverables = lang === 'en'
+    ? (selectedPackage?.deliverablesEn ?? selectedPackage?.deliverablesAm ?? [])
+    : lang === 'om'
+    ? (selectedPackage?.deliverablesOm ?? selectedPackage?.deliverablesAm ?? [])
+    : (selectedPackage?.deliverablesAm ?? []);
+
   const submit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
-    const servicesDetails = selectedPackage?.servicesList?.length
-      ? `\n\n📋 Included Services (${selectedPackage.servicesList.length}):\n` + selectedPackage.servicesList.join('\n')
-      : selectedPackage?.includes?.length
-      ? `\n\n📋 Included Features:\n` + selectedPackage.includes.map(inc => `• ${inc}`).join('\n')
+    const deliverablesText = deliverables.length
+      ? `\n\n📋 Included Deliverables (${deliverables.length}):\n` + deliverables.map(d => `• ${d}`).join('\n')
+      : selectedPackage?.servicesList?.length
+      ? `\n\n📋 Included Services:\n` + selectedPackage.servicesList.join('\n')
       : '';
 
     const formattedMessage = `📸 NEW BOOKING REQUEST — HOPE PHOTO & VELO\n\n` +
       `📦 Package: ${pkgName}\n` +
-      `💰 Total Price: ${selectedPackage?.price ? selectedPackage.price + ' ETB' : 'Custom'}` +
-      servicesDetails + `\n\n` +
+      `💰 Official Price: ${selectedPackage?.price ? selectedPackage.price + ' ETB' : 'Standard Rate'}` +
+      deliverablesText + `\n\n` +
       `👤 Client Name: ${form.name}\n` +
       `📅 Target Date: ${form.date}\n` +
       `📞 Phone: ${form.phone}\n` +
@@ -504,6 +882,7 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
     setSubmitting(false);
     setSubmitted(true);
   };
+
   return (
     <div className="booking-layer" role="dialog" aria-modal="true" aria-labelledby="booking-title">
       <button className="booking-backdrop" aria-label="Close" onClick={onClose} />
@@ -526,7 +905,20 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
               <div className="selected-package">
                 <span>{t.bookingSelectedLabel}</span>
                 <strong>{pkgName}</strong>
-                <b>{selectedPackage.price} ETB</b>
+                <b>{selectedPackage.price ? `${selectedPackage.price} ETB` : ''}</b>
+                {deliverables.length > 0 && (
+                  <div className="selected-pkg-deliverables">
+                    <small>{lang === 'am' ? 'የተካተቱ ዋና ዋና ነገሮች:' : lang === 'om' ? 'Waan Dabalame:' : 'Included:'}</small>
+                    <ul>
+                      {deliverables.slice(0, 4).map((item, idx) => (
+                        <li key={idx}><Check size={12} /> {item}</li>
+                      ))}
+                      {deliverables.length > 4 && (
+                        <li><Sparkles size={12} /> +{deliverables.length - 4} {lang === 'am' ? 'ተጨማሪ አገልግሎቶች' : lang === 'om' ? 'dabalataa' : 'more items'}</li>
+                      )}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
             <form className="booking-form" onSubmit={submit}>
@@ -548,162 +940,144 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
   );
 }
 
-/* ── PRICING EXPLORER ───────────────────────────────────────────────────── */
-function PricingExplorer({ lang, openBooking }) {
-  const [activeCat, setActiveCat]   = useState('wedding');
-  const [customSvcs, setCustomSvcs] = useState(
-    () => new Set(PKG_INCLUDES['wedding'].filter(Boolean))
-  );
-  const t    = T[lang];
-  const meta = PKG_CAT_META[activeCat];
-  const pkg  = packages[meta.pkgIdx];
+/* ── PACKAGES SECTION (FIXED PACKAGES — NO CUSTOMIZER) ──────────────────── */
+function PackagesSection({ lang, openBooking }) {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const t = T[lang];
 
-  useEffect(() => {
-    setCustomSvcs(new Set(PKG_INCLUDES[activeCat].filter(Boolean)));
-  }, [activeCat]);
-
-  const pkgName = lang === 'en' ? pkg.nameEn : lang === 'om' ? pkg.nameOm : pkg.name;
-  const pkgNote = lang === 'en' ? pkg.noteEn : lang === 'om' ? pkg.noteOm : pkg.note;
-
-  const selSvcs    = SVC_MODULES.filter(svc => customSvcs.has(svc.id));
-  const totalPrice = selSvcs.reduce((sum, s) => sum + s.price, 0);
-
-  const toggleSvc = (id) => setCustomSvcs(prev => {
-    const next = new Set(prev);
-    next.has(id) ? next.delete(id) : next.add(id);
-    return next;
-  });
-
-  const bookPkg = {
-    name:   `${lang === 'am' ? 'ካስተም ፓኬጅ' : lang === 'om' ? 'Paakeejii Addaa' : 'Custom Package'} (${selSvcs.length})`,
-    nameEn: `Custom Package (${selSvcs.length} Services)`,
-    nameOm: `Paakeejii Addaa (${selSvcs.length})`,
-    price:  totalPrice.toLocaleString(),
-    servicesList: selSvcs.map(s => `${lang === 'en' ? s.labelEn : lang === 'om' ? s.labelOm : s.labelAm} (${s.labelAm}) — ${(s.price).toLocaleString()} ETB`),
-  };
+  const filteredPackages = activeCategory === 'all'
+    ? PACKAGES_DATA
+    : PACKAGES_DATA.filter(pkg => pkg.category === activeCategory);
 
   return (
-    <section id="pricing" className="pricing-xp section-anchor">
-      <div className="pricing-xp-head">
-        <div>
-          <p className="eyebrow">{T[lang].pricingEyebrow}</p>
-          <h2>{T[lang].pricingH2a}<br /><em>{T[lang].pricingH2b}</em></h2>
+    <section id="pricing" className="pricing-packages-section section-anchor">
+      {/* ── Heading ── */}
+      <div className="packages-section-head">
+        <div className="packages-head-left">
+          <p className="eyebrow">{t.pricingEyebrow}</p>
+          <h2>
+            {t.pricingH2a}
+            <br />
+            <em>{t.pricingH2b}</em>
+          </h2>
         </div>
-        <p className="pricing-xp-note">{T[lang].pricingNote}</p>
+        <p className="packages-section-note">{t.pricingNote}</p>
       </div>
 
-      <div className="pricing-xp-layout">
+      {/* ── Category Filter Tabs ── */}
+      <div className="pkg-tabs-container">
+        <div className="pkg-tabs-wrapper">
+          {PACKAGE_CATEGORIES.map(cat => {
+            const isActive = activeCategory === cat.id;
+            const count = cat.id === 'all'
+              ? PACKAGES_DATA.length
+              : PACKAGES_DATA.filter(p => p.category === cat.id).length;
+            const label = lang === 'en' ? cat.labelEn : lang === 'om' ? cat.labelOm : cat.labelAm;
+            const Icon = cat.Icon;
 
-        {/* ── LEFT SIDEBAR ── */}
-        <aside className="pkg-sidebar">
-          <p className="pkg-sidebar-lbl">
-            {lang === 'am' ? 'ፓኬጅ ምረጡ' : lang === 'om' ? 'Paakeejii Filadhaa' : 'CHOOSE PACKAGE'}
-          </p>
-          <nav className="pkg-cat-nav">
-            {PRICING_CATS.map(c => {
-              const lbl = lang === 'en' ? c.labelEn : lang === 'om' ? c.labelOm : c.labelAm;
-              return (
-                <button key={c.id} className={`pkg-cat-btn${activeCat === c.id ? ' pkg-cat-on' : ''}`}
-                  onClick={() => setActiveCat(c.id)}>
-                  <c.Icon size={17} /><span>{lbl}</span>
-                </button>
-              );
-            })}
-          </nav>
-          <div className="pkg-contact-card">
-            <p className="pkg-contact-hdg">
-              {lang === 'am' ? 'ጥያቄ አለዎ?' : lang === 'om' ? 'Gaaffii Qabdaa?' : 'Have a Question?'}
-            </p>
-            <p className="pkg-contact-txt">
-              {lang === 'am' ? 'ፍጹም ቀን እንዲያቅዱ እዚህ ነን።' : lang === 'om' ? 'Guyyaa bareedaa qopheessuuf asiif jirra.' : "We're here to help you plan a perfect day."}
-            </p>
-            <button className="pkg-contact-btn" onClick={() => openBooking()}>
-              {lang === 'am' ? 'አግኙን' : lang === 'om' ? 'Nu Quunnamaa' : 'Contact Us'} <ArrowRight size={14} />
-            </button>
-          </div>
-        </aside>
-
-        {/* ── CENTER SHOWCASE ── */}
-        <div className="pkg-showcase">
-          <div className="pkg-showcase-card"
-            style={{ backgroundImage: `url(${galleryImages[meta.imgIdx].src})` }}>
-            <div className="pkg-showcase-grad" />
-            <div className="pkg-showcase-body">
-              <p className="pkg-showcase-ew">
-                {lang === 'am' ? 'ፓኬጅ' : lang === 'om' ? 'PAAKEEJII' : 'PACKAGE'}
-              </p>
-              <h3 className="pkg-showcase-name">{pkgName}</h3>
-              <p className="pkg-showcase-note">{pkgNote}</p>
-
-              {/* — Live price counter — */}
-              <div className="pkg-price-display">
-                <span className="pkg-price-lbl">
-                  {lang === 'am' ? 'ገጥላላ ዋጋ' : lang === 'om' ? 'GATII WALIIGALAA' : 'YOUR TOTAL'}
-                </span>
-                <div className="pkg-price-row">
-                  <strong className="pkg-price-num">{totalPrice.toLocaleString()}</strong>
-                  <span className="pkg-price-etb">ETB</span>
-                </div>
-                <span className="pkg-price-svcs">
-                  {selSvcs.length} {lang === 'am' ? 'አገልግሎታ' : lang === 'om' ? 'Tajaajila' : 'services selected'}
-                </span>
-              </div>
-
-              <div className="pkg-svc-strip">
-                {selSvcs.slice(0, 4).map(svc => (
-                  <div key={svc.id} className="pkg-svc-strip-item">
-                    <svc.Icon size={18} />
-                    <span>{lang === 'en' ? svc.labelEn : lang === 'om' ? svc.labelOm : svc.labelAm}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="pkg-explore-btn" onClick={() => openBooking(bookPkg)}>
-                {lang === 'am' ? 'ፓኬጁን ያስይዑ' : lang === 'om' ? 'Paakeejii Barbaachaa' : 'Book Custom Package'} <ArrowRight size={16} />
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                className={`pkg-tab-pill ${isActive ? 'pkg-tab-active' : ''}`}
+                onClick={() => setActiveCategory(cat.id)}
+              >
+                <Icon size={16} />
+                <span>{label}</span>
+                <span className="pkg-tab-count">{count}</span>
               </button>
-            </div>
-          </div>
+            );
+          })}
         </div>
+      </div>
 
-        {/* ── RIGHT GRID — Build Your Package ── */}
-        <div className="pkg-includes">
-          <div className="pkg-includes-bar">
-            <span className="pkg-incl-title">
-              {lang === 'am' ? 'ፓኬጅ አዘጋጅ' : lang === 'om' ? 'PAAKEEJII QOPHEESSAA' : 'BUILD YOUR PACKAGE'}
-            </span>
-            <button className="pkg-view-dtl" onClick={() => openBooking(bookPkg)}>
-              {lang === 'am' ? 'ዝርዝር ይመልከቱ' : lang === 'om' ? "Bal'ina Ilaalaa" : 'View Details'} <ArrowRight size={13} />
-            </button>
-          </div>
-          <div className="pkg-modules-grid">
-            {SVC_MODULES.map((svc) => {
-              const isOn = customSvcs.has(svc.id);
-              const lbl  = lang === 'en' ? svc.labelEn : lang === 'om' ? svc.labelOm : svc.labelAm;
-              return (
-                <button
-                  key={svc.id}
-                  type="button"
-                  className={`pkg-module${isOn ? ' pkg-module-on' : ' pkg-module-off'}`}
-                  style={isOn ? { background: svc.bg } : {}}
-                  onClick={() => toggleSvc(svc.id)}
-                  aria-pressed={isOn}
-                  title={`${lbl} — ${svc.price.toLocaleString()} ETB`}
-                >
-                  <div className="pkg-module-photo"
-                    style={{ backgroundImage: `url(${galleryImages[svc.imgIdx].src})` }} />
-                  <div className="pkg-module-cover" />
-                  <span className="pkg-module-ic"><svc.Icon size={26} /></span>
-                  <span className="pkg-module-nm">{lbl}</span>
-                  <span className="pkg-module-price">+{(svc.price/1000).toFixed(0)}K ETB</span>
-                  <span className="pkg-module-ck">
-                    {isOn ? <Check size={11} /> : <span className="pkg-module-plus">+</span>}
+      {/* ── Packages Grid ── */}
+      <div className="packages-cards-grid">
+        {filteredPackages.map((pkg) => {
+          const name = lang === 'en' ? pkg.nameEn : lang === 'om' ? pkg.nameOm : pkg.nameAm;
+          const categoryTag = lang === 'en' ? pkg.catEn : lang === 'om' ? pkg.catOm : pkg.catAm;
+          const badge = lang === 'en' ? pkg.badgeEn : lang === 'om' ? pkg.badgeOm : pkg.badgeAm;
+          const deliverables = lang === 'en' ? pkg.deliverablesEn : lang === 'om' ? pkg.deliverablesOm : pkg.deliverablesAm;
+
+          return (
+            <article
+              key={pkg.id}
+              className={`pkg-card ${pkg.featured ? 'pkg-card-featured' : ''}`}
+            >
+              {/* Top Meta Bar */}
+              <div className="pkg-card-top">
+                <span className="pkg-card-cat">{categoryTag}</span>
+                {badge && (
+                  <span className={`pkg-card-badge ${pkg.featured ? 'badge-featured' : ''}`}>
+                    {pkg.featured && <Sparkles size={12} />}
+                    {badge}
                   </span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="pkg-disclaimer"><Check size={13} /> {T[lang].priceDisclaimer}</p>
-        </div>
+                )}
+              </div>
 
+              {/* Package Title */}
+              <h3 className="pkg-card-title">{name}</h3>
+
+              {/* Price Tag */}
+              <div className="pkg-card-price-box">
+                <div className="pkg-card-price-row">
+                  <strong className="pkg-card-price-num">{pkg.price}</strong>
+                  <span className="pkg-card-price-currency">ETB</span>
+                </div>
+                <span className="pkg-card-price-sub">
+                  {lang === 'am' ? 'ይፋዊ ዋጋ' : lang === 'om' ? 'Gatii Idilee' : 'Official Package Rate'}
+                </span>
+              </div>
+
+              {/* Deliverables List */}
+              <div className="pkg-card-deliverables">
+                <span className="pkg-deliverables-header">
+                  {lang === 'am' ? 'የተካተቱ ዋና ዋና አገልግሎቶች' : lang === 'om' ? 'Waan Dabalame' : 'Deliverables & Inclusions'}
+                </span>
+                <ul className="pkg-deliverables-list">
+                  {deliverables.map((item, idx) => (
+                    <li key={idx}>
+                      <span className="deliverable-check">
+                        <Check size={13} strokeWidth={2.8} />
+                      </span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Action Button */}
+              <div className="pkg-card-action">
+                <button
+                  type="button"
+                  className={`pkg-select-btn ${pkg.featured ? 'btn-featured' : ''}`}
+                  onClick={() => openBooking(pkg)}
+                >
+                  <span>{t.pkgCta}</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      {/* ── Disclaimer & Direct Call Strip ── */}
+      <div className="pkg-footer-strip">
+        <div className="pkg-footer-guarantee">
+          <Check size={16} />
+          <span>{t.priceDisclaimer}</span>
+        </div>
+        <div className="pkg-footer-contacts">
+          <a href={`tel:${PHONE_LINK}`} className="pkg-quick-call">
+            <Phone size={14} />
+            <span>{PHONE_DISPLAY}</span>
+          </a>
+          <a href={TELEGRAM_LINK} target="_blank" rel="noreferrer" className="pkg-quick-tg">
+            <Send size={14} />
+            <span>{lang === 'am' ? 'በቴሌግራም ይጠይቁን' : lang === 'om' ? 'Telegram Irratti' : 'Telegram Booking'}</span>
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -779,10 +1153,21 @@ function App() {
 
         {/* ── HERO — Reference Design matching user mock ── */}
         <section id="home" className="hero hero-ref-design section-anchor">
-          <div className="hero-bg-image" style={{ backgroundImage: `url(${ASSET}/bg.png)` }} />
+          {/* Hero Background Image Container (Desktop vs Mobile specific image) */}
+          <div className="hero-couple-container">
+            <picture>
+              <source media="(max-width: 900px)" srcSet={`${ASSET}/hero_mobile_bg.jpg`} />
+              <img
+                src={`${ASSET}/weee.jpg`}
+                alt="Hope Photo Hero Background"
+                className="hero-couple-img"
+              />
+            </picture>
+          </div>
+
           <div className="hero-bg-overlay" />
 
-          {/* Top Row: Left Text + Right Couple Photo */}
+          {/* Top Row: Left Text + Floating Pills */}
           <div className="hero-top-row">
             {/* Left Content Column */}
             <div className="hero-content-col">
@@ -797,7 +1182,7 @@ function App() {
                     <span className="h1-row">
                       ጊዜያት
                       <span className="h1-circle-avatar">
-                        <img src={galleryImages[0].src} alt="Hope Photo" />
+                        <img src={`${ASSET}/hero-h1-avatar.jpg`} alt="Bride sunset silhouette" />
                       </span>
                     </span>
                     <span className="h1-row">ያልፋሉ፤</span>
@@ -808,7 +1193,7 @@ function App() {
                     <span className="h1-row">
                       Yeroon
                       <span className="h1-circle-avatar">
-                        <img src={galleryImages[0].src} alt="Hope Photo" />
+                        <img src={`${ASSET}/hero-h1-avatar.jpg`} alt="Bride sunset silhouette" />
                       </span>
                     </span>
                     <span className="h1-row">ni darba;</span>
@@ -819,7 +1204,7 @@ function App() {
                     <span className="h1-row">
                       Moments
                       <span className="h1-circle-avatar">
-                        <img src={galleryImages[0].src} alt="Hope Photo" />
+                        <img src={`${ASSET}/hero-h1-avatar.jpg`} alt="Bride sunset silhouette" />
                       </span>
                     </span>
                     <span className="h1-row">pass—</span>
@@ -861,18 +1246,17 @@ function App() {
             </div>
           </div>
 
-          {/* Connected 3 Proof Tiles at bottom of hero section */}
+          {/* 3 Proof Cards connected directly inside the bottom of hero section */}
           <div className="hero-proof-strip">
-            {[galleryImages[0], galleryImages[1], galleryImages[3]].map((img, i) => (
-              <div key={i} className="hero-proof-tile">
-                <img
-                  src={img.src}
-                  alt={lang === 'en' ? img.altEn : lang === 'om' ? img.altOm : img.altAm}
-                  loading="eager"
-                  decoding="async"
-                />
-              </div>
-            ))}
+            <div className="hero-proof-tile">
+              <img src={`${ASSET}/hero-card-1.jpg`} alt="Golden Hour Sunset Love" loading="eager" />
+            </div>
+            <div className="hero-proof-tile">
+              <img src={`${ASSET}/hero-card-2.jpg`} alt="Garden Wedding Walk" loading="eager" />
+            </div>
+            <div className="hero-proof-tile">
+              <img src={`${ASSET}/hero-card-3.jpg`} alt="Evening Dusk Couple" loading="eager" />
+            </div>
           </div>
         </section>
 
@@ -883,7 +1267,10 @@ function App() {
             <p className="script">{t.storyScript}</p>
             <h2>{t.storyH2a}<br /><em>{t.storyH2b}</em></h2>
             <p>{t.storyBody}</p>
-            <button className="underlined-button" onClick={() => scrollToSection('work')}>{t.storyCta} <ArrowRight size={16} /></button>
+            <button className="underlined-button story-cta-btn" onClick={() => scrollToSection('work')}>
+              <span>{t.storyCta}</span>
+              <ArrowRight size={16} className="btn-arrow-icon" />
+            </button>
           </Reveal>
           <div className="intro-picture">
             <img src={galleryImages[6].src} alt={lang === 'en' ? galleryImages[6].altEn : lang === 'om' ? galleryImages[6].altOm : galleryImages[6].altAm} />
@@ -1046,8 +1433,8 @@ function App() {
           </div>
         </section>
 
-        {/* ── PRICING ── */}
-        <PricingExplorer lang={lang} openBooking={openBooking} />
+        {/* ── PRICING PACKAGES ── */}
+        <PackagesSection lang={lang} openBooking={openBooking} />
 
         {/* ── TESTIMONIALS ── */}
         <section id="testimonials" className="testimonials-section section-anchor">
