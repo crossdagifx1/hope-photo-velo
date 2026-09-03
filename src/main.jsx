@@ -846,7 +846,10 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
       `📞 Phone: ${form.phone}\n` +
       `📝 Note / Details: ${form.note || 'N/A'}`;
 
+    let orderId = selectedPackage?.id || 'wedding-bronze';
+
     try {
+      // 1. Send Telegram Notification to studio admins
       await Promise.all(
         TELEGRAM_CHAT_IDS.map(chat_id =>
           fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -859,9 +862,8 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
           })
         )
       );
-
       // Register order into CRM & Unified Admin Message Hub
-      fetch('/api/orders', {
+      const orderRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -874,12 +876,31 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
           notes: form.note,
           category: selectedPackage?.category || 'custom'
         })
-      }).catch(() => {});
+      });
+      const orderData = await orderRes.json();
+      if (orderData?.order?.id) {
+        orderId = orderData.order.id;
+      }
+
+      await Promise.all(
+        TELEGRAM_CHAT_IDS.map(chat_id =>
+          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id,
+              text: formattedMessage + `\n🔖 Order ID: ${orderId}`,
+            }),
+          })
+        )
+      );
     } catch (err) {
       console.error(err);
     }
+
     setSubmitting(false);
-    setSubmitted(true);
+    // DIRECTLY GO TO TG BOT WITH /start AND AGREE ORDER!
+    window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${orderId}`;
   };
 
   return (
@@ -893,7 +914,15 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
             <p className="eyebrow">{t.successEyebrow}</p>
             <h2>{t.successH2}</h2>
             <p>{t.successBody}</p>
-            <button className="primary-button" onClick={onClose}>{t.backBtn} <ArrowRight size={17} /></button>
+            <button
+              className="primary-button"
+              onClick={() => {
+                window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${selectedPackage?.id || 'wedding-bronze'}`;
+              }}
+            >
+              <Send size={17} />
+              <span>{lang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ & ውል ይፈራረሙ' : 'Open Telegram Bot & Sign Agreement'}</span>
+            </button>
           </div>
         ) : (
           <>
@@ -929,16 +958,18 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
                 </label>
               ))}
               <button className="primary-button form-button" type="submit" disabled={submitting}>
-                {submitting ? (lang === 'am' ? 'በመላክ ላይ...' : lang === 'om' ? 'Ergamaa Jira...' : 'Submitting...') : t.bookingSubmit} <Send size={17} />
+                {submitting ? (lang === 'am' ? 'ወደ ቴሌግራም በመሄድ ላይ...' : 'Opening Telegram Bot...') : t.bookingSubmit} <Send size={17} />
               </button>
               <button
                 type="button"
                 className="telegram-miniapp-quicklink"
-                onClick={() => { onClose(); onOpenTma?.(selectedPackage); }}
+                onClick={() => {
+                  const pkgId = selectedPackage?.id || 'wedding-bronze';
+                  window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${pkgId}`;
+                }}
               >
-                <Sparkles size={16} />
-                <span>{lang === 'am' ? 'በቴሌግራም ሚኒ አፕ ዋጋ ይደራደሩ & ስምምነት ይፈራረሙ' : 'Negotiate & Sign Agreement in Telegram Mini App'}</span>
-                <ArrowRight size={14} />
+                <Send size={16} />
+                <span>{lang === 'am' ? 'ቀጥታ በቴሌግራም ቦት ይዘዙ & ውል ይፈራረሙ ➜' : 'Directly Order & Sign Agreement in Telegram Bot ➜'}</span>
               </button>
             </form>
           </>
@@ -957,7 +988,7 @@ function PackagesSection({ lang, openBooking }) {
 
   const handlePackageClick = (pkg) => {
     const pkgId = pkg?.id || 'wedding-bronze';
-    window.open(`https://t.me/HoopStudioSystemBot?start=order_${pkgId}`, '_blank');
+    window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${pkgId}`;
   };
 
   return (
@@ -1004,8 +1035,6 @@ function PackagesSection({ lang, openBooking }) {
         </div>
         <a
           href={`https://t.me/HoopStudioSystemBot?start=pricing_${activeCategory}`}
-          target="_blank"
-          rel="noreferrer"
           className="ptb-direct-btn"
         >
           <Send size={15} />
@@ -1026,6 +1055,8 @@ function PackagesSection({ lang, openBooking }) {
             <article
               key={pkg.id}
               className={`pricing-v2-card ${pkg.isDark ? 'card-premium-dark' : 'card-light-tier'}`}
+              onClick={() => handlePackageClick(pkg)}
+              style={{ cursor: 'pointer' }}
             >
               {/* Card Header: Tier Label & Pill Badge */}
               <div className="card-v2-top-bar">
@@ -1157,7 +1188,7 @@ function App() {
 
   const openBooking = (pkg = null) => {
     const pkgId = pkg?.id || 'wedding-bronze';
-    window.open(`https://t.me/HoopStudioSystemBot?start=order_${pkgId}`, '_blank');
+    window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${pkgId}`;
     setMenuOpen(false);
   };
   const nav = (t) => { scrollToSection(t); setMenuOpen(false); };
