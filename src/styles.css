@@ -1585,8 +1585,91 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 .form-button { width:100%; margin-top:1.4rem; background:var(--red); min-height:54px; font-size:13.5px; font-weight:800; }
 .booking-success { min-height:calc(100vh - 8rem); display:flex; flex-direction:column; justify-content:center; align-items:flex-start; }
 .success-mark { width:74px; height:74px; display:grid; place-items:center; margin-bottom:2.2rem; border-radius:50%; background:var(--red); color:#fff; }
-.booking-success p:not(.eyebrow) { max-width:380px; color:#42362f; font-size:1.12rem; font-weight:500; line-height:1.72; }
+.booking-success p:not(.eyebrow) { max-width:100%; color:#42362f; font-size:1.12rem; font-weight:500; line-height:1.72; }
 .booking-success .primary-button { margin-top:1.2rem; }
+
+.booking-success-summary-box {
+  width: 100%;
+  background: #f4ede6;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-left: 4px solid var(--red);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  margin: 1.4rem 0 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.bss-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  border-bottom: 1px dashed rgba(30, 24, 22, 0.12);
+  padding-bottom: 0.45rem;
+}
+
+.bss-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.bss-label {
+  color: #5a4b42;
+  font-weight: 600;
+}
+
+.bss-val {
+  color: #1a1310;
+  font-weight: 700;
+  text-align: right;
+}
+
+.bss-price {
+  color: var(--red);
+  font-size: 1.1rem;
+}
+
+.bss-id {
+  background: rgba(185, 37, 57, 0.1);
+  color: var(--red);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 800;
+}
+
+.booking-auto-redirect-note {
+  font-size: 0.9rem !important;
+  color: #6b5c54 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.direct-tg-cta-button {
+  width: 100%;
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%) !important;
+  color: #0b1329 !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  min-height: 56px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.65rem !important;
+  text-decoration: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45) !important;
+  transition: all 0.25s ease !important;
+  cursor: pointer;
+}
+
+.direct-tg-cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(212, 175, 55, 0.65) !important;
+  color: #000 !important;
+}
 @keyframes slide-in { from { transform:translateX(100%); } to { transform:translateX(0); } }
 
 /* ── 900px BREAKPOINT ── */

@@ -443,20 +443,84 @@ async function handleMessage(msg) {
       const existingOrder = db.getOrder(orderId);
       const targetUrl = `${APP_URL}?tma=1&order_id=${orderId}&tab=agreement`;
 
-      const agreementMsg = `✨ <b>Welcome to HOPE Photo & Velo!</b>\n\n` +
-        `Your official digital service contract for Order <b>${orderId}</b> is ready.\n\n` +
-        (existingOrder ? `📦 Package: <b>${existingOrder.packageName}</b>\n💰 Total: <b>${(existingOrder.negotiatedPrice || existingOrder.totalPrice || 0).toLocaleString()} ETB</b>\n\n` : '') +
-        `👇 Tap below to review the contract terms and sign with your e-signature:`;
+      if (existingOrder) {
+        // Link client's Telegram to this order
+        db.updateOrder(orderId, {
+          telegramUserId: chatId,
+          telegramUsername: fromUser.username || ''
+        });
+        db.linkChatToOrder(chatId, orderId);
 
-      await sendTelegramMessage(chatId, agreementMsg, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '✍️ Review & Sign Agreement', web_app: { url: targetUrl } }],
-            [{ text: '📞 Call Studio', url: 'tel:+251910526962' }]
-          ]
-        }
-      });
-      return;
+        const clientGreeting = existingOrder.clientName ? `ሰላም ${existingOrder.clientName}` : `ሰላም`;
+        const orderSummaryMsg = `👋 <b>${clientGreeting}! እንኳን ወደ HOPE Photo & Velo በደህና መጡ።</b>\n\n` +
+          `📸 የቀጠሮ መረጃዎ እና የመረጡት ፓኬጅ ዝርዝር በስኬት ተመዝግቧል:\n\n` +
+          `━━━━━━━━━━━━━━━━━━━\n` +
+          `👤 <b>ሙሉ ስም (Client):</b> ${existingOrder.clientName || 'N/A'}\n` +
+          `📞 <b>ስልክ (Phone):</b> ${existingOrder.phone || 'N/A'}\n` +
+          `📅 <b>የቀጠሮ ቀን (Event Date):</b> ${existingOrder.eventDate || 'N/A'}\n` +
+          `📝 <b>የዝግጅት አይነት / ማስታወሻ:</b> ${existingOrder.notes || 'N/A'}\n` +
+          `📦 <b>የመረጡት ፓኬጅ:</b> ${existingOrder.packageName}\n` +
+          `💰 <b>ይፋዊ ዋጋ (Total Price):</b> <b>${(existingOrder.negotiatedPrice || existingOrder.totalPrice || 0).toLocaleString()} ETB</b>\n` +
+          `🔖 <b>የትእዛዝ መለያ (Order ID):</b> <code>${orderId}</code>\n` +
+          `━━━━━━━━━━━━━━━━━━━\n\n` +
+          `✍️ <b>ይፋዊ ውልዎን በዲጂታል ፊርማ ለማጠናቀቅ፡</b>\n` +
+          `ከታች ያለውን <b>'✍️ ውሉን ፈርመው ያጠናቁ (Sign Agreement)'</b> የሚለውን ይጫኑ። ውሉ በራስ-ሰር በመረጃዎ ተሞልቶ የቀረበ ሲሆን በስልክዎ ላይ በቀጥታ በዲጂታል ፊርማ ያጠናቅቃሉ።\n\n` +
+          `💬 <b>ዋጋ ለመደራደር ወይም ጥያቄ ለመጠየቅ፡</b>\n` +
+          `ልዩ ቅናሽ ወይም ተጨማሪ አገልግሎት ከፈለጉ በቀጥታ እዚህ በቴሌግራም ይጻፉልን — ማኔጅመንታችን ወዲያውኑ ይመልስልዎታል።`;
+
+        await sendTelegramMessage(chatId, orderSummaryMsg, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '✍️ ውሉን ፈርመው ያጠናቁ (Sign Agreement)', web_app: { url: targetUrl } }],
+              [
+                { text: '💬 ዋጋ ይደራደሩ (Negotiate Discount)', callback_data: `reply_chat:${chatId}` },
+                { text: '📞 ይደውሉ (Call Studio)', url: 'tel:+251910526962' }
+              ]
+            ]
+          }
+        });
+
+        // Notify management that client with full info is in the bot!
+        const adminNotice = `🔔 <b>ደንበኛ መረጃውን ሞልቶ ቦቱ ጋር ደርሷል (Client Joined Bot with Info)!</b>\n\n` +
+          `👤 <b>ስም:</b> ${existingOrder.clientName}\n` +
+          `📞 <b>ስልክ:</b> ${existingOrder.phone}\n` +
+          `📅 <b>ቀን:</b> ${existingOrder.eventDate}\n` +
+          `📝 <b>ማስታወሻ:</b> ${existingOrder.notes || 'N/A'}\n` +
+          `📦 <b>ፓኬጅ:</b> ${existingOrder.packageName}\n` +
+          `💰 <b>ዋጋ:</b> ${(existingOrder.negotiatedPrice || existingOrder.totalPrice || 0).toLocaleString()} ETB\n` +
+          `🔖 <b>Order ID:</b> <code>${orderId}</code>\n` +
+          `🆔 <b>Telegram:</b> @${fromUser.username || 'N/A'} (<code>${chatId}</code>)\n\n` +
+          `<i>ደንበኛው የውል መፈረሚያ ሊንክ ተልኮለታል። እዚህ ጋር ቀጥታ ማናገር ወይም ቅናሽ መስጠት ይችላሉ።</i>`;
+
+        await notifyAdmins(adminNotice, {
+          reply_markup: {
+            inline_keyboard: [
+              [
+                { text: '💬 መልስ ይጻፉ (Reply)', callback_data: `reply_chat:${chatId}` },
+                { text: '🏷️ ቅናሽ ይስጡ (Discount)', callback_data: `discount_chat:${chatId}` }
+              ],
+              [
+                { text: '📜 ውል በድጋሚ ላኩ (Resend Agreement)', callback_data: `agree_chat:${chatId}` }
+              ]
+            ]
+          }
+        });
+        return;
+      } else {
+        // Fallback for cold start or direct link
+        const fallbackMsg = `✨ <b>Welcome to HOPE Photo & Velo!</b>\n\n` +
+          `Your official booking reference: <code>${orderId}</code>\n\n` +
+          `👇 Tap below to review contract terms and sign with your digital signature:`;
+        await sendTelegramMessage(chatId, fallbackMsg, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '✍️ Review & Sign Agreement', web_app: { url: targetUrl } }],
+              [{ text: '📞 Call Studio', url: 'tel:+251910526962' }]
+            ]
+          }
+        });
+        return;
+      }
     }
 
     if (payload.startsWith('chat_')) {

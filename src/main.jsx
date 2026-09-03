@@ -809,9 +809,10 @@ function PageLoader({ onDone }) {
 
 /* ── BOOKING PANEL ─────────────────────────────────────────────────────── */
 function BookingPanel({ selectedPackage, onClose, lang }) {
-  const [submitted, setSubmitted]   = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm]             = useState({ name: '', date: '', phone: '', note: '' });
+  const [submitted, setSubmitted]       = useState(false);
+  const [submitting, setSubmitting]     = useState(false);
+  const [form, setForm]                 = useState({ name: '', date: '', phone: '', note: '' });
+  const [createdOrder, setCreatedOrder] = useState(null);
   const t = T[lang];
   const update = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -846,24 +847,12 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
       `📞 Phone: ${form.phone}\n` +
       `📝 Note / Details: ${form.note || 'N/A'}`;
 
-    let orderId = selectedPackage?.id || 'wedding-bronze';
+    let orderId = 'HOPE-' + Math.floor(1000 + Math.random() * 9000);
+    const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
 
     try {
-      // 1. Send Telegram Notification to studio admins
-      await Promise.all(
-        TELEGRAM_CHAT_IDS.map(chat_id =>
-          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id,
-              text: formattedMessage,
-            }),
-          })
-        )
-      );
-      // Register order into CRM & Unified Admin Message Hub
-      const orderRes = await fetch('/api/orders', {
+      // 1. Register order into CRM & Unified Admin Message Hub
+      const orderRes = await fetch(`${apiBase}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -882,6 +871,7 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
         orderId = orderData.order.id;
       }
 
+      // 2. Send Telegram Notification to studio admins
       await Promise.all(
         TELEGRAM_CHAT_IDS.map(chat_id =>
           fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -898,7 +888,19 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
       console.error(err);
     }
 
+    const newOrderObj = {
+      id: orderId,
+      name: form.name,
+      phone: form.phone,
+      date: form.date,
+      note: form.note,
+      pkgName,
+      price: selectedPackage?.price
+    };
+    setCreatedOrder(newOrderObj);
     setSubmitting(false);
+    setSubmitted(true);
+
     // DIRECTLY GO TO TG BOT WITH /start AND AGREE ORDER!
     window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${orderId}`;
   };
@@ -910,19 +912,56 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
         <button className="icon-button close-button" onClick={onClose}><X size={20} /></button>
         {submitted ? (
           <div className="booking-success">
-            <div className="success-mark"><Check size={34} /></div>
-            <p className="eyebrow">{t.successEyebrow}</p>
-            <h2>{t.successH2}</h2>
-            <p>{t.successBody}</p>
-            <button
-              className="primary-button"
-              onClick={() => {
-                window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${selectedPackage?.id || 'wedding-bronze'}`;
-              }}
+            <div className="success-mark"><Check size={36} /></div>
+            <p className="eyebrow">{lang === 'am' ? 'የቀጠሮ መረጃዎ ተመዝግቧል!' : lang === 'om' ? 'Galmeen Isini Milkaa\'eera!' : 'Booking Info Registered!'}</p>
+            <h2>{lang === 'am' ? 'ቀጥታ ወደ ቴሌግራም ቦት ይሂዱ!' : lang === 'om' ? 'Gara Bootii Telegram Dhaqaa!' : 'Continue to Telegram Bot!'}</h2>
+
+            <div className="booking-success-summary-box">
+              <div className="bss-row">
+                <span className="bss-label">👤 {lang === 'am' ? 'ሙሉ ስም:' : 'Full Name:'}</span>
+                <strong className="bss-val">{createdOrder?.name || form.name}</strong>
+              </div>
+              <div className="bss-row">
+                <span className="bss-label">📞 {lang === 'am' ? 'ስልክ ቁጥር:' : 'Phone:'}</span>
+                <strong className="bss-val">{createdOrder?.phone || form.phone}</strong>
+              </div>
+              <div className="bss-row">
+                <span className="bss-label">📅 {lang === 'am' ? 'የቀጠሮ ቀን:' : 'Event Date:'}</span>
+                <strong className="bss-val">{createdOrder?.date || form.date}</strong>
+              </div>
+              {form.note && (
+                <div className="bss-row">
+                  <span className="bss-label">📝 {lang === 'am' ? 'ማስታወሻ:' : 'Note:'}</span>
+                  <span className="bss-val">{form.note}</span>
+                </div>
+              )}
+              <div className="bss-row">
+                <span className="bss-label">📦 {lang === 'am' ? 'የመረጡት ፓኬጅ:' : 'Package:'}</span>
+                <strong className="bss-val">{pkgName}</strong>
+              </div>
+              <div className="bss-row">
+                <span className="bss-label">💰 {lang === 'am' ? 'ይፋዊ ዋጋ:' : 'Price:'}</span>
+                <strong className="bss-val bss-price">{selectedPackage?.price} ETB</strong>
+              </div>
+              <div className="bss-row">
+                <span className="bss-label">🔖 {lang === 'am' ? 'የትእዛዝ መለያ:' : 'Order ID:'}</span>
+                <code className="bss-id">{createdOrder?.id}</code>
+              </div>
+            </div>
+
+            <p className="booking-auto-redirect-note">
+              {lang === 'am' ? 'የመረጡት ፓኬጅ እና መረጃዎ በቀጥታ ወደ ቴሌግራም ቦቱ ተላልፏል:: ካልተከፈተ ከታች ያለውን ይጫኑ:' : 'Your package & user info is linked directly to Telegram Bot. Tap below to continue:'}
+            </p>
+
+            <a
+              className="primary-button direct-tg-cta-button"
+              href={`https://t.me/HoopStudioSystemBot?start=order_${createdOrder?.id || 'wedding-bronze'}`}
+              target="_blank"
+              rel="noreferrer"
             >
-              <Send size={17} />
-              <span>{lang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ & ውል ይፈራረሙ' : 'Open Telegram Bot & Sign Agreement'}</span>
-            </button>
+              <Send size={18} />
+              <span>{lang === 'am' ? '👉 ወደ ቴሌግራም ቦት ይሂዱ & ውል ይፈራረሙ' : '👉 Open Telegram Bot & Sign Agreement'}</span>
+            </a>
           </div>
         ) : (
           <>
