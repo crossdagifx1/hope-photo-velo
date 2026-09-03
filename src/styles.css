@@ -87,6 +87,72 @@ img { display:block; max-width:100%; }
 }
 .lang-toggle { display:inline-flex; align-items:center; gap:.4rem; min-height:42px; padding:0 .9rem; border:1.5px solid var(--line); background:transparent; color:var(--ink); font:800 11.5px 'DM Mono',monospace; letter-spacing:.07em; text-transform:uppercase; transition:all .2s; }
 .lang-toggle:hover { border-color:var(--red); color:var(--red); }
+.header-tma-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 42px;
+  padding: 0 .95rem;
+  border: 1.5px solid #b92539;
+  background: rgba(185, 37, 57, 0.08);
+  color: #b92539;
+  font: 800 12px 'DM Mono', monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.header-tma-btn:hover {
+  background: #b92539;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(185, 37, 57, 0.3);
+  transform: translateY(-1px);
+}
+.tma-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 13, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.25s ease;
+}
+.tma-modal-window {
+  width: 100%;
+  max-width: 480px;
+  height: 92vh;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+.telegram-miniapp-quicklink {
+  width: 100%;
+  margin-top: 0.8rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(185, 37, 57, 0.12) 0%, rgba(212, 175, 55, 0.12) 100%);
+  border: 1.5px dashed rgba(185, 37, 57, 0.4);
+  color: #b92539;
+  font: 700 12.5px 'DM Sans', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.telegram-miniapp-quicklink:hover {
+  background: #b92539;
+  color: #ffffff;
+  border-color: #b92539;
+}
 .header-book, .primary-button { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:52px; padding:0 1.4rem; border:0; background:var(--ink); color:#fff; font:800 13px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; transition:transform .2s var(--ease), background .2s; }
 .header-book { min-height:42px; padding:0 1.2rem; background:var(--red); font-size:12px; }
 .header-book:hover, .primary-button:hover { transform:translateY(-2px); background:var(--red-dark); }

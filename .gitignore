@@ -5,3 +5,5 @@ dist
 chrome-check-profile
 .DS_Store
 *.local
+
+.vercel

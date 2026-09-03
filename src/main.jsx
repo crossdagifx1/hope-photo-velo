@@ -6,6 +6,7 @@ import {
   MessageCircle, Phone, Play, Quote, Send, Sliders, Sparkles, Video, X,
 } from 'lucide-react';
 import './styles.css';
+import TelegramMiniApp from './tma/TelegramMiniApp.jsx';
 
 /* ── CONSTANTS ──────────────────────────────────────────────────────────── */
 const PHONE_DISPLAY     = '09 10 52 69 62';
@@ -913,6 +914,15 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
               <button className="primary-button form-button" type="submit" disabled={submitting}>
                 {submitting ? (lang === 'am' ? 'በመላክ ላይ...' : lang === 'om' ? 'Ergamaa Jira...' : 'Submitting...') : t.bookingSubmit} <Send size={17} />
               </button>
+              <button
+                type="button"
+                className="telegram-miniapp-quicklink"
+                onClick={() => { onClose(); onOpenTma?.(selectedPackage); }}
+              >
+                <Sparkles size={16} />
+                <span>{lang === 'am' ? 'በቴሌግራም ሚኒ አፕ ዋጋ ይደራደሩ & ስምምነት ይፈራረሙ' : 'Negotiate & Sign Agreement in Telegram Mini App'}</span>
+                <ArrowRight size={14} />
+              </button>
             </form>
           </>
         )}
@@ -1065,17 +1075,25 @@ function Reveal({ children, className = '', delay = 0 }) {
 
 /* ── APP ────────────────────────────────────────────────────────────────── */
 function App() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isTmaDirect = urlParams.get('tma') === '1' || Boolean(window.Telegram?.WebApp?.initData);
+
+  if (isTmaDirect) {
+    return <TelegramMiniApp />;
+  }
+
   const [loaded, setLoaded]   = useState(false);
   const [lang, setLang]       = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingPkg, setBookingPkg] = useState(null);
+  const [showTmaModal, setShowTmaModal] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
   const [activeLocTab, setActiveLocTab] = useState(0);
 
   const t = T[lang];
 
-  useEffect(() => { document.body.style.overflow = (!loaded || bookingPkg) ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [loaded, bookingPkg]);
+  useEffect(() => { document.body.style.overflow = (!loaded || bookingPkg || showTmaModal) ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [loaded, bookingPkg, showTmaModal]);
 
   const openBooking = (pkg = null) => { setBookingPkg(pkg ?? { name: 'የ HOPE አገልግሎት', nameEn: 'HOPE Service', nameOm: 'Tajaajila HOPE', price: 'TBD' }); setMenuOpen(false); };
   const nav = (t) => { scrollToSection(t); setMenuOpen(false); };
@@ -1111,6 +1129,10 @@ function App() {
               <Phone size={15} />
               <span className="call-text">{PHONE_DISPLAY}</span>
             </a>
+            <button className="header-tma-btn" onClick={() => setShowTmaModal(true)} title="HOPE Telegram Mini App">
+              <Sparkles size={14} />
+              <span>Mini App</span>
+            </button>
             <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
               <Globe size={15} />
               <span>{lang === 'am' ? 'አማ' : lang === 'en' ? 'EN' : 'OR'}</span>
@@ -1501,7 +1523,22 @@ function App() {
           <p className="copyright">© {new Date().getFullYear()} HOPE Photo &amp; Velo</p>
         </footer>
 
-        {bookingPkg && <BookingPanel selectedPackage={bookingPkg} onClose={() => setBookingPkg(null)} lang={lang} />}
+        {bookingPkg && (
+          <BookingPanel
+            selectedPackage={bookingPkg}
+            onClose={() => setBookingPkg(null)}
+            lang={lang}
+            onOpenTma={() => setShowTmaModal(true)}
+          />
+        )}
+
+        {showTmaModal && (
+          <div className="tma-modal-backdrop" onClick={() => setShowTmaModal(false)}>
+            <div className="tma-modal-window" onClick={e => e.stopPropagation()}>
+              <TelegramMiniApp onClose={() => setShowTmaModal(false)} />
+            </div>
+          </div>
+        )}
       </main>
     </>
   );
