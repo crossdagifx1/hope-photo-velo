@@ -69,6 +69,47 @@
   font-weight: 500;
 }
 
+.tma-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tma-lang-toggle {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f5f9;
+  border-radius: 9999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tma-lang-toggle:hover {
+  background: rgba(185, 37, 57, 0.2);
+  border-color: #b92539;
+  color: #ffffff;
+}
+
+.tma-admin-trigger-btn {
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #d4af37;
+  border-radius: 9999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
 .tma-close-btn {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -80,6 +121,38 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+/* Category Switcher in TMA */
+.tma-category-switcher {
+  display: flex;
+  background: #111422;
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 4px;
+  margin-bottom: 0.8rem;
+}
+
+.tma-cat-pill {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0.65rem 0.5rem;
+  border-radius: 9px;
+  color: #94a3b8;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.tma-cat-pill.active {
+  background: #b92539;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(185, 37, 57, 0.35);
 }
 
 /* Tab Bar */

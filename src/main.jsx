@@ -2,11 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
-  ChevronDown, ChevronRight, ChevronUp, ExternalLink, Film, Globe, Heart, Layers, MapPin, Menu,
+  ChevronDown, ChevronRight, ChevronUp, ExternalLink, Film, Globe, Heart, Layers, Lock, MapPin, Menu,
   MessageCircle, Phone, Play, Quote, Send, Sliders, Sparkles, Video, X,
 } from 'lucide-react';
 import './styles.css';
 import TelegramMiniApp from './tma/TelegramMiniApp.jsx';
+import AdminDashboard from './admin/AdminDashboard.jsx';
 
 /* ── CONSTANTS ──────────────────────────────────────────────────────────── */
 const PHONE_DISPLAY     = '09 10 52 69 62';
@@ -858,6 +859,22 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
           })
         )
       );
+
+      // Register order into CRM & Unified Admin Message Hub
+      fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: form.name,
+          phone: form.phone,
+          packageName: pkgName,
+          basePrice: parseInt((selectedPackage?.price || '0').toString().replace(/[^0-9]/g, ''), 10) || 10000,
+          totalPrice: parseInt((selectedPackage?.price || '0').toString().replace(/[^0-9]/g, ''), 10) || 10000,
+          eventDate: form.date,
+          notes: form.note,
+          category: selectedPackage?.category || 'custom'
+        })
+      }).catch(() => {});
     } catch (err) {
       console.error(err);
     }
@@ -1077,9 +1094,27 @@ function Reveal({ children, className = '', delay = 0 }) {
 function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const isTmaDirect = urlParams.get('tma') === '1' || Boolean(window.Telegram?.WebApp?.initData);
+  const isAdminDirect = window.location.pathname === '/admin' || urlParams.get('admin') === '1';
+
+  const [showAdminModal, setShowAdminModal] = useState(false);
+
+  if (isAdminDirect) {
+    return <AdminDashboard onClose={() => window.location.href = '/'} />;
+  }
 
   if (isTmaDirect) {
-    return <TelegramMiniApp />;
+    return (
+      <>
+        <TelegramMiniApp onOpenAdmin={() => setShowAdminModal(true)} />
+        {showAdminModal && (
+          <div className="tma-modal-backdrop" onClick={() => setShowAdminModal(false)}>
+            <div className="admin-modal-window" onClick={e => e.stopPropagation()}>
+              <AdminDashboard onClose={() => setShowAdminModal(false)} />
+            </div>
+          </div>
+        )}
+      </>
+    );
   }
 
   const [loaded, setLoaded]   = useState(false);
@@ -1132,6 +1167,9 @@ function App() {
             <button className="header-tma-btn" onClick={() => setShowTmaModal(true)} title="HOPE Telegram Mini App">
               <Sparkles size={14} />
               <span>Mini App</span>
+            </button>
+            <button className="header-admin-btn" onClick={() => setShowAdminModal(true)} title="Admin Control Dashboard">
+              <Lock size={14} />
             </button>
             <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
               <Globe size={15} />
@@ -1535,7 +1573,21 @@ function App() {
         {showTmaModal && (
           <div className="tma-modal-backdrop" onClick={() => setShowTmaModal(false)}>
             <div className="tma-modal-window" onClick={e => e.stopPropagation()}>
-              <TelegramMiniApp onClose={() => setShowTmaModal(false)} />
+              <TelegramMiniApp
+                onClose={() => setShowTmaModal(false)}
+                onOpenAdmin={() => {
+                  setShowTmaModal(false);
+                  setShowAdminModal(true);
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {showAdminModal && (
+          <div className="tma-modal-backdrop" onClick={() => setShowAdminModal(false)}>
+            <div className="admin-modal-window" onClick={e => e.stopPropagation()}>
+              <AdminDashboard onClose={() => setShowAdminModal(false)} />
             </div>
           </div>
         )}
