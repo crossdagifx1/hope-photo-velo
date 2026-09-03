@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Camera, Film, Sparkles, MessageCircle, FileSignature, CheckCircle2,
   Clock, Calendar, MapPin, Send, Plus, Minus, Tag, AlertCircle, RefreshCw,
-  Phone, ArrowRight, ShieldCheck, Download, Trash2, X, ChevronRight, User, Globe, Lock
+  Phone, ArrowRight, ShieldCheck, Download, Trash2, X, ChevronRight, User, Globe, Lock, MessageSquare
 } from 'lucide-react';
 import './tma.css';
 
@@ -11,7 +11,7 @@ const T_TMA = {
   am: {
     title: 'የ HOPE ስቱዲዮ ሚኒ አፕ',
     subtitle: 'አዲስ አበባ • በፍቅር የተመሠረተ',
-    tabs: { services: 'አገልግሎቶች', customize: 'ማስተካከያ', negotiate: 'ድርድር', contract: 'ስምምነት', my_orders: 'የእኔ ቀጠሮዎች' },
+    tabs: { services: 'አገልግሎቶች', customize: 'ማስተካከያ', negotiate: 'ድርድር', contract: 'ስምምነት', my_orders: 'የእኔ ቀጠሮዎች', replayer: 'የደንበኞች ቻት' },
     bannerTag: 'የ HOPE ስቱዲዮ የ 2026 ስብስቦች',
     bannerH2: 'የእርስዎን ምርጥ ፓኬጅ ይምረጡ',
     bannerP: 'አገልግሎቶችን ያበጁ፣ በቀጥታ ዋጋ ይደራደሩ፣ እና ይፋዊ ውል በቴሌግራም ይፈራረሙ።',
@@ -66,7 +66,7 @@ const T_TMA = {
   en: {
     title: 'HOPE Studio Mini App',
     subtitle: 'Addis Ababa • Founded in Love',
-    tabs: { services: 'Services', customize: 'Customize', negotiate: 'Negotiate', contract: 'Contract', my_orders: 'Bookings' },
+    tabs: { services: 'Services', customize: 'Customize', negotiate: 'Negotiate', contract: 'Contract', my_orders: 'Bookings', replayer: 'Bot Chats' },
     bannerTag: 'HOPE Studio 2026 Collection',
     bannerH2: 'Select Your Perfect Experience',
     bannerP: 'Customize deliverables, negotiate live discounts, and sign your official contract inside Telegram.',
@@ -121,7 +121,7 @@ const T_TMA = {
   om: {
     title: 'Mini App Istuudiyoo HOPE',
     subtitle: 'Finfinnee • Jaalalaan Hundeeffame',
-    tabs: { services: 'Tajaajila', customize: 'Mijeesuu', negotiate: 'Gatii Falmuu', contract: 'Waliigaltee', my_orders: 'Qophii Koo' },
+    tabs: { services: 'Tajaajila', customize: 'Mijeesuu', negotiate: 'Gatii Falmuu', contract: 'Waliigaltee', my_orders: 'Qophii Koo', replayer: 'Haasaa Bot' },
     bannerTag: 'Koleekshinii HOPE 2026',
     bannerH2: 'Paakeejii Bareedaa Filadhaa',
     bannerP: 'Tajaajila fooyyessaa, gatii dabalataa falmaa, waliigaltee keessan Telegiraam irratti mallatteessaa.',
@@ -298,6 +298,11 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
   const user = tg?.initDataUnsafe?.user || { id: 'demo_user', first_name: 'Guest Client', username: 'guest' };
   const isAdminUser = ADMIN_IDS.includes(String(user.id));
 
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
+  const isAdminParam = urlParams.get('admin') === '1';
+  const chatIdParam = urlParams.get('chat_id');
+  const isEffectiveAdmin = isAdminUser || isAdminParam;
+
   const [lang, setLang] = useState('am'); // 'am' | 'en' | 'om'
   const t = T_TMA[lang] || T_TMA.am;
 
@@ -305,7 +310,7 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
   const [addons, setAddons] = useState(DEFAULT_ADDONS_DATA);
   const [activeCategory, setActiveCategory] = useState('studio'); // 'studio' | 'wedding' | 'mesk'
 
-  const [activeTab, setActiveTab] = useState('catalog'); // 'catalog' | 'order' | 'chat' | 'agreement' | 'my_orders'
+  const [activeTab, setActiveTab] = useState(isEffectiveAdmin ? 'replayer' : 'agreement'); // 'replayer' | 'agreement' | 'catalog' | 'order' | 'chat' | 'my_orders'
   const [selectedPkg, setSelectedPkg] = useState(DEFAULT_PACKAGES_DATA[3]); // Default Wedding Bronze
   const [selectedAddons, setSelectedAddons] = useState([]);
   const [eventDate, setEventDate] = useState('');
@@ -328,6 +333,17 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [signedAgreement, setSignedAgreement] = useState(null);
   const [isSigning, setIsSigning] = useState(false);
+
+  // ── ADMIN CHAT REPLAYER STATE ──
+  const [botChats, setBotChats] = useState([]);
+  const [selectedChatId, setSelectedChatId] = useState(chatIdParam || null);
+  const [selectedChatData, setSelectedChatData] = useState(null);
+  const [replayerMessages, setReplayerMessages] = useState([]);
+  const [replayerInput, setReplayerInput] = useState('');
+  const [isSendingReplayer, setIsSendingReplayer] = useState(false);
+  const [showDiscountStrip, setShowDiscountStrip] = useState(false);
+  const [replayerDiscountAmount, setReplayerDiscountAmount] = useState('');
+  const [replayerNotice, setReplayerNotice] = useState('');
 
   // Fetch Live Dynamic Settings (Prices, Deliverables, Custom Addons)
   useEffect(() => {
@@ -353,10 +369,16 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
 
     if (langParam && ['am', 'en', 'om'].includes(langParam)) setLang(langParam);
     if (orderIdParam) fetchOrder(orderIdParam);
-    if (tabParam && ['catalog', 'order', 'chat', 'agreement', 'my_orders'].includes(tabParam)) setActiveTab(tabParam);
+    if (tabParam && ['catalog', 'order', 'chat', 'agreement', 'my_orders', 'replayer'].includes(tabParam)) {
+      setActiveTab(tabParam);
+    } else if (orderIdParam) {
+      setActiveTab('agreement');
+    } else if (isEffectiveAdmin) {
+      setActiveTab('replayer');
+    }
   }, []);
 
-  // Poll chat messages if in chat tab
+  // Poll chat messages if in client chat tab
   useEffect(() => {
     if (activeTab === 'chat' && activeOrder?.id) {
       fetchChat(activeOrder.id);
@@ -364,6 +386,110 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
       return () => clearInterval(interval);
     }
   }, [activeTab, activeOrder?.id]);
+
+  // ── ADMIN REPLAYER FETCHING & POLLING ──
+  const fetchBotChats = async () => {
+    try {
+      const res = await fetch('/api/chat?list=1');
+      const data = await res.json();
+      if (data.chats) {
+        setBotChats(data.chats);
+        if (!selectedChatId && data.chats.length > 0) {
+          setSelectedChatId(data.chats[0].chatId);
+        }
+      }
+    } catch (e) {}
+  };
+
+  const fetchChatThread = async (cId) => {
+    if (!cId) return;
+    try {
+      const res = await fetch(`/api/chat?chat_id=${cId}&mark_read=1`);
+      const data = await res.json();
+      if (data.chat) setSelectedChatData(data.chat);
+      if (data.messages) setReplayerMessages(data.messages);
+    } catch (e) {}
+  };
+
+  useEffect(() => {
+    if (activeTab === 'replayer' || isEffectiveAdmin) {
+      fetchBotChats();
+      const interval = setInterval(fetchBotChats, 3500);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, isEffectiveAdmin]);
+
+  useEffect(() => {
+    if (activeTab === 'replayer' && selectedChatId) {
+      fetchChatThread(selectedChatId);
+      const interval = setInterval(() => fetchChatThread(selectedChatId), 3000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab, selectedChatId]);
+
+  const handleSendReplayerMessage = async (customText = null, msgType = 'text', msgData = null) => {
+    const textToSend = customText || replayerInput.trim();
+    if (!textToSend || !selectedChatId) return;
+
+    setIsSendingReplayer(true);
+    haptic('light');
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: selectedChatId,
+          text: textToSend,
+          sender: 'admin',
+          senderName: 'HOPE Studio Management',
+          type: msgType,
+          data: msgData
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.message) {
+        setReplayerMessages(prev => [...prev, data.message]);
+        if (!customText) setReplayerInput('');
+        setReplayerNotice(lang === 'am' ? 'መልእክትዎ በቀጥታ ለደንበኛው ቴሌግራም ተልኳል! ✓' : 'Dispatched to Client Telegram! ✓');
+        setTimeout(() => setReplayerNotice(''), 3500);
+        fetchBotChats();
+      }
+    } catch (e) {
+      alert('Error sending message: ' + e.message);
+    } finally {
+      setIsSendingReplayer(false);
+    }
+  };
+
+  const handleSendAgreementToClient = () => {
+    if (!selectedChatId) return;
+    const orderId = selectedChatData?.orderId || ('HOPE-' + selectedChatId.slice(-4));
+    handleSendReplayerMessage(
+      lang === 'am'
+        ? 'የእርስዎ ይፋዊ የአገልግሎት ውል ተዘጋጅቷል፤ ከታች ያለውን ሊንክ በመጫን ውሉን በዲጂታል ፊርማ ያጠናቁ።'
+        : 'Your official service contract is ready. Please tap the button below to review and sign.',
+      'agreement_link',
+      { orderId }
+    );
+  };
+
+  const handleSendDiscountToClient = () => {
+    const amount = parseInt(replayerDiscountAmount.replace(/[^0-9]/g, ''), 10);
+    if (!amount || amount <= 0 || !selectedChatId) {
+      alert('Please enter a valid amount');
+      return;
+    }
+    handleSendReplayerMessage(
+      lang === 'am'
+        ? `ልዩ የ ${amount.toLocaleString()} ብር ቅናሽ ለቀጠሮዎ ተፈቅዶልዎታል!`
+        : `A special discount of ${amount.toLocaleString()} ETB has been approved for you!`,
+      'discount_offer',
+      { discountAmount: amount }
+    );
+    setShowDiscountStrip(false);
+    setReplayerDiscountAmount('');
+  };
 
   const haptic = (type = 'light') => {
     try {
@@ -667,6 +793,23 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
 
       {/* ── MAIN TAB NAVIGATION ── */}
       <nav className="tma-tab-bar">
+        {isEffectiveAdmin && (
+          <button
+            className={`tma-tab-item ${activeTab === 'replayer' ? 'active' : ''}`}
+            onClick={() => { haptic(); setActiveTab('replayer'); }}
+          >
+            <MessageSquare size={15} />
+            <span>{t.tabs.replayer || 'Bot Chats'}</span>
+            {botChats.some(c => c.unreadCount > 0) && <span className="tma-tab-badge">●</span>}
+          </button>
+        )}
+        <button
+          className={`tma-tab-item ${activeTab === 'agreement' ? 'active' : ''}`}
+          onClick={() => { haptic(); setActiveTab('agreement'); }}
+        >
+          <FileSignature size={15} />
+          <span>{t.tabs.contract}</span>
+        </button>
         <button
           className={`tma-tab-item ${activeTab === 'catalog' ? 'active' : ''}`}
           onClick={() => { haptic(); setActiveTab('catalog'); }}
@@ -689,18 +832,30 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
           <span>{t.tabs.negotiate}</span>
           {activeOrder && <span className="tma-tab-badge">●</span>}
         </button>
-        <button
-          className={`tma-tab-item ${activeTab === 'agreement' ? 'active' : ''}`}
-          onClick={() => { haptic(); setActiveTab('agreement'); }}
-        >
-          <FileSignature size={15} />
-          <span>{t.tabs.contract}</span>
-        </button>
       </nav>
 
       {/* ── TAB 1: SERVICES CATALOG VIEW (3 CATEGORIES & 9 PACKAGES) ── */}
       {activeTab === 'catalog' && (
         <div className="tma-content">
+          {/* Direct Bot Negotiation Notice */}
+          <div className="tma-bot-chat-notice-card">
+            <div className="tma-notice-head">
+              <MessageCircle size={17} />
+              <span>{lang === 'am' ? 'ቀጥታ ውይይት እና ድርድር በቴሌግራም ቦት' : 'Direct Negotiation on Telegram Bot'}</span>
+            </div>
+            <p className="tma-notice-body">
+              {lang === 'am'
+                ? 'ከ HOPE ስቱዲዮ ዳይሬክተሮች ጋር ዋጋ ለመደራደር፣ ጥያቄዎችን ለመጠየቅ እና ዝርዝር መረጃ ለማግኘት በቀጥታ በቴሌግራም ቦቱ ማውራት ይችላሉ። ይህ ሚኒ አፕ የተዘጋጀው ይፋዊ ውልዎን በዲጂታል ፊርማ ለማጽደቅ ነው።'
+                : 'You can chat directly with HOPE Studio directors on Telegram to negotiate prices and customize your event. Use this Mini App to review terms and sign your official digital agreement.'}
+            </p>
+            <div className="tma-notice-actions">
+              <a href="https://t.me/HoopStudioSystemBot" className="tma-notice-tg-btn" target="_blank" rel="noreferrer">
+                <Send size={13} />
+                <span>{lang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ (Direct Chat)' : 'Open Telegram Bot'}</span>
+              </a>
+            </div>
+          </div>
+
           <div className="tma-banner">
             <span className="tma-banner-tag">{t.bannerTag}</span>
             <h2>{t.bannerH2}</h2>
@@ -1145,6 +1300,148 @@ export default function TelegramMiniApp({ onClose, onOpenAdmin }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ── TAB 6: ADMIN CHAT REPLAYER CONSOLE ── */}
+      {activeTab === 'replayer' && (
+        <div className="tma-content tma-replayer-wrap">
+          <div className="tma-replayer-head-bar">
+            <div className="tma-replayer-title-box">
+              <MessageSquare size={16} color="#d4af37" />
+              <h3>{lang === 'am' ? 'የደንበኞች የቀጥታ ቻት (Bot Replayer)' : 'Client Live Bot Chats'}</h3>
+              <span className="tma-replayer-badge">{botChats.length} Chats</span>
+            </div>
+            <button
+              className="tma-replayer-refresh-btn"
+              onClick={() => { fetchBotChats(); if (selectedChatId) fetchChatThread(selectedChatId); }}
+            >
+              <RefreshCw size={13} />
+              <span>{lang === 'am' ? 'አድስ' : 'Refresh'}</span>
+            </button>
+          </div>
+
+          {replayerNotice && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.6rem 0.8rem', borderRadius: '10px', fontSize: '0.78rem', fontWeight: '700' }}>
+              {replayerNotice}
+            </div>
+          )}
+
+          {/* Chats Horizontal Selector */}
+          {botChats.length === 0 ? (
+            <div className="tma-replayer-empty">
+              <AlertCircle size={28} style={{ margin: '0 auto 0.5rem', opacity: 0.5 }} />
+              <p>{lang === 'am' ? 'እስካሁን ከቦቱ ጋር የተወያየ ደንበኛ የለም።' : 'No clients have chatted with the bot yet.'}</p>
+            </div>
+          ) : (
+            <>
+              <div className="tma-chats-selector">
+                {botChats.map(c => {
+                  const isSelected = selectedChatId === c.chatId;
+                  return (
+                    <div
+                      key={c.chatId}
+                      className={`tma-chat-pill ${isSelected ? 'active' : ''}`}
+                      onClick={() => { setSelectedChatId(c.chatId); fetchChatThread(c.chatId); }}
+                    >
+                      <div className="tma-chat-pill-top">
+                        <span className="tma-chat-pill-name">{c.firstName} {c.lastName || ''}</span>
+                        {c.unreadCount > 0 && <span className="tma-chat-pill-unread">{c.unreadCount}</span>}
+                      </div>
+                      <div className="tma-chat-pill-preview">
+                        {c.username ? `@${c.username}` : `ID: ${c.chatId}`} • {c.lastMessage || 'No messages'}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Selected Chat Window */}
+              <div className="tma-replayer-box">
+                <div className="tma-replayer-user-header">
+                  <div className="tma-replayer-user-info">
+                    <span className="tma-replayer-user-name">
+                      {selectedChatData?.firstName || 'Client'} {selectedChatData?.lastName || ''}
+                    </span>
+                    <span className="tma-replayer-user-meta">
+                      {selectedChatData?.username ? `@${selectedChatData.username}` : `Chat ID: ${selectedChatId}`}
+                      {selectedChatData?.orderId && ` • Order: ${selectedChatData.orderId}`}
+                    </span>
+                  </div>
+                  <div className="tma-replayer-quick-tools">
+                    <button
+                      type="button"
+                      className="tma-quick-tool-btn"
+                      onClick={() => setShowDiscountStrip(!showDiscountStrip)}
+                    >
+                      <Tag size={13} />
+                      <span>{lang === 'am' ? 'ቅናሽ ስጥ' : 'Discount'}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="tma-quick-tool-btn gold"
+                      onClick={handleSendAgreementToClient}
+                    >
+                      <FileSignature size={13} />
+                      <span>{lang === 'am' ? 'ይፋዊ ውል ላክ' : 'Send Agreement'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {showDiscountStrip && (
+                  <div className="tma-replayer-discount-strip">
+                    <input
+                      type="number"
+                      placeholder={lang === 'am' ? 'የቅናሽ መጠን በብር (ምሳሌ፡ 2000)' : 'Discount in ETB (e.g. 2000)'}
+                      value={replayerDiscountAmount}
+                      onChange={e => setReplayerDiscountAmount(e.target.value)}
+                    />
+                    <button onClick={handleSendDiscountToClient}>
+                      {lang === 'am' ? 'ቅናሹን ላክ' : 'Apply & Send'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Conversation Bubbles */}
+                <div className="tma-replayer-messages-stream">
+                  {replayerMessages.length === 0 ? (
+                    <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem', padding: '1.5rem' }}>
+                      {lang === 'am' ? 'ምንም መልእክት አልተገኘም።' : 'No messages in this thread.'}
+                    </div>
+                  ) : (
+                    replayerMessages.map(m => (
+                      <div key={m.id} className={`tma-rep-bubble ${m.sender === 'admin' ? 'admin' : m.sender === 'system' ? 'system' : 'client'}`}>
+                        <span className="tma-rep-bubble-author">{m.senderName}</span>
+                        <span>{m.text}</span>
+                        <span className="tma-rep-bubble-time">
+                          {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Reply Bar */}
+                <div className="tma-replayer-input-bar">
+                  <input
+                    type="text"
+                    placeholder={lang === 'am' ? 'ለደንበኛው ቀጥታ መልስ ይጻፉ (በቴሌግራም ይደርሳል)...' : 'Type reply (dispatches directly to client Telegram)...'}
+                    value={replayerInput}
+                    onChange={e => setReplayerInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleSendReplayerMessage()}
+                  />
+                  <button
+                    className="tma-replayer-send-btn"
+                    onClick={() => handleSendReplayerMessage()}
+                    disabled={isSendingReplayer || !replayerInput.trim()}
+                  >
+                    {isSendingReplayer ? <RefreshCw size={14} className="tma-spin" /> : <Send size={14} />}
+                    <span>{lang === 'am' ? 'ላክ' : 'Reply'}</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

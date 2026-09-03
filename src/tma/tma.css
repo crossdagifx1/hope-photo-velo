@@ -1069,3 +1069,399 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ── DIRECT BOT NEGOTIATION GUIDANCE BANNER ── */
+.tma-bot-chat-notice-card {
+  background: linear-gradient(135deg, rgba(185, 37, 57, 0.15) 0%, rgba(212, 175, 55, 0.1) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tma-notice-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #d4af37;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.tma-notice-body {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #cbd5e1;
+  margin: 0;
+}
+
+.tma-notice-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.tma-notice-tg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #229ED9;
+  color: #ffffff;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.tma-notice-tg-btn:hover {
+  opacity: 0.9;
+}
+
+/* ── ADMIN CHAT REPLAYER INBOX (TMA) ── */
+.tma-replayer-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.tma-replayer-head-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tma-replayer-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tma-replayer-title-box h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+}
+
+.tma-replayer-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+}
+
+.tma-replayer-refresh-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tma-replayer-refresh-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Chat Threads Horizontal/Vertical Scroll */
+.tma-chats-selector {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  scrollbar-width: thin;
+}
+
+.tma-chats-selector::-webkit-scrollbar {
+  height: 4px;
+}
+
+.tma-chats-selector::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.tma-chat-pill {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.55rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  cursor: pointer;
+  min-width: 140px;
+  max-width: 190px;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.tma-chat-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tma-chat-pill.active {
+  background: rgba(185, 37, 57, 0.25);
+  border-color: #b92539;
+  box-shadow: 0 0 14px rgba(185, 37, 57, 0.3);
+}
+
+.tma-chat-pill-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tma-chat-pill-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tma-chat-pill-unread {
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 9999px;
+  line-height: 1;
+}
+
+.tma-chat-pill-preview {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Active Conversation View */
+.tma-replayer-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tma-replayer-user-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tma-replayer-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.tma-replayer-user-name {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.tma-replayer-user-meta {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+.tma-replayer-quick-tools {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.tma-quick-tool-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #f1f5f9;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tma-quick-tool-btn:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #d4af37;
+  color: #ffffff;
+}
+
+.tma-quick-tool-btn.gold {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: rgba(212, 175, 55, 0.35);
+  color: #d4af37;
+}
+
+/* Discount Input Modal Strip */
+.tma-replayer-discount-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(212, 175, 55, 0.08);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.tma-replayer-discount-strip input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.tma-replayer-discount-strip button {
+  background: #d4af37;
+  color: #0a0c14;
+  font-weight: 800;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+/* Messages Stream */
+.tma-replayer-messages-stream {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 380px;
+  min-height: 220px;
+  overflow-y: auto;
+}
+
+.tma-rep-bubble {
+  max-width: 82%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tma-rep-bubble.client {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border-bottom-left-radius: 4px;
+}
+
+.tma-rep-bubble.admin {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #b92539 0%, #8b1e2d 100%);
+  color: #ffffff;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 12px rgba(185, 37, 57, 0.25);
+}
+
+.tma-rep-bubble.system {
+  align-self: center;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: #d4af37;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.tma-rep-bubble-author {
+  font-size: 0.68rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.tma-rep-bubble-time {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  align-self: flex-end;
+}
+
+/* Reply Input Bar */
+.tma-replayer-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.tma-replayer-input-bar input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.tma-replayer-input-bar input:focus {
+  border-color: #b92539;
+}
+
+.tma-replayer-send-btn {
+  background: #b92539;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.tma-replayer-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tma-replayer-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+

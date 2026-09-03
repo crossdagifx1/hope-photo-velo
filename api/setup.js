@@ -45,10 +45,10 @@ export default async function handler(req, res) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         commands: [
-          { command: 'start', description: 'Open HOPE Studio Mini App' },
-          { command: 'orders', description: 'View current orders & quotes (Admin)' },
-          { command: 'discount', description: 'Grant custom discount: /discount <id> <amount>' },
-          { command: 'reply', description: 'Send chat message to client: /reply <id> <text>' }
+          { command: 'start', description: 'Start negotiation chat & view packages' },
+          { command: 'orders', description: 'View current bookings & pipeline (Admin)' },
+          { command: 'discount', description: 'Grant discount: /discount <id_or_chat> <amount>' },
+          { command: 'reply', description: 'Send message to client: /reply <id_or_chat> <text>' }
         ]
       })
     });

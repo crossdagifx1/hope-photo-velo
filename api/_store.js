@@ -161,6 +161,7 @@ const DEFAULT_ADDONS = [
 let memoryStore = {
   orders: {},
   messages: {},
+  chats: {},
   agreements: {},
   adminState: {},
   settings: {
@@ -180,6 +181,7 @@ try {
     const raw = fs.readFileSync(STORE_FILE, 'utf8');
     const parsed = JSON.parse(raw);
     memoryStore = { ...memoryStore, ...parsed };
+    if (!memoryStore.chats) memoryStore.chats = {};
     if (!memoryStore.settings?.packages?.length) {
       memoryStore.settings = { ...memoryStore.settings, packages: DEFAULT_PACKAGES, addons: DEFAULT_ADDONS };
     }
@@ -223,6 +225,12 @@ export const db = {
     }
     order.updatedAt = new Date().toISOString();
     memoryStore.orders[order.id] = order;
+
+    // If order has telegramUserId, link to chat
+    if (order.telegramUserId) {
+      db.linkChatToOrder(order.telegramUserId, order.id);
+    }
+
     persistStore();
     return order;
   },
@@ -259,6 +267,81 @@ export const db = {
     memoryStore.messages[orderId].push(messageObj);
     persistStore();
     return messageObj;
+  },
+  // ── UNIFIED TELEGRAM BOT CHATS ──
+  getOrCreateChat(chatId, userInfo = {}) {
+    if (!memoryStore.chats) memoryStore.chats = {};
+    const idStr = String(chatId);
+    if (!memoryStore.chats[idStr]) {
+      memoryStore.chats[idStr] = {
+        chatId: idStr,
+        userId: userInfo.id ? String(userInfo.id) : idStr,
+        firstName: userInfo.first_name || userInfo.firstName || 'Client',
+        lastName: userInfo.last_name || userInfo.lastName || '',
+        username: userInfo.username || '',
+        lastMessage: '',
+        lastMessageAt: new Date().toISOString(),
+        unreadCount: 0,
+        orderId: null,
+        messages: []
+      };
+    } else {
+      if (userInfo.first_name || userInfo.firstName) memoryStore.chats[idStr].firstName = userInfo.first_name || userInfo.firstName;
+      if (userInfo.last_name || userInfo.lastName) memoryStore.chats[idStr].lastName = userInfo.last_name || userInfo.lastName;
+      if (userInfo.username) memoryStore.chats[idStr].username = userInfo.username;
+    }
+    persistStore();
+    return memoryStore.chats[idStr];
+  },
+  getAllChats() {
+    if (!memoryStore.chats) memoryStore.chats = {};
+    return Object.values(memoryStore.chats).sort((a, b) => new Date(b.lastMessageAt || 0) - new Date(a.lastMessageAt || 0));
+  },
+  getChat(chatId) {
+    if (!memoryStore.chats) memoryStore.chats = {};
+    return memoryStore.chats[String(chatId)] || null;
+  },
+  addChatMessage(chatId, msg) {
+    const idStr = String(chatId);
+    const chat = db.getOrCreateChat(idStr, {
+      firstName: msg.senderName,
+      first_name: msg.senderName
+    });
+    const messageObj = {
+      id: 'cmsg-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      chatId: idStr,
+      sender: msg.sender || 'client', // 'client' | 'admin' | 'system'
+      senderName: msg.senderName || (msg.sender === 'admin' ? 'HOPE Studio Management' : chat.firstName || 'Client'),
+      text: msg.text || '',
+      type: msg.type || 'text', // 'text' | 'discount_offer' | 'agreement_link' | 'agreement_signed'
+      data: msg.data || null,
+      timestamp: new Date().toISOString()
+    };
+    if (!chat.messages) chat.messages = [];
+    chat.messages.push(messageObj);
+    chat.lastMessage = msg.text || (msg.type === 'agreement_link' ? '📜 Agreement link sent' : 'Message');
+    chat.lastMessageAt = messageObj.timestamp;
+    if (msg.sender !== 'admin' && msg.sender !== 'system') {
+      chat.unreadCount = (chat.unreadCount || 0) + 1;
+    } else if (msg.sender === 'admin') {
+      chat.unreadCount = 0;
+    }
+    persistStore();
+    return messageObj;
+  },
+  markChatRead(chatId) {
+    const chat = db.getChat(chatId);
+    if (chat) {
+      chat.unreadCount = 0;
+      persistStore();
+    }
+    return chat;
+  },
+  linkChatToOrder(chatId, orderId) {
+    const chat = db.getOrCreateChat(chatId);
+    chat.orderId = orderId;
+    persistStore();
+    return chat;
   },
   saveAgreement(agreement) {
     if (!agreement.id) {

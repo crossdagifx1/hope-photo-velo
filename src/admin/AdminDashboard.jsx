@@ -66,6 +66,7 @@ export default function AdminDashboard({ onClose }) {
   const [packages, setPackages] = useState(DEFAULT_ADMIN_PACKAGES);
   const [addons, setAddons] = useState(DEFAULT_ADMIN_ADDONS);
   const [orders, setOrders] = useState(SAMPLE_ORDERS);
+  const [botChats, setBotChats] = useState([]);
   const [messages, setMessages] = useState({});
   const [agreements, setAgreements] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -110,6 +111,10 @@ export default function AdminDashboard({ onClose }) {
         if (data.agreements) setAgreements(data.agreements);
         if (data.orders?.length > 0) setSelectedOrderId(data.orders[0].id);
       }
+
+      const chatsRes = await fetch('/api/chat?list=1');
+      const chatsData = await chatsRes.json();
+      if (chatsData.chats) setBotChats(chatsData.chats);
     } catch (err) {
       // Fallback seamlessly to local defaults
     } finally {
@@ -131,6 +136,9 @@ export default function AdminDashboard({ onClose }) {
         setMessages(data.messages || {});
         setAgreements(data.agreements || []);
       }
+      const chatsRes = await fetch('/api/chat?list=1');
+      const chatsData = await chatsRes.json();
+      if (chatsData.chats) setBotChats(chatsData.chats);
     } catch (e) {}
     setIsLoading(false);
   };
@@ -215,19 +223,19 @@ export default function AdminDashboard({ onClose }) {
     setIsSendingReply(true);
 
     try {
-      const res = await fetch('/api/settings', {
+      const isChatId = /^\d+$/.test(selectedOrderId);
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-admin-pin': pinInput
         },
         body: JSON.stringify({
-          action: 'reply_to_customer',
-          payload: {
-            orderId: selectedOrderId,
-            text: replyText.trim(),
-            senderName: 'HOPE Studio Director'
-          }
+          chat_id: isChatId ? selectedOrderId : (currentOrder?.telegramUserId || null),
+          order_id: !isChatId ? selectedOrderId : null,
+          text: replyText.trim(),
+          sender: 'admin',
+          senderName: 'HOPE Studio Director'
         })
       });
       const data = await res.json();
@@ -239,6 +247,38 @@ export default function AdminDashboard({ onClose }) {
       alert('Failed to send reply message');
     } finally {
       setIsSendingReply(false);
+    }
+  };
+
+  // Send Official Agreement Link directly to user's Telegram
+  const handleSendAgreementLink = async () => {
+    if (!selectedOrderId) return;
+    setIsLoading(true);
+    try {
+      const isChatId = /^\d+$/.test(selectedOrderId);
+      const finalOrderId = isChatId ? ('HOPE-' + selectedOrderId.slice(-4)) : selectedOrderId;
+      await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-pin': pinInput
+        },
+        body: JSON.stringify({
+          chat_id: isChatId ? selectedOrderId : (currentOrder?.telegramUserId || null),
+          order_id: !isChatId ? selectedOrderId : null,
+          text: 'የእርስዎ ይፋዊ የአገልግሎት ውል ተዘጋጅቷል፤ እባክዎ ከታች ያለውን ሊንክ በመጫን ውሉን በዲጂታል ፊርማ ያጠናቁ።',
+          sender: 'admin',
+          type: 'agreement_link',
+          data: { orderId: finalOrderId }
+        })
+      });
+      await refreshData();
+      setSaveSuccess('Agreement signing button dispatched directly to client\'s Telegram! ✓');
+      setTimeout(() => setSaveSuccess(''), 4000);
+    } catch (e) {
+      alert('Failed to dispatch agreement');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -310,9 +350,25 @@ export default function AdminDashboard({ onClose }) {
     .reduce((sum, o) => sum + Math.round((o.negotiatedPrice || o.totalPrice || 0) * 0.3), 0);
   const signedContracts = orders.filter(o => o.status === 'signed' || o.status === 'confirmed').length;
 
-  // Selected Order Object
-  const currentOrder = orders.find(o => o.id === selectedOrderId) || orders[0];
-  const currentOrderMessages = currentOrder ? (messages[currentOrder.id] || []) : [];
+  // Selected Chat / Order Object
+  const selectedChat = botChats.find(c => c.chatId === selectedOrderId);
+  const selectedOrder = orders.find(o => o.id === selectedOrderId);
+  const currentOrder = selectedOrder || (selectedChat ? {
+    id: selectedChat.chatId,
+    clientName: `${selectedChat.firstName} ${selectedChat.lastName || ''}`.trim(),
+    phone: selectedChat.username ? `@${selectedChat.username}` : `Chat ID: ${selectedChat.chatId}`,
+    packageName: 'Direct Telegram Conversation',
+    eventDate: 'Direct Bot Chat',
+    location: 'Telegram',
+    totalPrice: 0,
+    negotiatedPrice: 0,
+    status: 'active_chat',
+    telegramUserId: selectedChat.chatId
+  } : orders[0]);
+
+  const currentOrderMessages = selectedChat
+    ? (selectedChat.messages || [])
+    : (currentOrder ? (messages[currentOrder.id] || []) : []);
   const currentOrderAgreement = currentOrder ? agreements.find(a => a.orderId === currentOrder.id) : null;
 
   /* ── 1. AUTHENTICATION VIEW ── */
@@ -630,15 +686,51 @@ export default function AdminDashboard({ onClose }) {
       {/* ── TAB 4: UNIFIED MESSAGE & BOT REPLY HUB ── */}
       {activeTab === 'messages' && (
         <div className="admin-tab-content admin-messages-layout">
-          {/* Left: Orders List */}
+          {/* Left: Orders & Direct Bot Chats */}
           <div className="admin-msg-threads">
-            <h4>Customer Inquiries</h4>
+            <h4>Inquiries & Telegram Chats</h4>
             <div className="admin-thread-items">
+              {/* Direct Telegram Bot Chats */}
+              {botChats.length > 0 && (
+                <div style={{ marginBottom: '0.8rem' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#d4af37', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.35rem' }}>
+                    Telegram Direct Chats ({botChats.length})
+                  </div>
+                  {botChats.map(c => (
+                    <div
+                      key={c.chatId}
+                      className={`admin-thread-card ${selectedOrderId === c.chatId ? 'active' : ''}`}
+                      onClick={() => setSelectedOrderId(c.chatId)}
+                      style={{ marginBottom: '0.35rem' }}
+                    >
+                      <div className="admin-thread-top">
+                        <span className="admin-thread-id">Chat #{c.chatId.slice(-4)}</span>
+                        {c.unreadCount > 0 && (
+                          <span className="admin-mini-status" style={{ background: '#ef4444', color: '#fff', padding: '0.1rem 0.35rem', borderRadius: '6px' }}>
+                            {c.unreadCount} New
+                          </span>
+                        )}
+                      </div>
+                      <div className="admin-thread-name">{c.firstName} {c.lastName || ''}</div>
+                      <div className="admin-thread-pkg">{c.username ? `@${c.username}` : `Telegram ID: ${c.chatId}`}</div>
+                      <div className="admin-thread-price" style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
+                        {c.lastMessage?.slice(0, 32) || 'Direct Bot Chat'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Booking Orders */}
+              <div style={{ fontSize: '0.72rem', fontWeight: 800, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.35rem' }}>
+                Booking Orders ({orders.length})
+              </div>
               {orders.map(o => (
                 <div
                   key={o.id}
                   className={`admin-thread-card ${selectedOrderId === o.id ? 'active' : ''}`}
                   onClick={() => setSelectedOrderId(o.id)}
+                  style={{ marginBottom: '0.35rem' }}
                 >
                   <div className="admin-thread-top">
                     <span className="admin-thread-id">{o.id}</span>
@@ -657,14 +749,16 @@ export default function AdminDashboard({ onClose }) {
             <div className="admin-chat-console">
               <div className="admin-chat-header">
                 <div>
-                  <h4>Order #{currentOrder.id} • {currentOrder.clientName}</h4>
-                  <p>📞 {currentOrder.phone} • 📅 {currentOrder.eventDate || 'Date TBD'} • 📍 {currentOrder.location}</p>
+                  <h4>{currentOrder.id?.startsWith('HOPE-') ? `Order #${currentOrder.id}` : `Chat #${currentOrder.id}`} • {currentOrder.clientName}</h4>
+                  <p>📞 {currentOrder.phone} • 📅 {currentOrder.eventDate || 'Direct Chat'} • 📍 {currentOrder.location}</p>
                 </div>
                 <div className="admin-chat-header-actions">
-                  <span className="admin-quote-badge">
-                    Quote: <b>{(currentOrder.negotiatedPrice || currentOrder.totalPrice).toLocaleString()} ETB</b>
-                  </span>
-                  {currentOrder.status !== 'confirmed' && (
+                  {currentOrder.totalPrice > 0 && (
+                    <span className="admin-quote-badge">
+                      Quote: <b>{(currentOrder.negotiatedPrice || currentOrder.totalPrice).toLocaleString()} ETB</b>
+                    </span>
+                  )}
+                  {currentOrder.status !== 'confirmed' && currentOrder.id?.startsWith('HOPE-') && (
                     <button
                       className="admin-confirm-dep-btn"
                       onClick={() => handleConfirmDeposit(currentOrder.id)}
@@ -680,7 +774,7 @@ export default function AdminDashboard({ onClose }) {
               <div className="admin-quick-actions-bar">
                 <div className="admin-discount-tool">
                   <Tag size={15} />
-                  <span>Offer Custom Discount:</span>
+                  <span>Offer Discount:</span>
                   <input
                     type="number"
                     value={discountInput}
@@ -689,6 +783,15 @@ export default function AdminDashboard({ onClose }) {
                   />
                   <button onClick={handleGrantDiscount} disabled={isLoading}>Apply Discount</button>
                 </div>
+
+                <button
+                  className="admin-action-btn"
+                  onClick={handleSendAgreementLink}
+                  style={{ background: 'rgba(212, 175, 55, 0.15)', border: '1px solid rgba(212, 175, 55, 0.3)', color: '#d4af37', fontWeight: '700', padding: '0.4rem 0.75rem', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                >
+                  <ShieldCheck size={14} />
+                  <span>Send Agreement Link to Telegram</span>
+                </button>
 
                 {currentOrderAgreement && (
                   <div className="admin-agreement-badge">

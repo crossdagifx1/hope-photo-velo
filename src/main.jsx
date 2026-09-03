@@ -955,6 +955,11 @@ function PackagesSection({ lang, openBooking }) {
 
   const currentCards = PACKAGES_BY_CATEGORY[activeCategory] || PACKAGES_BY_CATEGORY.studio;
 
+  const handlePackageClick = (pkg) => {
+    const pkgId = pkg?.id || 'wedding-bronze';
+    window.open(`https://t.me/HoopStudioSystemBot?start=order_${pkgId}`, '_blank');
+  };
+
   return (
     <section id="pricing" className="pricing-packages-section section-anchor">
       {/* ── Top Header Section (Matching Design Image) ── */}
@@ -988,6 +993,24 @@ function PackagesSection({ lang, openBooking }) {
             })}
           </div>
         </div>
+      </div>
+
+      {/* ── Direct Telegram Bot Booking Banner ── */}
+      <div className="pricing-telegram-bot-banner">
+        <div className="ptb-left">
+          <span className="ptb-badge">⚡ ቀጥታ በቴሌግራም ቦት (Direct Bot Booking)</span>
+          <h3>{lang === 'am' ? 'ዋጋዎችን በቴሌግራም ቦት ተደራድረው ውልዎን በዲጂታል ፊርማ ያጠናቁ!' : lang === 'om' ? 'Telegram Irratti Gatii Mari\'adhaa Walii Galaa!' : 'Negotiate on Telegram Bot & Sign Your Official Agreement!'}</h3>
+          <p>{lang === 'am' ? 'የትኛውንም ፓኬጅ ሲነኩ በቀጥታ ወደ ቴሌግራም ቦቱ በመሄድ ከስቱዲዮ ማኔጅመንት ጋር መደራደርና ይፋዊ ውል መፈራረም ይችላሉ።' : lang === 'om' ? 'Paakeejii yoo filattan kallattiin gara bootiitti geessitee walii galtee ni mallatteessitu.' : 'When you tap any package, it opens the Telegram Bot to agree on details and sign your digital contract.'}</p>
+        </div>
+        <a
+          href={`https://t.me/HoopStudioSystemBot?start=pricing_${activeCategory}`}
+          target="_blank"
+          rel="noreferrer"
+          className="ptb-direct-btn"
+        >
+          <Send size={15} />
+          <span>{lang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ ➜' : lang === 'om' ? 'Gara Bootiitti Dhaqaa ➜' : 'Open Telegram Bot ➜'}</span>
+        </a>
       </div>
 
       {/* ── 3 Cards Grid (Categorized by 3) ── */}
@@ -1042,7 +1065,7 @@ function PackagesSection({ lang, openBooking }) {
                 ))}
               </ul>
 
-              {/* Action Button */}
+              {/* Action Button: Opens Telegram Bot with package order & agreement */}
               <div className="card-v2-cta-wrap">
                 <button
                   type="button"
@@ -1053,9 +1076,10 @@ function PackagesSection({ lang, openBooking }) {
                       ? 'btn-style-outline'
                       : 'btn-style-dark'
                   }`}
-                  onClick={() => openBooking(pkg)}
+                  onClick={() => handlePackageClick(pkg)}
                 >
-                  <span>{t.pricingBookBtn}</span>
+                  <Send size={14} />
+                  <span>{lang === 'am' ? 'በቴሌግራም እዘዙ & ውል ይዋዋሉ' : lang === 'om' ? 'Telegram Irratti Ajajaa' : 'Order on Bot & Sign Agreement'}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -1074,9 +1098,10 @@ function PackagesSection({ lang, openBooking }) {
         <button
           type="button"
           className="bottom-bar-contact-btn"
-          onClick={() => openBooking({ titleEn: 'Custom / Special Inquiry', titleAm: 'ልዩ ጥያቄ', price: 'Custom' })}
+          onClick={() => handlePackageClick({ id: 'custom' })}
         >
-          <span>{t.pricingContactBtn}</span>
+          <Send size={14} />
+          <span>{lang === 'am' ? 'በቴሌግራም ቦት ይነጋገሩ' : 'Chat on Telegram'}</span>
           <ArrowRight size={16} />
         </button>
       </div>
@@ -1130,7 +1155,11 @@ function App() {
 
   useEffect(() => { document.body.style.overflow = (!loaded || bookingPkg || showTmaModal) ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [loaded, bookingPkg, showTmaModal]);
 
-  const openBooking = (pkg = null) => { setBookingPkg(pkg ?? { name: 'የ HOPE አገልግሎት', nameEn: 'HOPE Service', nameOm: 'Tajaajila HOPE', price: 'TBD' }); setMenuOpen(false); };
+  const openBooking = (pkg = null) => {
+    const pkgId = pkg?.id || 'wedding-bronze';
+    window.open(`https://t.me/HoopStudioSystemBot?start=order_${pkgId}`, '_blank');
+    setMenuOpen(false);
+  };
   const nav = (t) => { scrollToSection(t); setMenuOpen(false); };
   const toggleLang = () => setLang(l => l === 'am' ? 'en' : l === 'en' ? 'om' : 'am');
 
