@@ -2445,12 +2445,24 @@ function App() {
   const [lang, setLang]       = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingPkg, setBookingPkg] = useState(null);
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(() => {
+    return typeof window !== 'undefined' && (window.location.hash === '#admin' || window.location.pathname.startsWith('/admin'));
+  });
   const [activeImg, setActiveImg] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
   const [activeLocTab, setActiveLocTab] = useState(0);
 
   const t = T[lang];
+
+  useEffect(() => {
+    const onHash = () => {
+      if (window.location.hash === '#admin' || window.location.pathname.startsWith('/admin')) {
+        setShowAdmin(true);
+      }
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = (!loaded || bookingPkg || showAdmin) ? 'hidden' : '';
@@ -2894,7 +2906,12 @@ function App() {
         )}
         {showAdmin && (
           <AdminControlPanel
-            onClose={() => setShowAdmin(false)}
+            onClose={() => {
+              setShowAdmin(false);
+              if (window.location.hash === '#admin') {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+              }
+            }}
             lang={lang}
           />
         )}
