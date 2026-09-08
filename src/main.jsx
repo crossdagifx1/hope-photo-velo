@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
   ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Copy, CreditCard, Edit2, ExternalLink,
-  Film, Globe, Heart, Layers, Lock, MapPin, Menu, MessageCircle, Package, Pencil,
-  Phone, Play, Plus, Quote, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X,
+  Eye, Film, Globe, Heart, Layers, Lock, LogOut, MapPin, Menu, MessageCircle, Package, Pencil,
+  Phone, Play, Plus, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X,
 } from 'lucide-react';
 import './styles.css';
 
@@ -1767,29 +1767,37 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
 /* ── BACKWARD COMPAT: BookingPanel alias ──────────────────────────────────── */
 const BookingPanel = BookingFlowModal;
 
-/* ── ADMIN CONTROL PANEL ─────────────────────────────────────────────────── */
+/* ── STANDALONE ADMIN CONTROL PORTAL ─────────────────────────────────────── */
 function AdminControlPanel({ onClose, lang }) {
-  const [pin, setPin]           = useState('');
-  const [unlocked, setUnlocked] = useState(false);
-  const [pinError, setPinError] = useState(false);
-  const [tab, setTab]           = useState('orders'); // 'orders' | 'packages' | 'contract' | 'calendar'
-  const [settings, setSettings] = useState(null);
-  const [orders, setOrders]     = useState([]);
-  const [loading, setLoading]   = useState(false);
-  const [status, setStatus]     = useState('');
-  // Package editing
-  const [editPkg, setEditPkg]   = useState(null);
-  // Contract editing
+  const [pin, setPin]                     = useState('');
+  const [unlocked, setUnlocked]           = useState(false);
+  const [pinError, setPinError]           = useState(false);
+  const [tab, setTab]                     = useState('orders'); // 'orders' | 'calendar' | 'packages' | 'contract' | 'accounts'
+  const [settings, setSettings]           = useState(null);
+  const [orders, setOrders]               = useState([]);
+  const [loading, setLoading]             = useState(false);
+  const [status, setStatus]               = useState('');
+  const [searchQuery, setSearchQuery]     = useState('');
+  const [statusFilter, setStatusFilter]   = useState('all');
+  const [receiptModalImg, setReceiptModalImg] = useState(null);
+
+  // Edit states
+  const [editPkg, setEditPkg]             = useState(null);
   const [contractDraft, setContractDraft] = useState(null);
-  // Blackout
-  const [newBlackout, setNewBlackout] = useState('');
+  const [newBlackout, setNewBlackout]     = useState('');
+  const [payDraft, setPayDraft]           = useState(null);
 
   const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
 
   const checkPin = (e) => {
     e.preventDefault();
-    if (pin === 'HOPE2026') { setUnlocked(true); loadData(); }
-    else { setPinError(true); setTimeout(() => setPinError(false), 1200); }
+    if (pin === 'HOPE2026') {
+      setUnlocked(true);
+      loadData();
+    } else {
+      setPinError(true);
+      setTimeout(() => setPinError(false), 1200);
+    }
   };
 
   const loadData = async () => {
@@ -1801,8 +1809,13 @@ function AdminControlPanel({ onClose, lang }) {
       ]);
       setSettings(sRes.settings || {});
       setContractDraft(sRes.settings?.contractTemplate || {});
+      setPayDraft(sRes.settings?.paymentAccounts || {});
       setOrders(oRes.orders || []);
-    } catch(e) { setStatus('Failed to load data'); }
+      setStatus('✓ Live data synced');
+      setTimeout(() => setStatus(''), 2500);
+    } catch(e) {
+      setStatus('Failed to load data');
+    }
     setLoading(false);
   };
 
@@ -1816,8 +1829,8 @@ function AdminControlPanel({ onClose, lang }) {
       });
       const data = await r.json();
       setSettings(data.settings || settings);
-      setStatus('✓ Saved');
-      setTimeout(() => setStatus(''), 2000);
+      setStatus('✓ Settings saved');
+      setTimeout(() => setStatus(''), 2500);
     } catch(e) { setStatus('Save failed'); }
     setLoading(false);
   };
@@ -1830,7 +1843,7 @@ function AdminControlPanel({ onClose, lang }) {
         body: JSON.stringify({ id, status: newStatus })
       });
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
-      setStatus(`✓ Order ${id} → ${newStatus}`);
+      setStatus(`✓ Order #${id} set to ${newStatus}`);
       setTimeout(() => setStatus(''), 2500);
     } catch(e) { setStatus('Update failed'); }
   };
@@ -1855,227 +1868,755 @@ function AdminControlPanel({ onClose, lang }) {
     await patchSettings({ contractTemplate: contractDraft });
   };
 
+  const savePaymentAccounts = async () => {
+    await patchSettings({ paymentAccounts: payDraft });
+  };
+
   const statusColor = (s) => {
     if (s === 'CONFIRMED') return '#22c55e';
     if (s === 'PENDING_VERIFICATION') return '#f59e0b';
     if (s === 'REJECTED') return '#ef4444';
-    if (s === 'IN_DISCUSSION') return '#60a5fa';
+    if (s === 'IN_DISCUSSION') return '#38bdf8';
     return '#9090a8';
   };
 
+  // KPIs
+  const pendingCount = orders.filter(o => o.status === 'PENDING_VERIFICATION').length;
+  const confirmedCount = orders.filter(o => o.status === 'CONFIRMED').length;
+  const discussCount = orders.filter(o => o.status === 'IN_DISCUSSION').length;
+  const totalRevenue = orders
+    .filter(o => o.status === 'CONFIRMED' || o.status === 'PENDING_VERIFICATION')
+    .reduce((sum, o) => sum + (Number(o.totalPrice || o.basePrice) || 0), 0);
+
+  // Filtered orders
+  const filteredOrders = orders.filter(o => {
+    if (statusFilter !== 'all' && o.status !== statusFilter) return false;
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (o.clientName && o.clientName.toLowerCase().includes(q)) ||
+      (o.phone && o.phone.includes(q)) ||
+      (o.id && o.id.toLowerCase().includes(q)) ||
+      (o.packageName && o.packageName.toLowerCase().includes(q)) ||
+      (o.eventDate && o.eventDate.includes(q))
+    );
+  });
+
+  /* ── 1. PIN LOCK SCREEN (STANDALONE) ── */
   if (!unlocked) {
     return (
-      <div className="admin-overlay" role="dialog">
-        <button className="bf-backdrop" onClick={onClose}/>
-        <div className="admin-pin-panel">
-          <div className="admin-pin-icon"><Lock size={32}/></div>
-          <h3>Admin Access</h3>
-          <p>HOPE Studio Control Panel</p>
-          <form onSubmit={checkPin} className="admin-pin-form">
-            <input
-              type="password"
-              className={`admin-pin-input ${pinError ? 'pin-shake' : ''}`}
-              value={pin} onChange={e => setPin(e.target.value)}
-              placeholder="Enter PIN"
-              autoFocus
-            />
-            <button type="submit" className="bf-primary-btn"><Lock size={15}/> Unlock</button>
+      <div className="admin-lock-screen">
+        <div className="admin-lock-card">
+          <div className="admin-lock-glow"/>
+          <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="admin-lock-logo"/>
+          <div className="admin-lock-icon">
+            <Shield size={36} color="#bd2637"/>
+          </div>
+          <h2>HOPE STUDIO PORTAL</h2>
+          <p className="admin-lock-sub">Executive Administration &amp; Booking Management</p>
+
+          <form onSubmit={checkPin} className="admin-lock-form">
+            <div className="admin-lock-input-wrap">
+              <Lock size={16} className="admin-lock-field-icon"/>
+              <input
+                type="password"
+                className={`admin-lock-input ${pinError ? 'pin-shake' : ''}`}
+                value={pin}
+                onChange={e => setPin(e.target.value)}
+                placeholder="Enter Studio PIN (e.g. HOPE2026)"
+                autoFocus
+              />
+            </div>
+            {pinError && <p className="admin-lock-err">⚠️ Incorrect Security PIN. Please try again.</p>}
+            <button type="submit" className="admin-lock-btn">
+              <Lock size={16}/> Unlock Studio Portal
+            </button>
           </form>
-          <button className="bf-back-btn" onClick={onClose}>Cancel</button>
+
+          <button type="button" className="admin-lock-exit" onClick={onClose}>
+            ← Return to Public Website
+          </button>
         </div>
       </div>
     );
   }
 
-  const tabs = [
-    { id: 'orders', label: 'Orders', icon: <Package size={15}/> },
-    { id: 'calendar', label: 'Calendar', icon: <CalendarDays size={15}/> },
-    { id: 'packages', label: 'Packages', icon: <Star size={15}/> },
-    { id: 'contract', label: 'Contract', icon: <Shield size={15}/> },
-  ];
-
+  /* ── 2. STANDALONE DASHBOARD ── */
   return (
-    <div className="admin-overlay" role="dialog">
-      <button className="bf-backdrop" onClick={onClose}/>
-      <div className="admin-panel">
-        <div className="admin-header">
-          <div className="admin-header-left">
-            <Shield size={20} style={{color:'#bd2637'}}/>
-            <div>
-              <h3>HOPE Admin Panel</h3>
-              <p>Studio Control Center</p>
+    <div className="admin-portal-standalone">
+      {/* ── TOP EXECUTIVE BAR ── */}
+      <header className="admin-portal-topbar">
+        <div className="apt-left">
+          <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="apt-logo"/>
+          <div>
+            <div className="apt-brand-row">
+              <span className="apt-title">HOPE STUDIO</span>
+              <span className="apt-badge">DIRECTOR PORTAL</span>
+              <span className="apt-live-dot">● Live Sync</span>
             </div>
-          </div>
-          <div className="admin-header-right">
-            {status && <span className="admin-status-badge">{status}</span>}
-            <button className="bf-close-btn" onClick={onClose}><X size={18}/></button>
+            <p className="apt-sub">Official Booking &amp; Contract Control System</p>
           </div>
         </div>
 
-        <div className="admin-tabs">
-          {tabs.map(t => (
-            <button key={t.id} className={`admin-tab ${tab===t.id?'admin-tab-active':''}`} onClick={() => setTab(t.id)}>
-              {t.icon} {t.label}
-            </button>
-          ))}
+        {/* Center KPIs */}
+        <div className="apt-kpis">
+          <div className="apt-kpi-item">
+            <span className="apt-kpi-val">{orders.length}</span>
+            <span className="apt-kpi-lbl">Total Orders</span>
+          </div>
+          <div className="apt-kpi-item apt-kpi-amber">
+            <span className="apt-kpi-val">{pendingCount}</span>
+            <span className="apt-kpi-lbl">Pending Review</span>
+          </div>
+          <div className="apt-kpi-item apt-kpi-green">
+            <span className="apt-kpi-val">{confirmedCount}</span>
+            <span className="apt-kpi-lbl">Confirmed</span>
+          </div>
+          <div className="apt-kpi-item apt-kpi-gold">
+            <span className="apt-kpi-val">{totalRevenue.toLocaleString()} ETB</span>
+            <span className="apt-kpi-lbl">Pipeline Value</span>
+          </div>
         </div>
 
-        <div className="admin-tab-content">
-          {loading && <div className="admin-loading">Loading…</div>}
+        {/* Right Actions */}
+        <div className="apt-right">
+          {status && <span className="apt-status-toast">{status}</span>}
+          <button className="apt-btn-secondary" onClick={loadData} title="Refresh live data">
+            <RefreshCw size={14}/> <span>Refresh</span>
+          </button>
+          <button className="apt-btn-exit" onClick={onClose} title="Return to client website">
+            <LogOut size={14}/> <span>Exit to Website</span>
+          </button>
+        </div>
+      </header>
 
-          {/* ── ORDERS TAB ── */}
-          {tab === 'orders' && (
-            <div className="admin-orders">
-              <div className="admin-section-header">
-                <h4>All Orders ({orders.length})</h4>
-                <button className="bf-copy-btn" onClick={loadData}>↻ Refresh</button>
-              </div>
-              {orders.length === 0 && <p className="admin-empty">No orders yet.</p>}
-              {orders.map(o => (
-                <div key={o.id} className="admin-order-card">
-                  <div className="aoc-top">
-                    <div>
-                      <strong className="aoc-name">{o.clientName}</strong>
-                      <span className="aoc-pkg">{o.packageName}</span>
-                    </div>
-                    <span className="aoc-status" style={{color: statusColor(o.status)}}>{o.status}</span>
-                  </div>
-                  <div className="aoc-meta">
-                    <span>📅 {o.eventDate || 'TBD'}</span>
-                    <span>📞 {o.phone || '—'}</span>
-                    <span>💰 {Number(o.totalPrice||0).toLocaleString()} ETB</span>
-                    <span>🔖 {o.id}</span>
-                  </div>
-                  {o.paymentProof && (
-                    <img src={o.paymentProof} alt="receipt" className="aoc-receipt"/>
-                  )}
-                  {(o.status === 'PENDING_VERIFICATION' || o.status === 'IN_DISCUSSION' || o.status === 'DRAFT') && (
-                    <div className="aoc-actions">
-                      <button className="aoc-approve" onClick={() => updateOrderStatus(o.id, 'CONFIRMED')}>✅ Approve</button>
-                      <button className="aoc-reject" onClick={() => updateOrderStatus(o.id, 'REJECTED')}>❌ Reject</button>
-                    </div>
-                  )}
-                  {o.status === 'CONFIRMED' && <div className="aoc-confirmed-badge">✅ CONFIRMED</div>}
-                </div>
-              ))}
-            </div>
-          )}
+      {/* ── TABS NAVIGATION BAR ── */}
+      <nav className="admin-portal-nav">
+        <div className="admin-portal-tabs">
+          <button
+            className={`apt-tab ${tab === 'orders' ? 'apt-tab-active' : ''}`}
+            onClick={() => setTab('orders')}
+          >
+            <Package size={16}/> <span>Orders &amp; Receipts</span>
+            {pendingCount > 0 && <span className="apt-tab-pill-amber">{pendingCount}</span>}
+          </button>
+          <button
+            className={`apt-tab ${tab === 'calendar' ? 'apt-tab-active' : ''}`}
+            onClick={() => setTab('calendar')}
+          >
+            <CalendarDays size={16}/> <span>Calendar &amp; Blackouts</span>
+          </button>
+          <button
+            className={`apt-tab ${tab === 'packages' ? 'apt-tab-active' : ''}`}
+            onClick={() => setTab('packages')}
+          >
+            <Star size={16}/> <span>Packages &amp; Pricing</span>
+          </button>
+          <button
+            className={`apt-tab ${tab === 'contract' ? 'apt-tab-active' : ''}`}
+            onClick={() => setTab('contract')}
+          >
+            <Shield size={16}/> <span>Contract Clauses</span>
+          </button>
+          <button
+            className={`apt-tab ${tab === 'accounts' ? 'apt-tab-active' : ''}`}
+            onClick={() => setTab('accounts')}
+          >
+            <CreditCard size={16}/> <span>Bank Accounts</span>
+          </button>
+        </div>
+      </nav>
 
-          {/* ── CALENDAR TAB ── */}
-          {tab === 'calendar' && (
-            <div className="admin-calendar">
-              <div className="admin-section-header">
-                <h4>Blackout Date Management</h4>
+      {/* ── MAIN CONTENT CONTAINER ── */}
+      <main className="admin-portal-main">
+        {loading && <div className="admin-portal-loader"><div className="brc-spinner"/> Loading latest data...</div>}
+
+        {/* ════ TAB 1: ORDERS & RECEIPTS ════ */}
+        {tab === 'orders' && (
+          <section className="apt-tab-section">
+            {/* Toolbar */}
+            <div className="apt-orders-toolbar">
+              <div className="apt-search-box">
+                <Search size={16} className="apt-search-icon"/>
+                <input
+                  type="text"
+                  placeholder="Search by client name, phone, order ID, or date..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="apt-search-input"
+                />
+                {searchQuery && (
+                  <button className="apt-search-clear" onClick={() => setSearchQuery('')}><X size={14}/></button>
+                )}
               </div>
-              <div className="admin-blackout-add">
-                <input type="date" className="bf-input" value={newBlackout} onChange={e => setNewBlackout(e.target.value)}/>
-                <button className="aoc-approve" onClick={addBlackout}><Plus size={14}/> Block Date</button>
-              </div>
-              <div className="admin-blackout-list">
-                {(settings?.blackoutDates || []).map(d => (
-                  <div key={d} className="admin-blackout-item">
-                    <span>🚫 {d}</span>
-                    <button className="aoc-reject" onClick={() => removeBlackout(d)}><Trash2 size={13}/></button>
-                  </div>
+
+              {/* Status Filters */}
+              <div className="apt-filter-pills">
+                {[
+                  { id: 'all', label: `All (${orders.length})` },
+                  { id: 'PENDING_VERIFICATION', label: `Pending (${pendingCount})`, amber: true },
+                  { id: 'CONFIRMED', label: `Confirmed (${confirmedCount})`, green: true },
+                  { id: 'IN_DISCUSSION', label: `Discussion (${discussCount})` },
+                  { id: 'REJECTED', label: `Rejected (${orders.filter(o=>o.status==='REJECTED').length})` },
+                ].map(f => (
+                  <button
+                    key={f.id}
+                    className={`apt-filter-pill ${statusFilter === f.id ? 'active' : ''} ${f.amber ? 'amber' : ''} ${f.green ? 'green' : ''}`}
+                    onClick={() => setStatusFilter(f.id)}
+                  >
+                    {f.label}
+                  </button>
                 ))}
-                {(settings?.blackoutDates || []).length === 0 && <p className="admin-empty">No blackout dates.</p>}
               </div>
-              <div className="admin-section-header" style={{marginTop:'1.5rem'}}>
-                <h4>Booked Dates</h4>
-              </div>
-              {orders.filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status)).map(o => (
-                <div key={o.id} className="admin-blackout-item">
-                  <span>📅 {o.eventDate} — {o.clientName} ({o.status})</span>
-                </div>
-              ))}
             </div>
-          )}
 
-          {/* ── PACKAGES TAB ── */}
-          {tab === 'packages' && (
-            <div className="admin-packages">
-              <div className="admin-section-header">
-                <h4>Package Management</h4>
+            {/* Orders Cards Grid */}
+            {filteredOrders.length === 0 ? (
+              <div className="apt-empty-state">
+                <Package size={48} color="#55556a"/>
+                <h4>No Orders Found</h4>
+                <p>No bookings match the selected status or search query.</p>
               </div>
-              {(settings?.packages || []).map(pkg => (
-                <div key={pkg.id} className="admin-pkg-card">
-                  <div className="admin-pkg-top">
-                    <div>
-                      <strong>{pkg.titleEn}</strong>
-                      <span className="aoc-pkg">{pkg.category} / {pkg.tier}</span>
-                    </div>
-                    <div className="admin-pkg-actions">
-                      <span className="admin-pkg-price">{Number(pkg.price).toLocaleString()} ETB</span>
-                      <button className="bf-copy-btn" onClick={() => setEditPkg({...pkg})}><Edit2 size={13}/></button>
-                    </div>
+            ) : (
+              <div className="apt-orders-grid">
+                {filteredOrders.map(o => {
+                  const depositAmt = o.depositAmount || Math.round((o.totalPrice || o.basePrice || 0) * 0.3);
+                  const remainingAmt = (o.totalPrice || o.basePrice || 0) - depositAmt;
+                  return (
+                    <article key={o.id} className="apt-order-card">
+                      {/* Card Header */}
+                      <div className="aoc-head">
+                        <div>
+                          <div className="aoc-id-row">
+                            <code className="aoc-ref-id">{o.id}</code>
+                            <span className="aoc-category-tag">{o.category || 'wedding'}</span>
+                          </div>
+                          <h3 className="aoc-client-name">{o.clientName}</h3>
+                          <p className="aoc-pkg-name">{o.packageName}</p>
+                        </div>
+                        <div className="aoc-status-pill" style={{color: statusColor(o.status), borderColor: statusColor(o.status)}}>
+                          {o.status.replace('_', ' ')}
+                        </div>
+                      </div>
+
+                      {/* Detail Data Grid */}
+                      <div className="aoc-body-grid">
+                        <div className="aoc-info-col">
+                          <div className="aoc-info-row">
+                            <span className="aoc-lbl">Event Date:</span>
+                            <strong className="aoc-val">📅 {o.eventDate || 'To be decided'}</strong>
+                          </div>
+                          <div className="aoc-info-row">
+                            <span className="aoc-lbl">Phone:</span>
+                            <a href={`tel:${o.phone}`} className="aoc-phone-link">📞 {o.phone || '—'}</a>
+                          </div>
+                          <div className="aoc-info-row">
+                            <span className="aoc-lbl">Location:</span>
+                            <span className="aoc-val">📍 {o.location || 'Addis Ababa'}</span>
+                          </div>
+                          <div className="aoc-info-row">
+                            <span className="aoc-lbl">Payment Method:</span>
+                            <span className="aoc-pay-badge">{o.paymentMethod === 'cbe' ? 'CBE Birr' : 'Telebirr'}</span>
+                          </div>
+                          {o.notes && (
+                            <div className="aoc-notes-box">
+                              <strong>Client Note:</strong> <em>"{o.notes}"</em>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="aoc-financials-col">
+                          <div className="aoc-fin-box">
+                            <div className="aoc-fin-row">
+                              <span>Total Investment:</span>
+                              <strong>{Number(o.totalPrice || o.basePrice || 0).toLocaleString()} ETB</strong>
+                            </div>
+                            <div className="aoc-fin-row aoc-deposit-row">
+                              <span>30% Deposit Paid:</span>
+                              <strong className="text-green">{depositAmt.toLocaleString()} ETB</strong>
+                            </div>
+                            <div className="aoc-fin-row">
+                              <span>Remaining Balance:</span>
+                              <strong>{remainingAmt.toLocaleString()} ETB</strong>
+                            </div>
+                          </div>
+
+                          {o.signatureDataUrl && (
+                            <div className="aoc-sig-badge">
+                              <Check size={13} color="#22c55e"/> <span>Digital Contract Signed</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Payment Proof Receipt */}
+                        <div className="aoc-receipt-col">
+                          <span className="aoc-lbl">Payment Proof Screenshot:</span>
+                          {o.paymentProof ? (
+                            <div className="aoc-receipt-thumb-wrap" onClick={() => setReceiptModalImg(o.paymentProof)}>
+                              <img src={o.paymentProof} alt="Payment Receipt" className="aoc-receipt-thumb"/>
+                              <div className="aoc-receipt-hover">
+                                <Eye size={18}/> <span>Click to Enlarge</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="aoc-no-receipt">No receipt image attached</div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Action Buttons */}
+                      <div className="aoc-card-actions">
+                        {o.status !== 'CONFIRMED' && (
+                          <button className="aoc-btn-approve" onClick={() => updateOrderStatus(o.id, 'CONFIRMED')}>
+                            <Check size={15}/> Approve Booking
+                          </button>
+                        )}
+                        {o.status !== 'REJECTED' && (
+                          <button className="aoc-btn-reject" onClick={() => updateOrderStatus(o.id, 'REJECTED')}>
+                            <X size={15}/> Reject
+                          </button>
+                        )}
+                        {o.status !== 'IN_DISCUSSION' && (
+                          <button className="aoc-btn-discuss" onClick={() => updateOrderStatus(o.id, 'IN_DISCUSSION')}>
+                            <MessageCircle size={15}/> Mark In Discussion
+                          </button>
+                        )}
+                        <a href={`tel:${o.phone}`} className="aoc-btn-call">
+                          <Phone size={14}/> Call Client
+                        </a>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ════ TAB 2: CALENDAR & BLACKOUTS ════ */}
+        {tab === 'calendar' && (
+          <section className="apt-tab-section">
+            <div className="apt-split-grid">
+              {/* Left Column: Blackout Management */}
+              <div className="apt-card-box">
+                <div className="apt-box-header">
+                  <div>
+                    <h4>Studio Blackout Date Management</h4>
+                    <p>Block dates when the studio is fully booked, travelling, or closed for holidays.</p>
                   </div>
-                  {editPkg?.id === pkg.id && (
-                    <div className="admin-pkg-edit">
-                      <label className="bf-label">Price (ETB)
-                        <input type="number" className="bf-input" value={editPkg.price}
-                          onChange={e => setEditPkg(p => ({...p, price: Number(e.target.value)}))}/>
-                      </label>
-                      <label className="bf-label">Badge (EN)
-                        <input className="bf-input" value={editPkg.badgeEn || ''}
-                          onChange={e => setEditPkg(p => ({...p, badgeEn: e.target.value}))}/>
-                      </label>
-                      <div className="aoc-actions">
-                        <button className="aoc-approve" onClick={async () => {
-                          const updated = (settings.packages || []).map(p => p.id === editPkg.id ? editPkg : p);
-                          await patchSettings({ packages: updated });
-                          setSettings(s => ({...s, packages: updated}));
-                          setEditPkg(null);
-                        }}>Save</button>
-                        <button className="aoc-reject" onClick={() => setEditPkg(null)}>Cancel</button>
+                </div>
+
+                <div className="apt-blackout-add-row">
+                  <input
+                    type="date"
+                    className="apt-date-input"
+                    value={newBlackout}
+                    onChange={e => setNewBlackout(e.target.value)}
+                  />
+                  <button className="aoc-btn-approve" onClick={addBlackout}>
+                    <Plus size={15}/> Block This Date
+                  </button>
+                </div>
+
+                <div className="apt-blackout-list">
+                  <h5>Active Blocked Dates ({settings?.blackoutDates?.length || 0})</h5>
+                  {(settings?.blackoutDates || []).length === 0 ? (
+                    <p className="admin-empty">No blackout dates currently configured.</p>
+                  ) : (
+                    <div className="apt-chips-list">
+                      {(settings?.blackoutDates || []).map(d => (
+                        <div key={d} className="apt-blackout-chip">
+                          <span>🚫 {d}</span>
+                          <button onClick={() => removeBlackout(d)} title="Remove block"><Trash2 size={13}/></button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Column: Confirmed/Pending Bookings Roster */}
+              <div className="apt-card-box">
+                <div className="apt-box-header">
+                  <div>
+                    <h4>Client Booked Dates</h4>
+                    <p>Dates currently reserved by clients awaiting or after confirmation.</p>
+                  </div>
+                </div>
+
+                <div className="apt-booked-list">
+                  {orders.filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status)).length === 0 ? (
+                    <p className="admin-empty">No client dates booked yet.</p>
+                  ) : (
+                    orders
+                      .filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status))
+                      .map(o => (
+                        <div key={o.id} className="apt-booked-row">
+                          <div className="apt-booked-date">
+                            📅 <strong>{o.eventDate}</strong>
+                          </div>
+                          <div className="apt-booked-info">
+                            <strong>{o.clientName}</strong>
+                            <span>{o.packageName}</span>
+                          </div>
+                          <div className="aoc-status-pill" style={{color: statusColor(o.status), borderColor: statusColor(o.status)}}>
+                            {o.status === 'CONFIRMED' ? 'Confirmed' : 'Pending Verification'}
+                          </div>
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ════ TAB 3: PACKAGES & PRICING ════ */}
+        {tab === 'packages' && (
+          <section className="apt-tab-section">
+            <div className="apt-card-box">
+              <div className="apt-box-header">
+                <div>
+                  <h4>Service Packages Management</h4>
+                  <p>Update official prices in ETB, tier badges, and client deliverables.</p>
+                </div>
+              </div>
+
+              <div className="apt-packages-grid">
+                {(settings?.packages || DEFAULT_PACKAGES).map(pkg => (
+                  <div key={pkg.id} className="apt-pkg-card">
+                    <div className="apt-pkg-top">
+                      <div>
+                        <span className="aoc-category-tag">{pkg.category} · {pkg.tier}</span>
+                        <h4>{pkg.titleEn}</h4>
+                        <small className="text-muted">{pkg.titleAm}</small>
+                      </div>
+                      <div className="apt-pkg-price-badge">
+                        {Number(pkg.price).toLocaleString()} <span>ETB</span>
                       </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
 
-          {/* ── CONTRACT EDITOR ── */}
-          {tab === 'contract' && contractDraft && (
-            <div className="admin-contract">
-              <div className="admin-section-header">
-                <h4>Contract Template Editor</h4>
-                <button className="aoc-approve" onClick={saveContract}>💾 Save</button>
+                    <div className="apt-pkg-badge-preview">
+                      Badge: <strong>{pkg.badgeEn || 'None'}</strong>
+                    </div>
+
+                    {editPkg?.id === pkg.id ? (
+                      <div className="apt-pkg-edit-form">
+                        <label className="bf-label">Price (ETB)
+                          <input
+                            type="number"
+                            className="bf-input"
+                            value={editPkg.price}
+                            onChange={e => setEditPkg(p => ({...p, price: Number(e.target.value)}))}
+                          />
+                        </label>
+                        <label className="bf-label">Badge Label (EN)
+                          <input
+                            className="bf-input"
+                            value={editPkg.badgeEn || ''}
+                            onChange={e => setEditPkg(p => ({...p, badgeEn: e.target.value}))}
+                          />
+                        </label>
+                        <div className="aoc-card-actions" style={{marginTop:'8px'}}>
+                          <button
+                            className="aoc-btn-approve"
+                            onClick={async () => {
+                              const updated = (settings.packages || DEFAULT_PACKAGES).map(p => p.id === editPkg.id ? editPkg : p);
+                              await patchSettings({ packages: updated });
+                              setSettings(s => ({...s, packages: updated}));
+                              setEditPkg(null);
+                            }}
+                          >
+                            <Check size={14}/> Save Changes
+                          </button>
+                          <button className="aoc-btn-reject" onClick={() => setEditPkg(null)}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button className="apt-edit-btn" onClick={() => setEditPkg({...pkg})}>
+                        <Edit2 size={13}/> Edit Price &amp; Badge
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
-              <label className="bf-label">Contract Title (EN)
-                <input className="bf-input" value={contractDraft.titleEn || ''}
-                  onChange={e => setContractDraft(d => ({...d, titleEn: e.target.value}))}/>
-              </label>
-              <label className="bf-label">Contract Title (AM)
-                <input className="bf-input" value={contractDraft.titleAm || ''}
-                  onChange={e => setContractDraft(d => ({...d, titleAm: e.target.value}))}/>
-              </label>
-              {(contractDraft.clauses || []).map((c, i) => (
-                <div key={c.id || i} className="admin-clause-edit">
-                  <p className="bf-clause-heading">{c.headingEn}</p>
-                  <label className="bf-label">Body (EN)
-                    <textarea className="bf-input" rows="4" value={c.bodyEn || ''}
-                      onChange={e => {
-                        const clauses = [...contractDraft.clauses];
-                        clauses[i] = {...clauses[i], bodyEn: e.target.value};
-                        setContractDraft(d => ({...d, clauses}));
-                      }}/>
+            </div>
+          </section>
+        )}
+
+        {/* ════ TAB 4: CONTRACT CLAUSES ════ */}
+        {tab === 'contract' && contractDraft && (
+          <section className="apt-tab-section">
+            <div className="apt-card-box">
+              <div className="apt-box-header">
+                <div>
+                  <h4>Official Service Contract Agreement Template</h4>
+                  <p>Bilingual legal contract clauses automatically populated with client tokens during booking.</p>
+                </div>
+                <button className="aoc-btn-approve" onClick={saveContract}>
+                  💾 Save Contract Template
+                </button>
+              </div>
+
+              <div className="apt-contract-token-bar">
+                <strong>Available Dynamic Tokens:</strong>
+                <code>{'{clientName}'}</code>
+                <code>{'{eventDate}'}</code>
+                <code>{'{phone}'}</code>
+                <code>{'{packageName}'}</code>
+                <code>{'{agreedPrice}'}</code>
+                <code>{'{depositAmount}'}</code>
+                <code>{'{remainingBalance}'}</code>
+              </div>
+
+              <div className="apt-contract-fields">
+                <div className="apt-split-grid">
+                  <label className="bf-label">Contract Document Title (English)
+                    <input
+                      className="bf-input"
+                      value={contractDraft.titleEn || ''}
+                      onChange={e => setContractDraft(d => ({...d, titleEn: e.target.value}))}
+                    />
                   </label>
-                  <label className="bf-label">Body (AM)
-                    <textarea className="bf-input" rows="4" value={c.bodyAm || ''}
-                      onChange={e => {
-                        const clauses = [...contractDraft.clauses];
-                        clauses[i] = {...clauses[i], bodyAm: e.target.value};
-                        setContractDraft(d => ({...d, clauses}));
-                      }}/>
+                  <label className="bf-label">Contract Document Title (Amharic)
+                    <input
+                      className="bf-input"
+                      value={contractDraft.titleAm || ''}
+                      onChange={e => setContractDraft(d => ({...d, titleAm: e.target.value}))}
+                    />
                   </label>
                 </div>
-              ))}
-              <button className="aoc-approve" style={{marginTop:'1rem'}} onClick={saveContract}>💾 Save Contract Template</button>
+
+                <div className="apt-clauses-editor">
+                  {(contractDraft.clauses || []).map((c, i) => (
+                    <div key={c.id || i} className="apt-clause-card">
+                      <div className="apt-clause-num">Clause 0{i + 1}</div>
+                      <div className="apt-split-grid">
+                        <div>
+                          <label className="bf-label">Heading (English)
+                            <input
+                              className="bf-input"
+                              value={c.headingEn || ''}
+                              onChange={e => {
+                                const clauses = [...contractDraft.clauses];
+                                clauses[i] = {...clauses[i], headingEn: e.target.value};
+                                setContractDraft(d => ({...d, clauses}));
+                              }}
+                            />
+                          </label>
+                          <label className="bf-label" style={{marginTop:'8px'}}>Clause Body (English)
+                            <textarea
+                              className="bf-input"
+                              rows="3"
+                              value={c.bodyEn || ''}
+                              onChange={e => {
+                                const clauses = [...contractDraft.clauses];
+                                clauses[i] = {...clauses[i], bodyEn: e.target.value};
+                                setContractDraft(d => ({...d, clauses}));
+                              }}
+                            />
+                          </label>
+                        </div>
+                        <div>
+                          <label className="bf-label">Heading (Amharic)
+                            <input
+                              className="bf-input"
+                              value={c.headingAm || ''}
+                              onChange={e => {
+                                const clauses = [...contractDraft.clauses];
+                                clauses[i] = {...clauses[i], headingAm: e.target.value};
+                                setContractDraft(d => ({...d, clauses}));
+                              }}
+                            />
+                          </label>
+                          <label className="bf-label" style={{marginTop:'8px'}}>Clause Body (Amharic)
+                            <textarea
+                              className="bf-input"
+                              rows="3"
+                              value={c.bodyAm || ''}
+                              onChange={e => {
+                                const clauses = [...contractDraft.clauses];
+                                clauses[i] = {...clauses[i], bodyAm: e.target.value};
+                                setContractDraft(d => ({...d, clauses}));
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button className="aoc-btn-approve" style={{marginTop:'1.25rem', alignSelf:'flex-start'}} onClick={saveContract}>
+                  💾 Save Contract Template
+                </button>
+              </div>
             </div>
-          )}
+          </section>
+        )}
+
+        {/* ════ TAB 5: BANK & PAYMENT ACCOUNTS ════ */}
+        {tab === 'accounts' && payDraft && (
+          <section className="apt-tab-section">
+            <div className="apt-card-box">
+              <div className="apt-box-header">
+                <div>
+                  <h4>Studio Payment Receiving Accounts</h4>
+                  <p>Manage Telebirr and Commercial Bank of Ethiopia (CBE) accounts displayed on the checkout screen.</p>
+                </div>
+                <button className="aoc-btn-approve" onClick={savePaymentAccounts}>
+                  💾 Save Bank Accounts
+                </button>
+              </div>
+
+              <div className="apt-split-grid">
+                {/* Telebirr Box */}
+                <div className="apt-account-edit-box">
+                  <div className="apt-account-head">
+                    <div className="bf-pay-logo telebirr-logo">T</div>
+                    <div>
+                      <h4>Telebirr Merchant Settings</h4>
+                      <small>Mobile Wallet Payment</small>
+                    </div>
+                  </div>
+                  <label className="bf-label">Display Phone Number
+                    <input
+                      className="bf-input"
+                      value={payDraft.telebirr?.phone || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        telebirr: { ...p.telebirr, phone: e.target.value, rawPhone: e.target.value.replace(/[^0-9]/g, '') }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Account Holder Name
+                    <input
+                      className="bf-input"
+                      value={payDraft.telebirr?.accountName || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        telebirr: { ...p.telebirr, accountName: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Payment Instructions (English)
+                    <textarea
+                      className="bf-input"
+                      rows="3"
+                      value={payDraft.telebirr?.instructionsEn || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        telebirr: { ...p.telebirr, instructionsEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Payment Instructions (Amharic)
+                    <textarea
+                      className="bf-input"
+                      rows="3"
+                      value={payDraft.telebirr?.instructionsAm || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        telebirr: { ...p.telebirr, instructionsAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                {/* CBE Box */}
+                <div className="apt-account-edit-box">
+                  <div className="apt-account-head">
+                    <div className="bf-pay-logo cbe-logo">CBE</div>
+                    <div>
+                      <h4>CBE Commercial Bank Settings</h4>
+                      <small>Bank Transfer Payment</small>
+                    </div>
+                  </div>
+                  <label className="bf-label">CBE Account Number
+                    <input
+                      className="bf-input"
+                      value={payDraft.cbe?.accountNumber || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        cbe: { ...p.cbe, accountNumber: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Account Name
+                    <input
+                      className="bf-input"
+                      value={payDraft.cbe?.accountName || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        cbe: { ...p.cbe, accountName: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Bank Branch
+                    <input
+                      className="bf-input"
+                      value={payDraft.cbe?.branch || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        cbe: { ...p.cbe, branch: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Payment Instructions (English)
+                    <textarea
+                      className="bf-input"
+                      rows="3"
+                      value={payDraft.cbe?.instructionsEn || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        cbe: { ...p.cbe, instructionsEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Payment Instructions (Amharic)
+                    <textarea
+                      className="bf-input"
+                      rows="3"
+                      value={payDraft.cbe?.instructionsAm || ''}
+                      onChange={e => setPayDraft(p => ({
+                        ...p,
+                        cbe: { ...p.cbe, instructionsAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <button className="aoc-btn-approve" style={{marginTop:'1.5rem'}} onClick={savePaymentAccounts}>
+                💾 Save Bank Accounts
+              </button>
+            </div>
+          </section>
+        )}
+      </main>
+
+      {/* ── FULLSCREEN RECEIPT MODAL LIGHTBOX ── */}
+      {receiptModalImg && (
+        <div className="admin-receipt-lightbox" role="dialog" onClick={() => setReceiptModalImg(null)}>
+          <div className="arl-content" onClick={e => e.stopPropagation()}>
+            <div className="arl-topbar">
+              <h4>Client Payment Receipt Screenshot</h4>
+              <button className="bf-close-btn" onClick={() => setReceiptModalImg(null)}><X size={20}/></button>
+            </div>
+            <div className="arl-body">
+              <img src={receiptModalImg} alt="Receipt Full Proof" className="arl-img"/>
+            </div>
+            <div className="arl-footer">
+              <a href={receiptModalImg} download="payment-receipt.png" className="apt-btn-secondary" target="_blank" rel="noreferrer">
+                Open in New Tab / Download
+              </a>
+              <button className="aoc-btn-reject" onClick={() => setReceiptModalImg(null)}>Close</button>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -2477,6 +3018,20 @@ function App() {
   const toggleLang = () => setLang(l => l === 'am' ? 'en' : l === 'en' ? 'om' : 'am');
 
   const locImgs = [galleryImages[1].src, galleryImages[3].src, galleryImages[5].src];
+
+  if (showAdmin) {
+    return (
+      <AdminControlPanel
+        onClose={() => {
+          setShowAdmin(false);
+          if (window.location.hash === '#admin') {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }}
+        lang={lang}
+      />
+    );
+  }
 
   return (
     <>
@@ -2901,17 +3456,6 @@ function App() {
           <BookingFlowModal
             selectedPackage={bookingPkg}
             onClose={() => setBookingPkg(null)}
-            lang={lang}
-          />
-        )}
-        {showAdmin && (
-          <AdminControlPanel
-            onClose={() => {
-              setShowAdmin(false);
-              if (window.location.hash === '#admin') {
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
-              }
-            }}
             lang={lang}
           />
         )}
