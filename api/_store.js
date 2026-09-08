@@ -1,4 +1,4 @@
-// api/_store.js - Shared Data Store & Telegram Utility for HOPE Studio
+// Shared Data Store & Telegram Utility for HOPE Studio
 import fs from 'fs';
 import path from 'path';
 
@@ -158,6 +158,62 @@ const DEFAULT_ADDONS = [
   { id: 'makeup', name: 'VIP Bridal Makeup Artist', price: 4500, desc: 'Professional on-location makeup touchups', active: true }
 ];
 
+const DEFAULT_PAYMENT_ACCOUNTS = {
+  telebirr: {
+    accountName: 'HOPE Photo & Velo (Director)',
+    phone: '09 10 52 69 62',
+    rawPhone: '0910526962',
+    instructionsAm: 'በቴሌብር መተግበሪያ ወይም በ *127# ወደ 0910526962 የ 30% ቅድመ ክፍያ ይላኩ። የደረሰኝ ስክሪንሾት (Screenshot) እዚህ ጋር ይጫኑ።',
+    instructionsEn: 'Transfer 30% advance deposit via Telebirr App or *127# to 0910526962. Upload confirmation screenshot here.',
+    instructionsOm: 'Mobaayilii Telebirr ykn *127# fayyadamuun kaffaltii dursaa 30% lakk. 0910526962 irratti ergaa. Suuraa nagahee asitti dhiheessaa.'
+  },
+  cbe: {
+    bankName: 'Commercial Bank of Ethiopia (የኢትዮጵያ ንግድ ባንክ)',
+    accountName: 'HOPE PHOTO AND VELO STUDIO',
+    accountNumber: '1000542389123',
+    branch: 'Hayahulet Branch (ሃያ ሁለት)',
+    instructionsAm: 'በ CBE Birr ወይም በሞባይል ባንኪንግ ወደ አካውንት 1000542389123 30% ቅድመ ክፍያ ያስገቡ። የተጠናቀቀውን የዝውውር ደረሰኝ ስክሪንሾት ይጫኑ።',
+    instructionsEn: 'Transfer 30% deposit to CBE Account 1000542389123 (Hayahulet Branch). Upload receipt screenshot.',
+    instructionsOm: 'Baankii Daldala Itiyoophiyaatiin (CBE) lakk. herregaa 1000542389123 irratti kaffalaa. Nagahee suuraan ol-fe\'aa.'
+  }
+};
+
+const DEFAULT_CONTRACT_TEMPLATE = {
+  titleAm: 'የይፋዊ አገልግሎት እና የፎቶግራፊ ስምምነት ውል',
+  titleEn: 'Official Photography & Videography Service Agreement',
+  termsVersion: 'v3.2-2026',
+  clauses: [
+    {
+      id: 'scope',
+      headingEn: '1. Scope of Creative Production',
+      headingAm: '1. የአገልግሎት አሰጣጥ እና የቴክኖሎጂ ሽፋን',
+      bodyEn: 'HOPE Photo & Velo agrees to provide professional cinematography and fine-art photography services for the celebration of {clientName} on {eventDate} in {location}. The production covers all deliverables specified under {packageName}: {deliverables}.',
+      bodyAm: 'ሆፕ (HOPE Photo & Velo) ለ {clientName} በ {eventDate} ቀን በ {location} ለሚከናወነው በዓል በ {packageName} ስር የተካተቱትን ሙሉ የሲኒማቲክ ቪዲዮ እና የፎቶግራፊ አገልግሎቶች ({deliverables}) በሙያዊ ብቃት ለማስረከብ ተስማምቷል።'
+    },
+    {
+      id: 'financial',
+      headingEn: '2. Investment & Settlement Schedule',
+      headingAm: '2. የክፍያ ሁኔታ እና የቅድመ ክፍያ ማረጋገጫ',
+      bodyEn: 'The agreed total service fee is {agreedPrice} ETB. To guarantee schedule reservation, a non-refundable 30% advance booking deposit of {depositAmount} ETB is required upon signing. The remaining balance of {remainingBalance} ETB shall be settled upon delivery of master deliverables.',
+      bodyAm: 'ጠቅላላ የተስማማው የአገልግሎት ክፍያ {agreedPrice} የኢትዮጵያ ብር ነው። የቀኑን ምዝገባ ለማረጋገጥ 30% ቅድመ ክፍያ ({depositAmount} ETB) በቴሌብር ወይም በኢትዮጵያ ንግድ ባንክ ይፈጸማል። ቀሪው {remainingBalance} ETB የተዘጋጁ አልበሞችና ቪዲዮዎች ሲረከቡ የሚጠናቀቅ ይሆናል።'
+    },
+    {
+      id: 'delivery',
+      headingEn: '3. Archival Turnaround & Quality Guarantee',
+      headingAm: '3. የርክክብ ጊዜ እና የጥራት ዋስትና',
+      bodyEn: 'Initial soft-copy proofs are made accessible within 3 to 5 business days following the event. Fully color-graded 4K/8K cinema films, laminated albums, and board displays are carefully delivered within 2 to 4 weeks.',
+      bodyAm: 'የመጀመሪያዎቹ ሶፍት ኮፒ ፎቶዎች በ 3-5 የሥራ ቀናት ውስጥ የሚረከቡ ሲሆን፤ በከፍተኛ ጥራት የተሰሩ ላሚኔት አልበሞች፣ የቦርድ ፎቶዎች እና የተቀነባበሩ ሲኒማቲክ ቪዲዮዎች በ 2-4 ሳምንታት ውስጥ ይረከባሉ።'
+    },
+    {
+      id: 'cooperation',
+      headingEn: '4. Mutual Commitment & Schedule Respect',
+      headingAm: '4. የጋራ ትብብር እና የቀጠሮ አክብሮት',
+      bodyEn: 'Both parties commit to mutual schedule discipline. The client ensures reasonable venue access for lighting and camera equipment. Should unavoidable date shifts occur, HOPE provides complimentary rescheduling subject to studio availability.',
+      bodyAm: 'ሁለቱም ወገኖች ለተመደበው የቀረጻ ሰዓትና ቦታ የጋራ ትብብር ያደርጋሉ። በድንገተኛ ምክንያት የቀን ለውጥ ቢያጋጥም ክፍት ቀናት እስካሉ ድረስ ያለተጨማሪ ቅጣት ቀን ይተላለፋል።'
+    }
+  ]
+};
+
 let memoryStore = {
   orders: {},
   messages: {},
@@ -171,7 +227,10 @@ let memoryStore = {
     announcementOm: 'FINFINNEE • JAALALAAN HUNDEEFFAME PHOTOGRAPHY & VIDEO',
     phone: '09 10 52 69 62',
     packages: DEFAULT_PACKAGES,
-    addons: DEFAULT_ADDONS
+    addons: DEFAULT_ADDONS,
+    paymentAccounts: DEFAULT_PAYMENT_ACCOUNTS,
+    contractTemplate: DEFAULT_CONTRACT_TEMPLATE,
+    blackoutDates: ['2026-09-12', '2026-09-13', '2026-09-20']
   }
 };
 
@@ -368,6 +427,72 @@ export const db = {
   clearAdminState(adminId) {
     delete memoryStore.adminState[adminId];
     persistStore();
+  },
+  getBlackoutDates() {
+    return memoryStore.settings?.blackoutDates || [];
+  },
+  toggleBlackoutDate(dateStr) {
+    if (!memoryStore.settings.blackoutDates) memoryStore.settings.blackoutDates = [];
+    const idx = memoryStore.settings.blackoutDates.indexOf(dateStr);
+    if (idx >= 0) {
+      memoryStore.settings.blackoutDates.splice(idx, 1);
+    } else {
+      memoryStore.settings.blackoutDates.push(dateStr);
+      memoryStore.settings.blackoutDates.sort();
+    }
+    persistStore();
+    return memoryStore.settings.blackoutDates;
+  },
+  setBlackoutDates(dates) {
+    memoryStore.settings.blackoutDates = Array.isArray(dates) ? dates : [];
+    persistStore();
+    return memoryStore.settings.blackoutDates;
+  },
+  getContractTemplate() {
+    return memoryStore.settings?.contractTemplate || DEFAULT_CONTRACT_TEMPLATE;
+  },
+  updateContractTemplate(patch) {
+    memoryStore.settings.contractTemplate = {
+      ...DEFAULT_CONTRACT_TEMPLATE,
+      ...(memoryStore.settings.contractTemplate || {}),
+      ...patch
+    };
+    persistStore();
+    return memoryStore.settings.contractTemplate;
+  },
+  getPaymentAccounts() {
+    return memoryStore.settings?.paymentAccounts || DEFAULT_PAYMENT_ACCOUNTS;
+  },
+  updatePaymentAccounts(accs) {
+    memoryStore.settings.paymentAccounts = {
+      ...DEFAULT_PAYMENT_ACCOUNTS,
+      ...(memoryStore.settings.paymentAccounts || {}),
+      ...accs
+    };
+    persistStore();
+    return memoryStore.settings.paymentAccounts;
+  },
+  addPackage(pkg) {
+    if (!pkg.id) pkg.id = 'pkg-' + Date.now();
+    memoryStore.settings.packages = [...(memoryStore.settings.packages || []), pkg];
+    persistStore();
+    return memoryStore.settings.packages;
+  },
+  updatePackage(id, patch) {
+    const pkgs = memoryStore.settings.packages || [];
+    const idx = pkgs.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      pkgs[idx] = { ...pkgs[idx], ...patch };
+      memoryStore.settings.packages = [...pkgs];
+      persistStore();
+      return pkgs[idx];
+    }
+    return null;
+  },
+  deletePackage(id) {
+    memoryStore.settings.packages = (memoryStore.settings.packages || []).filter(p => p.id !== id);
+    persistStore();
+    return memoryStore.settings.packages;
   }
 };
 
@@ -375,21 +500,67 @@ export const db = {
 export async function sendTelegramMessage(chatId, text, extra = {}) {
   try {
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    const body = {
-      chat_id: chatId,
-      text,
-      parse_mode: 'HTML',
-      ...extra
-    };
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: 'HTML',
+        ...extra
+      })
     });
     return await res.json();
   } catch (err) {
-    console.error(`Telegram send error to ${chatId}:`, err);
+    console.error(`Telegram message error to ${chatId}:`, err.message);
     return { ok: false, error: err.message };
+  }
+}
+
+// Telegram Send Photo with Receipt
+export async function sendTelegramPhoto(chatId, photoUrlOrBase64, caption = '', extra = {}) {
+  try {
+    if (typeof photoUrlOrBase64 === 'string' && photoUrlOrBase64.startsWith('data:image/')) {
+      const match = photoUrlOrBase64.match(/^data:image\/([a-zA-Z0-9]+);base64,(.+)$/);
+      if (match) {
+        const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+        const buffer = Buffer.from(match[2], 'base64');
+        const formData = new FormData();
+        formData.append('chat_id', chatId);
+        formData.append('photo', new Blob([buffer], { type: `image/${ext}` }), `receipt.${ext}`);
+        if (caption) formData.append('caption', caption);
+        formData.append('parse_mode', 'HTML');
+        if (extra.reply_markup) {
+          formData.append('reply_markup', typeof extra.reply_markup === 'string' ? extra.reply_markup : JSON.stringify(extra.reply_markup));
+        }
+        const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          body: formData
+        });
+        const json = await res.json();
+        if (json.ok) return json;
+        console.warn('sendPhoto via blob fallback:', json);
+      }
+    } else if (typeof photoUrlOrBase64 === 'string' && photoUrlOrBase64.startsWith('http')) {
+      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          photo: photoUrlOrBase64,
+          caption,
+          parse_mode: 'HTML',
+          ...extra
+        })
+      });
+      const json = await res.json();
+      if (json.ok) return json;
+    }
+
+    return await sendTelegramMessage(chatId, (caption ? caption + '\n\n' : '') + '📷 <i>[Proof-of-payment receipt screenshot attached]</i>', extra);
+  } catch (err) {
+    console.error(`Telegram photo error to ${chatId}:`, err.message);
+    return await sendTelegramMessage(chatId, caption, extra);
   }
 }
 
@@ -403,4 +574,15 @@ export async function notifyAdmins(text, extra = {}) {
   return results;
 }
 
-export { BOT_TOKEN, ADMIN_CHAT_IDS };
+// Broadcast photo with receipt to all company admins
+export async function notifyAdminsPhoto(photoUrlOrBase64, caption = '', extra = {}) {
+  const results = [];
+  for (const adminId of ADMIN_CHAT_IDS) {
+    const res = await sendTelegramPhoto(adminId, photoUrlOrBase64, caption, extra);
+    results.push(res);
+  }
+  return results;
+}
+
+export { BOT_TOKEN, ADMIN_CHAT_IDS, DEFAULT_CONTRACT_TEMPLATE, DEFAULT_PAYMENT_ACCOUNTS };
+

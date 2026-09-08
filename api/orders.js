@@ -1,8 +1,44 @@
-// api/orders.js - Order Management API for Mini App
-import { db, notifyAdmins } from './_store.js';
+// api/orders.js - Order Management API with Telegram Verification Alerts
+import { db, notifyAdmins, notifyAdminsPhoto } from './_store.js';
+
+// Function to dispatch instant admin alert with receipt photo & inline review buttons
+async function dispatchPaymentAlert(order) {
+  try {
+    const deposit = order.depositAmount || Math.round((order.totalPrice || order.basePrice || 0) * 0.3);
+    const alertCaption = `💳 <b>NEW PAYMENT RECEIPT UPLOADED!</b>\n\n` +
+      `🆔 <b>Order:</b> <code>${order.id}</code>\n` +
+      `👤 <b>Client:</b> ${order.clientName}\n` +
+      `📞 <b>Phone:</b> ${order.phone || 'Not provided'}\n` +
+      `📅 <b>Event Date:</b> <b>${order.eventDate || 'TBD'}</b>\n` +
+      `📍 <b>Location:</b> ${order.location || 'Addis Ababa'}\n` +
+      `📦 <b>Package:</b> ${order.packageName}\n` +
+      `💰 <b>Total Investment:</b> ${Number(order.totalPrice || order.basePrice || 0).toLocaleString()} ETB\n` +
+      `💵 <b>30% Deposit Paid:</b> <b>${Number(deposit).toLocaleString()} ETB</b>\n` +
+      `🏦 <b>Method:</b> ${(order.paymentMethod || 'telebirr').toUpperCase()}\n` +
+      (order.signatureDataUrl ? `✍️ <b>E-Signature:</b> Captured on contract\n` : '') +
+      (order.notes ? `📝 <b>Client Note:</b> <i>"${order.notes}"</i>\n` : '') +
+      `\n👇 <b>Director Action:</b>`;
+
+    const inlineKeyboard = {
+      inline_keyboard: [
+        [
+          { text: '✅ Approve Booking', callback_data: `approve:${order.id}` },
+          { text: '❌ Reject / Request Info', callback_data: `reject:${order.id}` }
+        ]
+      ]
+    };
+
+    if (order.paymentProof) {
+      await notifyAdminsPhoto(order.paymentProof, alertCaption, { reply_markup: inlineKeyboard });
+    } else {
+      await notifyAdmins(alertCaption, { reply_markup: inlineKeyboard });
+    }
+  } catch (err) {
+    console.error('Error dispatching payment alert to Telegram:', err);
+  }
+}
 
 export default async function handler(req, res) {
-  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -29,7 +65,12 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const base = Number(body.basePrice) || 0;
+      const total = Number(body.totalPrice) || base;
+      const deposit = Number(body.depositAmount) || Math.round(total * 0.3);
+
       const order = db.saveOrder({
+        id: body.id || ('HOPE-' + Math.floor(1000 + Math.random() * 9000)),
         clientName: body.clientName || 'Valued Client',
         phone: body.phone || '',
         telegramUserId: body.telegramUserId || null,
@@ -39,49 +80,24 @@ export default async function handler(req, res) {
         packageName: body.packageName || 'Selected Package',
         eventDate: body.eventDate || '',
         location: body.location || 'Addis Ababa',
-        basePrice: Number(body.basePrice) || 0,
+        basePrice: base,
         addons: body.addons || [],
-        totalPrice: Number(body.totalPrice) || Number(body.basePrice) || 0,
-        negotiatedPrice: Number(body.negotiatedPrice) || Number(body.totalPrice) || Number(body.basePrice) || 0,
-        discountAmount: Number(body.discountAmount) || 0,
+        totalPrice: total,
+        depositAmount: deposit,
+        remainingBalance: total - deposit,
+        paymentMethod: body.paymentMethod || null,
+        paymentProof: body.paymentProof || null,
+        signatureDataUrl: body.signatureDataUrl || null,
+        termsAccepted: Boolean(body.termsAccepted),
         notes: body.notes || '',
-        status: 'pending_quote', // 'pending_quote' | 'discount_offered' | 'signed' | 'confirmed'
+        status: body.status || (body.paymentProof ? 'PENDING_VERIFICATION' : 'DRAFT'),
+        createdAt: new Date().toISOString()
       });
 
-      // Initial system message in chat
-      db.addMessage(order.id, {
-        sender: 'system',
-        senderName: 'HOPE Studio System',
-        text: `✨ Order created for ${order.packageName}! Total quote: ${order.totalPrice.toLocaleString()} ETB. You can chat here directly with our directors to ask questions or request special discounts.`
-      });
-
-      // Send instant rich alert to company owners on Telegram
-      const alertMsg = `🌟 <b>NEW MINI APP BOOKING RECEIVED!</b>\n\n` +
-        `🆔 <b>Order:</b> <code>${order.id}</code>\n` +
-        `👤 <b>Client:</b> ${order.clientName} ${order.telegramUsername ? `(@${order.telegramUsername})` : ''}\n` +
-        `📞 <b>Phone:</b> ${order.phone || 'TBD'}\n` +
-        `📅 <b>Date:</b> ${order.eventDate || 'Not specified'}\n` +
-        `📍 <b>Location:</b> ${order.location}\n` +
-        `📦 <b>Package:</b> ${order.packageName} (${order.category.toUpperCase()})\n` +
-        `💰 <b>Quote:</b> <b>${order.totalPrice.toLocaleString()} ETB</b>\n` +
-        (order.addons?.length > 0 ? `➕ <b>Add-ons:</b> ${order.addons.map(a => a.name).join(', ')}\n` : '') +
-        (order.notes ? `📝 <b>Notes:</b> <i>"${order.notes}"</i>\n` : '') +
-        `\n👇 <b>Quick Actions:</b>`;
-
-      await notifyAdmins(alertMsg, {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              { text: '🏷️ Offer Discount', callback_data: `discount:${order.id}` },
-              { text: '💬 Reply to Client', callback_data: `reply:${order.id}` }
-            ],
-            [
-              { text: '📝 Send Agreement', callback_data: `agree:${order.id}` },
-              { text: '✅ Confirm Deposit', callback_data: `confirm:${order.id}` }
-            ]
-          ]
-        }
-      });
+      // If proof of payment attached at creation, dispatch alert
+      if (order.paymentProof) {
+        await dispatchPaymentAlert(order);
+      }
 
       return res.status(201).json({ success: true, order });
     } catch (e) {
@@ -96,8 +112,18 @@ export default async function handler(req, res) {
       const { id, ...patch } = body;
       if (!id) return res.status(400).json({ error: 'Order ID required' });
 
+      const prevOrder = db.getOrder(id);
+      if (!prevOrder) return res.status(404).json({ error: 'Order not found' });
+
+      // If payment proof newly uploaded or status changed to PENDING_VERIFICATION
+      const isNewReceipt = patch.paymentProof && patch.paymentProof !== prevOrder.paymentProof;
+      const isPendingVerif = patch.status === 'PENDING_VERIFICATION' && prevOrder.status !== 'PENDING_VERIFICATION';
+
       const updated = db.updateOrder(id, patch);
-      if (!updated) return res.status(404).json({ error: 'Order not found' });
+
+      if (isNewReceipt || isPendingVerif) {
+        await dispatchPaymentAlert(updated);
+      }
 
       return res.status(200).json({ success: true, order: updated });
     } catch (e) {

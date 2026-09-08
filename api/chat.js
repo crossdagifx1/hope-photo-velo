@@ -98,56 +98,6 @@ export default async function handler(req, res) {
         if (!message) message = orderMsg;
       }
 
-      // ── IF SENDER IS ADMIN: DISPATCH DIRECTLY TO CLIENT'S TELEGRAM ──
-      if (sender === 'admin' && effectiveChatId) {
-        if (type === 'agreement_link') {
-          const finalOrderId = data?.orderId || targetOrderId || (order ? order.id : 'HOPE-1001');
-          await sendTelegramMessage(effectiveChatId, `📜 <b>የ HOPE ስቱዲዮ ይፋዊ ውል ተዘጋጅቷል!</b>\n\n${text}\n\n<i>Your official service contract is ready for e-signature. Tap below to review and sign:</i>`, {
-            reply_markup: {
-              inline_keyboard: [
-                [{ text: '✍️ Review & Sign Agreement', web_app: { url: `${APP_URL}?tma=1&order_id=${finalOrderId}&tab=agreement` } }]
-              ]
-            }
-          });
-        } else if (type === 'discount_offer') {
-          await sendTelegramMessage(effectiveChatId, `🎉 <b>HOPE Studio Discount Approved!</b>\n\n${text}`);
-        } else {
-          await sendTelegramMessage(effectiveChatId, `💬 <b>HOPE Studio Management:</b>\n\n"${text}"`);
-        }
-      } else if (sender !== 'admin') {
-        // Client sent message from Mini App / Web -> Notify Admins
-        const isDiscountRequest = type === 'discount_request' || text.toLowerCase().includes('discount') || text.toLowerCase().includes('ዋጋ');
-        const header = isDiscountRequest 
-          ? `🏷️ <b>CLIENT REQUESTED A DISCOUNT!</b>`
-          : `💬 <b>NEW CLIENT MESSAGE</b>`;
-
-        const alertText = `${header}\n\n` +
-          (targetOrderId ? `🆔 <b>Order:</b> <code>${targetOrderId}</code>\n` : '') +
-          `👤 <b>From:</b> ${senderName || 'Client'} ${order?.telegramUsername ? `(@${order.telegramUsername})` : ''}\n` +
-          `💬 <i>"${text}"</i>\n\n` +
-          (order ? `Current Quote: <b>${(order.negotiatedPrice || order.totalPrice || 0).toLocaleString()} ETB</b>` : '');
-
-        const quickButtons = [];
-        if (effectiveChatId) {
-          quickButtons.push([
-            { text: '💬 Reply Directly', callback_data: `reply_chat:${effectiveChatId}` },
-            { text: '🏷️ Offer Discount', callback_data: `discount_chat:${effectiveChatId}` }
-          ]);
-          quickButtons.push([
-            { text: '📜 Send Agreement', callback_data: `agree_chat:${effectiveChatId}` }
-          ]);
-        } else if (targetOrderId) {
-          quickButtons.push([
-            { text: '🏷️ Offer Discount', callback_data: `discount:${targetOrderId}` },
-            { text: '💬 Reply to Client', callback_data: `reply:${targetOrderId}` }
-          ]);
-        }
-
-        await notifyAdmins(alertText, {
-          reply_markup: { inline_keyboard: quickButtons }
-        });
-      }
-
       return res.status(201).json({ success: true, message });
     } catch (e) {
       console.error('Chat error:', e);

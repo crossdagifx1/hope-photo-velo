@@ -1,21 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
-  ChevronDown, ChevronRight, ChevronUp, ExternalLink, Film, Globe, Heart, Layers, Lock, MapPin, Menu,
-  MessageCircle, Phone, Play, Quote, Send, Sliders, Sparkles, Video, X,
+  ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Copy, CreditCard, Edit2, ExternalLink,
+  Film, Globe, Heart, Layers, Lock, MapPin, Menu, MessageCircle, Package, Pencil,
+  Phone, Play, Plus, Quote, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X,
 } from 'lucide-react';
 import './styles.css';
-import TelegramMiniApp from './tma/TelegramMiniApp.jsx';
-import AdminDashboard from './admin/AdminDashboard.jsx';
 
 /* ── CONSTANTS ──────────────────────────────────────────────────────────── */
 const PHONE_DISPLAY     = '09 10 52 69 62';
 const PHONE_LINK        = '+251910526962';
-const TELEGRAM_BOT_TOKEN = '8911456945:AAHHDlGW6-7KPsUwMZvLbAX2EHDXDxAwIzw';
-const TELEGRAM_BOT_NAME  = 'HoopStudioSystemBot';
-const TELEGRAM_CHAT_IDS  = ['5563466567', '5473210957'];
-const TELEGRAM_LINK      = 'https://t.me/HoopStudioSystemBot';
 const ASSET             = '/assets';
 
 /* ── TRANSLATIONS ───────────────────────────────────────────────────────── */
@@ -123,7 +118,7 @@ const T = {
     closingBody: 'ቀናት በፍጥነት ስለሚያዙ፣ የሚያከብሩትን በዓል ይንገሩን፤ ቀጣዩን እርምጃ ቀላል እናደርገዋለን።',
     closingBtn: 'ቀንዎን ያስይዙ',
     footerTagline: 'ከፍተኛ ዋጋ ላላቸው አፍታዎች።',
-    footerTg: 'በቴሌግራም ያግኙን',
+    footerTg: 'ደውሉልን',
     bookingEyebrow: 'ቀንዎን ያስይዙ',
     bookingH2: 'ለድንቅ አፍታዎችዎ\nቦታ እንስጥ።',
     bookingIntro: 'ስለ በዓልዎ ጥቂት ነገሮችን ይንገሩን፤ እኛ ከእዚያ እንቀጥላለን።',
@@ -240,7 +235,7 @@ const T = {
     closingBody: 'Dates fill up fast — tell us about the celebration you\'re planning and we\'ll make the next step easy.',
     closingBtn: 'Book Your Date',
     footerTagline: 'For moments that matter most.',
-    footerTg: 'Find us on Telegram',
+    footerTg: 'Call Us Directly',
     bookingEyebrow: 'Book Your Date',
     bookingH2: 'Let\'s make space\nfor your special moments.',
     bookingIntro: 'Tell us a little about your celebration and we\'ll take it from there.',
@@ -357,7 +352,7 @@ const T = {
     closingBody: 'Guyyoonni dafanii waan qabatamaniif, ayyaana kabajjan nuu tsisaa; tarkaanfii itti aanu mijaataa ni goona.',
     closingBtn: 'Guyyaa Keessan Qabadhaa',
     footerTagline: 'Yeroowwan gatii ol\'aanaa qabaniif.',
-    footerTg: 'Telegram irratti nu argadhaa',
+    footerTg: 'Nuu Bilbilaa',
     bookingEyebrow: 'Guyyaa Keessan Qabadhaa',
     bookingH2: 'Yeroowwan keessan kan addaatiif\nbakka nuu kenninaa.',
     bookingIntro: 'Waa\'ee ayyaana keessanii xiqqoo nuu tsisaa; nuti achii itti fufna.',
@@ -807,8 +802,1286 @@ function PageLoader({ onDone }) {
   );
 }
 
-/* ── BOOKING PANEL ─────────────────────────────────────────────────────── */
-function BookingPanel({ selectedPackage, onClose, lang }) {
+/* ── INTERACTIVE CALENDAR DATE PICKER ──────────────────────────────────── */
+function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [] }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const [viewing, setViewing] = useState(() => {
+    const d = value ? new Date(value) : new Date();
+    return { year: d.getFullYear(), month: d.getMonth() };
+  });
+
+  const daysInMonth = (y, m) => new Date(y, m + 1, 0).getDate();
+  const firstDayOfMonth = (y, m) => new Date(y, m, 1).getDay();
+
+  const prevMonth = () => setViewing(v => {
+    const d = new Date(v.year, v.month - 1, 1);
+    return { year: d.getFullYear(), month: d.getMonth() };
+  });
+  const nextMonth = () => setViewing(v => {
+    const d = new Date(v.year, v.month + 1, 1);
+    return { year: d.getFullYear(), month: d.getMonth() };
+  });
+
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  const numDays = daysInMonth(viewing.year, viewing.month);
+  const startDay = firstDayOfMonth(viewing.year, viewing.month);
+
+  const formatDate = (y, m, d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+  const cells = [];
+  for (let i = 0; i < startDay; i++) cells.push(null);
+  for (let d = 1; d <= numDays; d++) cells.push(d);
+
+  return (
+    <div className="cal-picker">
+      <div className="cal-nav">
+        <button type="button" className="cal-nav-btn" onClick={prevMonth}><ChevronLeft size={16}/></button>
+        <span className="cal-month-label">{months[viewing.month]} {viewing.year}</span>
+        <button type="button" className="cal-nav-btn" onClick={nextMonth}><ChevronRight size={16}/></button>
+      </div>
+      <div className="cal-grid-head">
+        {days.map(d => <span key={d} className="cal-day-label">{d}</span>)}
+      </div>
+      <div className="cal-grid">
+        {cells.map((day, idx) => {
+          if (!day) return <span key={`e${idx}`} className="cal-cell cal-empty" />;
+          const dateStr = formatDate(viewing.year, viewing.month, day);
+          const cellDate = new Date(viewing.year, viewing.month, day);
+          const isPast = cellDate < today;
+          const isBlackout = blackoutDates.includes(dateStr);
+          const isBooked = bookedDates.includes(dateStr);
+          const isSelected = value === dateStr;
+          const isToday = cellDate.getTime() === today.getTime();
+          const isDisabled = isPast || isBlackout || isBooked;
+          const cls = [
+            'cal-cell',
+            isSelected ? 'cal-selected' : '',
+            isToday && !isSelected ? 'cal-today' : '',
+            isDisabled ? 'cal-disabled' : 'cal-available',
+            isBlackout ? 'cal-blackout' : '',
+            isBooked ? 'cal-booked' : '',
+          ].filter(Boolean).join(' ');
+          return (
+            <button
+              key={dateStr}
+              type="button"
+              className={cls}
+              disabled={isDisabled}
+              title={isBlackout ? 'Studio Unavailable' : isBooked ? 'Already Booked' : ''}
+              onClick={() => !isDisabled && onChange(dateStr)}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+      <div className="cal-legend">
+        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-available"/>Available</span>
+        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-blackout"/>Unavailable</span>
+        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-booked"/>Booked</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── SIGNATURE CANVAS PAD ───────────────────────────────────────────────── */
+function SignaturePad({ onSign, onClear }) {
+  const canvasRef = useRef(null);
+  const drawing = useRef(false);
+  const hasDrawn = useRef(false);
+
+  const getPos = (e, canvas) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
+  };
+
+  const start = (e) => {
+    e.preventDefault();
+    drawing.current = true;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const pos = getPos(e, canvas);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
+  const draw = (e) => {
+    e.preventDefault();
+    if (!drawing.current) return;
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    ctx.strokeStyle = '#e8d48b';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    const pos = getPos(e, canvas);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    hasDrawn.current = true;
+  };
+
+  const stop = (e) => {
+    e.preventDefault();
+    drawing.current = false;
+    if (hasDrawn.current) {
+      onSign(canvasRef.current.toDataURL('image/png'));
+    }
+  };
+
+  const clear = () => {
+    const canvas = canvasRef.current;
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+    hasDrawn.current = false;
+    onClear();
+  };
+
+  return (
+    <div className="sig-pad-wrap">
+      <canvas
+        ref={canvasRef}
+        width={480}
+        height={140}
+        className="sig-canvas"
+        onMouseDown={start} onMouseMove={draw} onMouseUp={stop} onMouseLeave={stop}
+        onTouchStart={start} onTouchMove={draw} onTouchEnd={stop}
+      />
+      <div className="sig-pad-footer">
+        <span className="sig-line-label">Sign above</span>
+        <button type="button" className="sig-clear-btn" onClick={clear}>Clear</button>
+      </div>
+    </div>
+  );
+}
+
+/* ── BOOKING FLOW MODAL ─────────────────────────────────────────────────── */
+function BookingFlowModal({ selectedPackage, onClose, lang }) {
+  const [step, setStep]               = useState(1); // 1=details 2=fork 3a=contract 3b=checkout 4=confirm 5=discussion
+  const [blackoutDates, setBlackout]  = useState([]);
+  const [bookedDates, setBooked]      = useState([]);
+  const [payAccounts, setPayAccounts] = useState(null);
+  const [contractTpl, setContractTpl] = useState(null);
+  const [form, setForm]               = useState({ name: '', date: '', phone: '', location: 'Addis Ababa', note: '' });
+  const [signature, setSignature]     = useState(null);
+  const [termsAccepted, setTerms]     = useState(false);
+  const [payMethod, setPayMethod]     = useState(null); // 'telebirr' | 'cbe'
+  const [receiptFile, setReceipt]     = useState(null);
+  const [receiptPreview, setReceiptPrev] = useState(null);
+  const [submitting, setSubmitting]   = useState(false);
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [error, setError]             = useState('');
+  const [addons, setAddons]           = useState([]);
+  const [pkgAddons, setPkgAddons]     = useState([]);
+
+  const t = T[lang];
+  const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
+
+  const pkgName = lang === 'en'
+    ? (selectedPackage?.titleEn ?? selectedPackage?.name ?? 'HOPE Package')
+    : lang === 'om'
+    ? (selectedPackage?.titleOm ?? selectedPackage?.name ?? 'Paakeejii HOPE')
+    : (selectedPackage?.titleAm ?? selectedPackage?.name ?? 'የ HOPE ፓኬጅ');
+
+  const deliverables = lang === 'en'
+    ? (selectedPackage?.deliverablesEn ?? [])
+    : lang === 'om'
+    ? (selectedPackage?.deliverablesOm ?? [])
+    : (selectedPackage?.deliverablesAm ?? []);
+
+  const basePrice = parseInt((selectedPackage?.price || '0').toString().replace(/[^0-9]/g, ''), 10) || 0;
+  const addonsTotal = addons.reduce((s, a) => s + (a.price || 0), 0);
+  const totalPrice = basePrice + addonsTotal;
+  const deposit = Math.round(totalPrice * 0.3);
+  const remaining = totalPrice - deposit;
+
+  // Load settings on mount
+  useEffect(() => {
+    fetch(`${apiBase}/api/settings`)
+      .then(r => r.json())
+      .then(data => {
+        setBlackout(data.settings?.blackoutDates || []);
+        setContractTpl(data.settings?.contractTemplate || null);
+        setPayAccounts(data.settings?.paymentAccounts || null);
+        const avail = (data.settings?.addons || []).filter(a => a.active);
+        setPkgAddons(avail);
+        // Get booked dates from orders
+        return fetch(`${apiBase}/api/orders`);
+      })
+      .then(r => r.json())
+      .then(data => {
+        const dates = (data.orders || []).filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status)).map(o => o.eventDate);
+        setBooked(dates);
+      })
+      .catch(() => {});
+  }, []);
+
+  const update = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleReceiptChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { setError('File too large (max 5MB)'); return; }
+    setReceipt(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setReceiptPrev(ev.target.result);
+    reader.readAsDataURL(file);
+    setError('');
+  };
+
+  const fillContractTemplate = (tpl) => {
+    if (!tpl) return 'Loading contract...';
+    const delvText = deliverables.slice(0, 5).join(', ') || pkgName;
+    const tokens = {
+      clientName: form.name || '___________',
+      phone: form.phone || '___________',
+      eventDate: form.date || '___________',
+      location: form.location || 'Addis Ababa',
+      packageName: pkgName,
+      deliverables: delvText,
+      agreedPrice: totalPrice.toLocaleString() + ' ETB',
+      depositAmount: deposit.toLocaleString() + ' ETB',
+      remainingBalance: remaining.toLocaleString() + ' ETB',
+      balance: remaining.toLocaleString() + ' ETB',
+    };
+    return tpl.clauses.map(c => {
+      const heading = lang === 'am' ? c.headingAm : c.headingEn;
+      let body = lang === 'am' ? c.bodyAm : c.bodyEn;
+      Object.entries(tokens).forEach(([k, v]) => { body = body?.replaceAll?.(`{${k}}`, v) ?? body; });
+      return { heading, body };
+    });
+  };
+
+  const contractTitle = contractTpl
+    ? (lang === 'am' ? contractTpl.titleAm : contractTpl.titleEn)
+    : 'Service Agreement';
+  const contractClauses = fillContractTemplate(contractTpl);
+
+  // Step 1 → validate and move to Step 2
+  const handleStep1Submit = (e) => {
+    e.preventDefault();
+    if (!form.date) { setError(lang === 'am' ? 'እባክዎ ቀን ይምረጡ' : 'Please select a date'); return; }
+    setError('');
+    setStep(2);
+  };
+
+  // Proceed to Contract (Option A)
+  const handleProceedContract = () => setStep(3);
+
+  // Proceed to Discussion (Option B)
+  const handleDiscussion = async () => {
+    setSubmitting(true);
+    try {
+      const r = await fetch(`${apiBase}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: form.name, phone: form.phone, eventDate: form.date,
+          location: form.location, notes: form.note, packageName: pkgName,
+          basePrice, totalPrice, category: selectedPackage?.category || 'custom',
+          status: 'IN_DISCUSSION'
+        })
+      });
+      const data = await r.json();
+      setCreatedOrder(data.order);
+    } catch(err) { /* fallback order id */ setCreatedOrder({ id: 'HOPE-' + Math.floor(1000 + Math.random() * 9000) }); }
+    setSubmitting(false);
+    setStep(5);
+  };
+
+  // Contract signed → checkout
+  const handleContractNext = () => {
+    if (!signature) { setError(lang === 'am' ? 'እባክዎ ፊርማ ያኑሩ' : 'Please sign the contract'); return; }
+    if (!termsAccepted) { setError(lang === 'am' ? 'ውሎቹን ይቀበሉ' : 'Please accept the terms'); return; }
+    setError('');
+    setStep(4);
+  };
+
+  // Final submit with receipt
+  const handlePaymentSubmit = async (e) => {
+    e.preventDefault();
+    if (!payMethod) { setError(lang === 'am' ? 'እባክዎ የክፍያ ዘዴ ይምረጡ' : 'Please select a payment method'); return; }
+    if (!receiptPreview) { setError(lang === 'am' ? 'የደረሰኝ ምስል ይጫኑ' : 'Please upload payment receipt'); return; }
+    setSubmitting(true);
+    setError('');
+    let orderObj = null;
+    try {
+      const r = await fetch(`${apiBase}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: form.name, phone: form.phone, eventDate: form.date,
+          location: form.location, notes: form.note, packageName: pkgName,
+          basePrice, addons, totalPrice, depositAmount: deposit, remainingBalance: remaining,
+          paymentMethod: payMethod, paymentProof: receiptPreview,
+          signatureDataUrl: signature, termsAccepted: true,
+          category: selectedPackage?.category || 'custom',
+          status: 'PENDING_VERIFICATION'
+        })
+      });
+      if (r.ok) {
+        const data = await r.json();
+        orderObj = data?.order || null;
+      }
+    } catch(err) {
+      console.warn('Backend order push failed, continuing with client receipt:', err);
+    }
+    if (!orderObj) {
+      orderObj = {
+        id: 'HOPE-' + Math.floor(1000 + Math.random() * 9000),
+        clientName: form.name,
+        phone: form.phone,
+        eventDate: form.date,
+        packageName: pkgName,
+        depositAmount: deposit,
+        remainingBalance: remaining,
+        paymentMethod: payMethod,
+        status: 'PENDING_VERIFICATION'
+      };
+    }
+    setCreatedOrder(orderObj);
+    setStep(6);
+    setSubmitting(false);
+  };
+
+  const stepLabel = {
+    1: lang === 'am' ? '1. ዝርዝርና ቀን' : '1. Details & Date',
+    2: lang === 'am' ? '2. አማራጭ ምረጥ' : '2. Choose Path',
+    3: lang === 'am' ? '3. ውል' : '3. Contract',
+    4: lang === 'am' ? '4. ክፍያ' : '4. Payment',
+    5: lang === 'am' ? 'ውይይት' : 'Discussion',
+    6: lang === 'am' ? '✅ ተረጋግጧል' : '✅ Submitted',
+  };
+
+  const toggleAddon = (addon) => {
+    setAddons(prev => prev.find(a => a.id === addon.id) ? prev.filter(a => a.id !== addon.id) : [...prev, addon]);
+  };
+
+  // ── RENDER ──
+  const renderStepIndicator = () => (
+    <div className="bf-steps">
+      {[1,2,3,4].map(s => (
+        <div key={s} className={`bf-step ${step >= s ? 'bf-step-done' : ''} ${step === s ? 'bf-step-active' : ''}`}>
+          <span className="bf-step-num">{step > s ? <Check size={11}/> : s}</span>
+        </div>
+      ))}
+    </div>
+  );
+
+  // ── STEP 1: Package + Calendar + Client Info ──
+  const renderStep1 = () => (
+    <form onSubmit={handleStep1Submit} className="bf-step-body">
+      <div className="bf-pkg-header">
+        <div className="bf-pkg-badge">{selectedPackage?.badgeEn || 'Package'}</div>
+        <h3 className="bf-pkg-name">{pkgName}</h3>
+        <div className="bf-pkg-price">{totalPrice.toLocaleString()} <span>ETB</span></div>
+      </div>
+
+      {deliverables.length > 0 && (
+        <div className="bf-deliverables">
+          <p className="bf-deliv-label">{lang === 'am' ? 'የተካተቱ አገልግሎቶች:' : 'Included deliverables:'}</p>
+          <ul className="bf-deliv-list">
+            {deliverables.map((d, i) => <li key={i}><Check size={11}/> {d}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {pkgAddons.length > 0 && (
+        <div className="bf-addons">
+          <p className="bf-deliv-label">{lang === 'am' ? 'ተጨማሪ አማራጮች:' : 'Optional Add-ons:'}</p>
+          <div className="bf-addon-grid">
+            {pkgAddons.map(a => {
+              const sel = addons.find(x => x.id === a.id);
+              return (
+                <button key={a.id} type="button" className={`bf-addon-chip ${sel ? 'bf-addon-selected':''}`} onClick={() => toggleAddon(a)}>
+                  {sel ? <Check size={11}/> : <Plus size={11}/>} {a.name} <span>+{a.price.toLocaleString()}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      <div className="bf-divider" />
+
+      <div className="bf-section-label">
+        <CalendarDays size={14}/>
+        <span>{lang === 'am' ? 'የቀን ምርጫ' : 'Select Your Date'}</span>
+      </div>
+      <CalendarPicker
+        value={form.date}
+        onChange={(d) => setForm(f => ({...f, date: d}))}
+        blackoutDates={blackoutDates}
+        bookedDates={bookedDates}
+      />
+      {form.date && (
+        <p className="bf-date-chosen"><Check size={13}/> {form.date}</p>
+      )}
+
+      <div className="bf-divider" />
+
+      <div className="bf-section-label"><Phone size={14}/><span>{lang === 'am' ? 'የግል መረጃ' : 'Your Details'}</span></div>
+      <div className="bf-field-group">
+        <label className="bf-label">{lang === 'am' ? 'ሙሉ ስምዎ' : 'Full Name'}
+          <input required className="bf-input" name="name" value={form.name} onChange={update} placeholder={lang === 'am' ? 'ሙሉ ስምዎን ያስገቡ' : 'Enter full name'}/>
+        </label>
+        <label className="bf-label">{lang === 'am' ? 'ስልክ ቁጥር' : 'Phone Number'}
+          <input required className="bf-input" name="phone" type="tel" value={form.phone} onChange={update} placeholder="09…"/>
+        </label>
+        <label className="bf-label">{lang === 'am' ? 'የቀረጻ ቦታ' : 'Event Location'}
+          <input className="bf-input" name="location" value={form.location} onChange={update} placeholder="Addis Ababa"/>
+        </label>
+        <label className="bf-label">{lang === 'am' ? 'ተጨማሪ ማስታወሻ' : 'Special Notes'}
+          <textarea className="bf-input" name="note" value={form.note} onChange={update} rows="2" placeholder={lang === 'am' ? 'ሌሎች ዝርዝሮች...' : 'Any special requests...'}/>
+        </label>
+      </div>
+
+      {error && <p className="bf-error">{error}</p>}
+      <button type="submit" className="bf-primary-btn">
+        {lang === 'am' ? 'ቀጣይ — አማራጭ ምረጥ' : 'Next — Choose Your Path'} <ChevronRight size={16}/>
+      </button>
+    </form>
+  );
+
+  // ── STEP 2: Fork — Contract or Discussion ──
+  const renderStep2 = () => (
+    <div className="bf-step-body bf-fork">
+      <div className="bf-fork-header">
+        <p className="eyebrow">{lang === 'am' ? 'የቀጠሮ መንገድ ምረጥ' : 'Choose Your Booking Path'}</p>
+        <p className="bf-fork-sub">{lang === 'am' ? `ቀን: ${form.date} | ${pkgName}` : `Date: ${form.date} | ${pkgName}`}</p>
+      </div>
+      <div className="bf-fork-cards">
+        <button type="button" className="bf-fork-card bf-fork-contract" onClick={handleProceedContract}>
+          <div className="bf-fork-icon"><Shield size={28}/></div>
+          <h4>{lang === 'am' ? 'ወደ ውል ቀጥሉ' : 'Proceed to Contract'}</h4>
+          <p>{lang === 'am' ? 'ውሉን ይፈርሙ፣ ቅድመ ክፍያ ያስገቡ፣ ቀንዎን አሁኑኑ ያስያዙ።' : 'Sign the agreement, pay 30% deposit, and lock your date now.'}</p>
+          <ul>
+            <li><Check size={12}/> {lang === 'am' ? 'ቀን ወዲያውኑ ይጠበቃል' : 'Date reserved immediately'}</li>
+            <li><Check size={12}/> {lang === 'am' ? '30% ቅድሚ ክፍያ' : '30% advance deposit'}</li>
+            <li><Check size={12}/> {lang === 'am' ? 'ዲጂታል ፊርማ' : 'Digital signature'}</li>
+          </ul>
+          <span className="bf-fork-cta">{lang === 'am' ? 'ወደ ውል →' : 'Go to Contract →'}</span>
+        </button>
+
+        <button type="button" className="bf-fork-card bf-fork-discuss" onClick={handleDiscussion} disabled={submitting}>
+          <div className="bf-fork-icon"><MessageCircle size={28}/></div>
+          <h4>{lang === 'am' ? 'ቀጥሎ ውይይት ማድረግ' : 'Request Discussion'}</h4>
+          <p>{lang === 'am' ? 'ፍላጎቶችዎን ለማብራራት ልምዱ ካለው ቡድናችን ጋር ምክር ያግኙ።' : 'Speak with our team to customize your package, schedule, and details.'}</p>
+          <ul>
+            <li><Check size={12}/> {lang === 'am' ? 'ያለ ቅድሚ ክፍያ' : 'No upfront payment'}</li>
+            <li><Check size={12}/> {lang === 'am' ? 'ፓኬጅ ማስተካከያ' : 'Custom package options'}</li>
+            <li><Check size={12}/> {lang === 'am' ? 'ፈጣን ምላሽ' : 'Quick response'}</li>
+          </ul>
+          <span className="bf-fork-cta">{submitting ? '...' : (lang === 'am' ? 'ውይይት ጠይቅ →' : 'Request Discussion →')}</span>
+        </button>
+      </div>
+      <button type="button" className="bf-back-btn" onClick={() => setStep(1)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
+    </div>
+  );
+
+  // ── STEP 3: Contract + Signature ──
+  const renderStep3 = () => (
+    <div className="bf-step-body">
+      <div className="bf-contract-header">
+        <Shield size={20} className="bf-contract-icon"/>
+        <div>
+          <h3 className="bf-contract-title">{contractTitle}</h3>
+          <p className="bf-contract-meta">
+            {form.name} • {form.date} • {pkgName}
+          </p>
+        </div>
+      </div>
+
+      <div className="bf-price-breakdown">
+        <div className="bf-price-row">
+          <span>{lang === 'am' ? 'ጠቅላላ ዋጋ' : 'Total Investment'}</span>
+          <strong>{totalPrice.toLocaleString()} ETB</strong>
+        </div>
+        <div className="bf-price-row bf-deposit-row">
+          <span>{lang === 'am' ? '30% ቅድሚ ክፍያ (አሁን)' : '30% Advance Deposit (Now)'}</span>
+          <strong className="bf-deposit-amt">{deposit.toLocaleString()} ETB</strong>
+        </div>
+        <div className="bf-price-row">
+          <span>{lang === 'am' ? 'ቀሪ ክፍያ (ማስረከቢያ ላይ)' : 'Remaining Balance (on delivery)'}</span>
+          <strong>{remaining.toLocaleString()} ETB</strong>
+        </div>
+      </div>
+
+      <div className="bf-contract-scroll">
+        {Array.isArray(contractClauses) ? contractClauses.map((c, i) => (
+          <div key={i} className="bf-clause">
+            <h5 className="bf-clause-heading">{c.heading}</h5>
+            <p className="bf-clause-body">{c.body}</p>
+          </div>
+        )) : <p style={{color:'#999'}}>{contractClauses}</p>}
+        <p className="bf-clause-version">Version {contractTpl?.termsVersion || 'v3.2-2026'}</p>
+      </div>
+
+      <div className="bf-sig-section">
+        <p className="bf-sig-label"><Pencil size={13}/> {lang === 'am' ? 'የደምበኛ ፊርማ' : 'Client Signature'}</p>
+        <SignaturePad onSign={setSignature} onClear={() => setSignature(null)}/>
+        {signature && <p className="bf-sig-ok"><Check size={13}/> {lang === 'am' ? 'ፊርማ ተቀብሏል' : 'Signature captured'}</p>}
+      </div>
+
+      <label className="bf-terms-check">
+        <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)}/>
+        <span>{lang === 'am' ? 'ሁሉንም ውሎች እና ቅድሚ ክፍያ ሁኔታ ተቀብያለሁ' : 'I accept all terms, conditions, and the 30% advance deposit requirement'}</span>
+      </label>
+
+      {error && <p className="bf-error">{error}</p>}
+      <div className="bf-btn-row">
+        <button type="button" className="bf-back-btn" onClick={() => setStep(2)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
+        <button type="button" className="bf-primary-btn" onClick={handleContractNext}>
+          {lang === 'am' ? 'ወደ ክፍያ ቀጥሉ' : 'Proceed to Payment'} <ChevronRight size={16}/>
+        </button>
+      </div>
+    </div>
+  );
+
+  // ── STEP 4: Checkout ──
+  const telebirr = payAccounts?.telebirr;
+  const cbe = payAccounts?.cbe;
+
+  const renderStep4 = () => (
+    <form onSubmit={handlePaymentSubmit} className="bf-step-body">
+      <div className="bf-pay-header">
+        <CreditCard size={22}/>
+        <div>
+          <h3>{lang === 'am' ? 'ቅድሚ ክፍያ ይፈጽሙ' : 'Complete Advance Deposit'}</h3>
+          <p>{lang === 'am' ? `30% ቅድሚ ክፍያ: ${deposit.toLocaleString()} ETB` : `30% Deposit: ${deposit.toLocaleString()} ETB`}</p>
+        </div>
+      </div>
+
+      <div className="bf-pay-methods">
+        <p className="bf-deliv-label">{lang === 'am' ? 'የክፍያ ዘዴ ምረጡ:' : 'Select Payment Method:'}</p>
+        <div className="bf-pay-method-cards">
+          <button type="button" className={`bf-pay-card ${payMethod==='telebirr'?'bf-pay-selected':''}`} onClick={() => setPayMethod('telebirr')}>
+            <div className="bf-pay-logo telebirr-logo">T</div>
+            <div>
+              <strong>Telebirr</strong>
+              <p>{telebirr?.phone || '09 10 52 69 62'}</p>
+              <small>{telebirr?.accountName || 'HOPE Photo & Velo'}</small>
+            </div>
+            {payMethod==='telebirr' && <Check size={18} className="bf-pay-check"/>}
+          </button>
+          <button type="button" className={`bf-pay-card ${payMethod==='cbe'?'bf-pay-selected':''}`} onClick={() => setPayMethod('cbe')}>
+            <div className="bf-pay-logo cbe-logo">CBE</div>
+            <div>
+              <strong>CBE (Commercial Bank)</strong>
+              <p>{cbe?.accountNumber || '1000542389123'}</p>
+              <small>{cbe?.branch || 'Hayahulet Branch'}</small>
+            </div>
+            {payMethod==='cbe' && <Check size={18} className="bf-pay-check"/>}
+          </button>
+        </div>
+      </div>
+
+      {payMethod && (
+        <div className="bf-pay-instructions">
+          {payMethod === 'telebirr' ? (
+            <>
+              <p className="bf-instr-text">
+                {lang === 'am' ? (telebirr?.instructionsAm || '') : (telebirr?.instructionsEn || '')}
+              </p>
+              <div className="bf-copy-row">
+                <code>{telebirr?.rawPhone || '0910526962'}</code>
+                <button type="button" className="bf-copy-btn" onClick={() => navigator.clipboard?.writeText(telebirr?.rawPhone || '0910526962')}>
+                  <Copy size={13}/> Copy
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="bf-instr-text">
+                {lang === 'am' ? (cbe?.instructionsAm || '') : (cbe?.instructionsEn || '')}
+              </p>
+              <div className="bf-copy-row">
+                <code>{cbe?.accountNumber || '1000542389123'}</code>
+                <button type="button" className="bf-copy-btn" onClick={() => navigator.clipboard?.writeText(cbe?.accountNumber || '1000542389123')}>
+                  <Copy size={13}/> Copy
+                </button>
+              </div>
+              <p className="bf-copy-row-label">{cbe?.bankName || 'Commercial Bank of Ethiopia'} — {cbe?.branch || 'Hayahulet'}</p>
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="bf-receipt-upload">
+        <p className="bf-deliv-label"><Upload size={13}/> {lang === 'am' ? 'የደረሰኝ ምስል ይጫኑ (screenshot)' : 'Upload Payment Receipt Screenshot'}</p>
+        <label className={`bf-dropzone ${receiptPreview ? 'bf-dropzone-filled':''}`}>
+          <input type="file" accept="image/*" onChange={handleReceiptChange} hidden/>
+          {receiptPreview
+            ? <img src={receiptPreview} alt="receipt" className="bf-receipt-preview"/>
+            : <>
+                <Upload size={28} className="bf-upload-icon"/>
+                <span>{lang === 'am' ? 'ምስል ይምረጡ ወይም ይጎትቱ' : 'Tap to select or drag receipt image'}</span>
+                <small>JPG, PNG — max 5MB</small>
+              </>}
+        </label>
+        {receiptPreview && (
+          <button type="button" className="bf-change-receipt" onClick={() => { setReceipt(null); setReceiptPrev(null); }}>
+            <X size={12}/> {lang === 'am' ? 'ሌላ ምስል ምረጥ' : 'Change receipt'}
+          </button>
+        )}
+      </div>
+
+      {error && <p className="bf-error">{error}</p>}
+      <div className="bf-btn-row">
+        <button type="button" className="bf-back-btn" onClick={() => setStep(3)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
+        <button type="submit" className="bf-primary-btn" disabled={submitting}>
+          {submitting ? (lang === 'am' ? 'በማስገባት ላይ...' : 'Submitting...') : (lang === 'am' ? 'ክፍያ ያስገቡ' : 'Submit Payment Proof')} <Check size={16}/>
+        </button>
+      </div>
+    </form>
+  );
+
+  // ── STEP 5: Discussion Confirmation ──
+  const renderStep5 = () => (
+    <div className="bf-step-body bf-confirm">
+      <div className="bf-confirm-icon discuss"><MessageCircle size={38}/></div>
+      <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Discussion Request Received!'}</h3>
+      <p className="bf-confirm-sub">{lang === 'am' ? 'የHOPE ቡድን አባላት ወደ ቴሌፎንዎ ይደውሉልዎታል።' : 'Our team will contact you shortly to customize your package and schedule.'}</p>
+      <div className="bf-confirm-detail-box">
+        <div className="bf-confirm-row"><span>👤</span><strong>{form.name}</strong></div>
+        <div className="bf-confirm-row"><span>📞</span><strong>{form.phone}</strong></div>
+        <div className="bf-confirm-row"><span>📅</span><strong>{form.date}</strong></div>
+        <div className="bf-confirm-row"><span>📦</span><strong>{pkgName}</strong></div>
+        <div className="bf-confirm-row"><span>🔖</span><code>{createdOrder?.id}</code></div>
+      </div>
+      <a className="bf-primary-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center'}}>
+        <Phone size={16}/> {lang === 'am' ? 'አሁን ደወሉ' : 'Call Us Now'}
+      </a>
+      <button type="button" className="bf-back-btn" style={{marginTop:'8px'}} onClick={onClose}>
+        {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
+      </button>
+    </div>
+  );
+
+  // ── STEP 6: QR RECEIPT CARD (beautiful + downloadable) ──
+  const receiptCardRef = useRef(null);
+  const [receiptDownloading, setReceiptDownloading] = useState(false);
+
+  // Load cross-origin image as promise
+  const loadImg = (url) => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = url;
+  });
+
+  const downloadReceipt = async () => {
+    setReceiptDownloading(true);
+    try {
+      const W = 720, H = 980;
+      const cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      const c = cv.getContext('2d');
+
+      // Background
+      const bg = c.createLinearGradient(0, 0, 0, H);
+      bg.addColorStop(0, '#0a0a0f');
+      bg.addColorStop(0.5, '#111118');
+      bg.addColorStop(1, '#0d0508');
+      c.fillStyle = bg; c.fillRect(0, 0, W, H);
+
+      // Crimson glow top-left
+      const g1 = c.createRadialGradient(130, 160, 0, 130, 160, 340);
+      g1.addColorStop(0, 'rgba(189,38,55,0.25)'); g1.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = g1; c.fillRect(0, 0, W, H);
+
+      // Gold glow bottom-right
+      const g2 = c.createRadialGradient(580, 820, 0, 580, 820, 260);
+      g2.addColorStop(0, 'rgba(212,175,55,0.18)'); g2.addColorStop(1, 'rgba(0,0,0,0)');
+      c.fillStyle = g2; c.fillRect(0, 0, W, H);
+
+      // Outer border
+      c.strokeStyle = 'rgba(255,255,255,0.06)'; c.lineWidth = 1.5;
+      c.strokeRect(1, 1, W-2, H-2);
+
+      // Header band fill
+      c.fillStyle = 'rgba(189,38,55,0.12)'; c.fillRect(0, 0, W, 118);
+      c.strokeStyle = 'rgba(189,38,55,0.3)'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(0, 118); c.lineTo(W, 118); c.stroke();
+
+      // Brand name
+      c.fillStyle = '#f5f5f5'; c.font = 'bold 40px Arial,sans-serif';
+      c.fillText('HOPE', 44, 60);
+      c.fillStyle = '#9090a8'; c.font = '500 14px Arial,sans-serif';
+      c.fillText('PHOTO & VELO STUDIO', 44, 84);
+      c.fillStyle = 'rgba(189,38,55,0.75)'; c.font = '500 11px Arial,sans-serif';
+      c.fillText('ADDIS ABABA  \u00B7  EST. 2009', 44, 108);
+
+      // Status pill (right)
+      c.fillStyle = 'rgba(245,158,11,0.15)';
+      cRR(c, W-230, 38, 186, 30, 8); c.fill();
+      c.strokeStyle = 'rgba(245,158,11,0.3)'; c.lineWidth = 1;
+      cRR(c, W-230, 38, 186, 30, 8); c.stroke();
+      c.fillStyle = '#f59e0b'; c.font = 'bold 11px Arial,sans-serif';
+      c.textAlign = 'center';
+      c.fillText('PENDING VERIFICATION', W-137, 59);
+      c.textAlign = 'left';
+
+      // Eyebrow
+      c.fillStyle = 'rgba(189,38,55,0.65)'; c.font = 'bold 11px Arial,sans-serif';
+      c.fillText('\u25CF  BOOKING RECEIPT', 44, 152);
+
+      // Thin divider
+      c.strokeStyle = 'rgba(255,255,255,0.05)'; c.lineWidth = 1;
+      c.beginPath(); c.moveTo(44, 163); c.lineTo(W-44, 163); c.stroke();
+
+      // Detail rows
+      const rows = [
+        ['\u{1F464}', 'Client', form.name || '\u2014', false],
+        ['\u{1F4DE}', 'Phone', form.phone || '\u2014', false],
+        ['\u{1F4C5}', 'Event Date', form.date || '\u2014', false],
+        ['\u{1F4E6}', 'Package', (createdOrder?.packageName || pkgName || '\u2014'), false],
+        ['\u{1F4B3}', 'Deposit Paid', `${deposit.toLocaleString()} ETB`, 'green'],
+        ['\u{1F4CA}', 'Balance Due', `${remaining.toLocaleString()} ETB`, false],
+        ['\u{1F3E6}', 'Paid Via', payMethod === 'telebirr' ? 'Telebirr' : 'CBE Birr', false],
+        ['\u{1F516}', 'Reference #', createdOrder?.id || '\u2014', 'gold'],
+        ['\u{1F4C6}', 'Issued', new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}), false],
+      ];
+      let ry = 188;
+      rows.forEach(([icon, label, val, accent], i) => {
+        if (i % 2 === 0) {
+          c.fillStyle = 'rgba(255,255,255,0.025)'; c.fillRect(44, ry-13, W-88, 27);
+        }
+        c.fillStyle = '#55556a'; c.font = '500 11px Arial,sans-serif';
+        c.fillText(label.toUpperCase(), 58, ry+4);
+        c.font = accent === 'gold' ? 'bold 13px Arial,sans-serif' : 'bold 14px Arial,sans-serif';
+        c.fillStyle = accent === 'green' ? '#22c55e' : accent === 'gold' ? '#d4af37' : '#f0f0f0';
+        c.textAlign = 'right';
+        c.fillText(val, W-58, ry+4);
+        c.textAlign = 'left';
+        ry += 30;
+      });
+
+      // QR Code fetch & draw
+      const qrY = ry + 28;
+      const QS = 170;
+      const qrX = (W - QS) / 2;
+      const qrData = encodeURIComponent(`HOPE|${createdOrder?.id||'REF'}|${form.name}|${form.date}`);
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&color=f5f5f5&bgcolor=1a1a25&ecc=M&data=${qrData}`;
+
+      // QR background card
+      c.fillStyle = '#1a1a25';
+      cRR(c, qrX-20, qrY-14, QS+40, QS+54, 14); c.fill();
+      c.strokeStyle = 'rgba(255,255,255,0.07)'; c.lineWidth = 1;
+      cRR(c, qrX-20, qrY-14, QS+40, QS+54, 14); c.stroke();
+
+      try {
+        const qrImg = await loadImg(qrUrl);
+        c.drawImage(qrImg, qrX, qrY, QS, QS);
+      } catch {
+        c.fillStyle = '#252535'; c.fillRect(qrX, qrY, QS, QS);
+        c.fillStyle = '#55556a'; c.font = '500 12px Arial,sans-serif';
+        c.textAlign = 'center'; c.fillText('QR CODE', W/2, qrY+QS/2+4); c.textAlign = 'left';
+      }
+
+      c.fillStyle = '#55556a'; c.font = '500 11px Arial,sans-serif';
+      c.textAlign = 'center'; c.fillText('Scan to verify booking', W/2, qrY+QS+22); c.textAlign = 'left';
+
+      // Tear line
+      const tearY = qrY + QS + 55;
+      c.setLineDash([5,6]); c.strokeStyle = 'rgba(255,255,255,0.07)'; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(44, tearY); c.lineTo(W-44, tearY); c.stroke(); c.setLineDash([]);
+      [[28, tearY],[W-28, tearY]].forEach(([cx,cy]) => {
+        c.fillStyle = '#0a0a0f'; c.beginPath(); c.arc(cx,cy,11,0,Math.PI*2); c.fill();
+      });
+
+      // Footer text
+      const fy = tearY + 32;
+      c.fillStyle = '#3a3a4a'; c.font = '500 10px Arial,sans-serif'; c.textAlign = 'center';
+      c.fillText('Date held 24 hrs pending verification  \u00B7  +251 910 52 69 62', W/2, fy);
+      c.fillStyle = 'rgba(189,38,55,0.5)';
+      c.fillText('hope-photo-velo.vercel.app', W/2, fy+20);
+      c.textAlign = 'left';
+
+      // Gold accent bottom line
+      const goldG = c.createLinearGradient(80, 0, W-80, 0);
+      goldG.addColorStop(0,'rgba(212,175,55,0)'); goldG.addColorStop(0.5,'rgba(212,175,55,0.55)'); goldG.addColorStop(1,'rgba(212,175,55,0)');
+      c.strokeStyle = goldG; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(80, H-26); c.lineTo(W-80, H-26); c.stroke();
+
+      // Download
+      const a = document.createElement('a');
+      a.download = `HOPE-receipt-${createdOrder?.id||'booking'}.png`;
+      a.href = cv.toDataURL('image/png');
+      a.click();
+    } catch(err) { console.error('Receipt download failed:', err); }
+    setReceiptDownloading(false);
+  };
+
+  // Canvas rounded-rect helper (no fill/stroke — caller does that)
+  function cRR(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x+r, y); c.lineTo(x+w-r, y); c.quadraticCurveTo(x+w,y,x+w,y+r);
+    c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
+    c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y);
+    c.closePath();
+  }
+
+  const renderStep6 = () => {
+    const qrVal = encodeURIComponent(`HOPE|${createdOrder?.id||'REF'}|${form.name}|${form.date}`);
+    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=f5f5f5&bgcolor=111118&ecc=M&data=${qrVal}`;
+    return (
+      <div className="bf-step-body bf-receipt-card-wrap" ref={receiptCardRef}>
+
+        {/* ── Animated check header ── */}
+        <div className="brc-header">
+          <div className="brc-check-ring">
+            <Check size={22} color="#f5f5f5" strokeWidth={2.5}/>
+          </div>
+          <div>
+            <p className="brc-header-title">{lang==='am'?'ቀጠሮዎ ቀርቧል!':'Booking Submitted!'}</p>
+            <p className="brc-header-sub">{lang==='am'?'ደረሰኝዎን ያስቀምጡ':'Save your receipt below'}</p>
+          </div>
+        </div>
+
+        {/* ── The visual receipt card ── */}
+        <div className="brc-card">
+          <div className="brc-glow-top"/>
+          <div className="brc-glow-bottom"/>
+
+          {/* Top band */}
+          <div className="brc-top-band">
+            <div className="brc-brand">
+              <span className="brc-brand-name">HOPE</span>
+              <span className="brc-brand-sub">Photo &amp; Velo Studio · Addis Ababa</span>
+            </div>
+            <div className="brc-pending-pill">PENDING</div>
+          </div>
+
+          <p className="brc-eyebrow"><span className="brc-dot"/>BOOKING RECEIPT</p>
+
+          {/* Detail rows */}
+          <div className="brc-details">
+            {[
+              {icon:'👤', label: lang==='am'?'ስም':'Client',      val: form.name,                   mono: false, green: false},
+              {icon:'📞', label: lang==='am'?'ስልክ':'Phone',      val: form.phone,                  mono: false, green: false},
+              {icon:'📅', label: lang==='am'?'ቀን':'Event Date',  val: form.date,                   mono: false, green: false},
+              {icon:'📦', label: lang==='am'?'ፓኬጅ':'Package',   val: createdOrder?.packageName || pkgName, mono: false, green: false},
+              {icon:'💳', label: lang==='am'?'ቅድሚ ክፍያ':'Deposit Paid', val: `${deposit.toLocaleString()} ETB`, mono: false, green: true},
+              {icon:'📊', label: lang==='am'?'ቀሪ ክፍያ':'Balance Due', val: `${remaining.toLocaleString()} ETB`, mono: false, green: false},
+              {icon:'🏦', label: lang==='am'?'ሳ/ዘዴ':'Paid Via',  val: payMethod==='telebirr'?'Telebirr':'CBE Birr', mono: false, green: false},
+              {icon:'🔖', label: lang==='am'?'ማጣቀሻ':'Reference',val: null,  mono: createdOrder?.id, green: false},
+              {icon:'📆', label: lang==='am'?'የቀረበ':'Issued',    val: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}), mono: false, green: false},
+            ].map(({icon, label, val, mono, green}) => (
+              <div key={label} className="brc-row">
+                <span className="brc-row-icon">{icon}</span>
+                <span className="brc-row-label">{label}</span>
+                {mono
+                  ? <code className="brc-row-mono">{mono}</code>
+                  : <span className="brc-row-value" style={green?{color:'#22c55e'}:{}}>{val}</span>
+                }
+              </div>
+            ))}
+          </div>
+
+          {/* Tear line */}
+          <div className="brc-tear">
+            <div className="brc-tear-notch brc-notch-l"/>
+            <div className="brc-tear-dashes"/>
+            <div className="brc-tear-notch brc-notch-r"/>
+          </div>
+
+          {/* QR Section */}
+          <div className="brc-qr-section">
+            <div className="brc-qr-frame">
+              <div className="brc-qr-corner brc-corner-tl"/><div className="brc-qr-corner brc-corner-tr"/>
+              <img src={qrSrc} alt="Booking QR Code" className="brc-qr-img" crossOrigin="anonymous"/>
+              <div className="brc-qr-corner brc-corner-bl"/><div className="brc-qr-corner brc-corner-br"/>
+            </div>
+            <p className="brc-qr-label">{lang==='am'?'ቀጠሮ ለማረጋገጥ ስካን ያድርጉ':'Scan to verify booking'}</p>
+          </div>
+
+          {/* Card footer */}
+          <div className="brc-card-footer">
+            <p>{lang==='am'?'ቀኑ ለ 24 ሰዓት ይጠበቃል':'Date held 24 hrs · +251 910 52 69 62'}</p>
+            <p className="brc-footer-url">hope-photo-velo.vercel.app</p>
+          </div>
+          <div className="brc-gold-line"/>
+        </div>
+
+        {/* ── Download button ── */}
+        <button
+          type="button"
+          className="bf-primary-btn brc-download-btn"
+          onClick={downloadReceipt}
+          disabled={receiptDownloading}
+          style={{marginTop:'8px'}}
+        >
+          {receiptDownloading ? (
+            <><span className="brc-spinner"/>  {lang==='am'?'በማዘጋጀት ላይ...':'Preparing receipt...'}</>
+          ) : (
+            <>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              {lang==='am'?'ደረሰኝ አውርድ (PNG)':'Download Receipt PNG'}
+            </>
+          )}
+        </button>
+
+        <button type="button" className="bf-back-btn" style={{alignSelf:'center'}} onClick={onClose}>
+          {lang==='am'?'ወደ ዋናው ገጽ':'Return to Website'}
+        </button>
+      </div>
+    );
+  };
+
+
+  return (
+    <div className="bf-overlay" role="dialog" aria-modal="true" aria-labelledby="bf-title">
+      <button className="bf-backdrop" aria-label="Close" onClick={onClose}/>
+      <section className="bf-panel">
+        <div className="bf-panel-header">
+          <div>
+            <p className="bf-eyebrow">{lang === 'am' ? 'ቀን ምዝገባ' : 'Book Your Date'}</p>
+            <h2 id="bf-title" className="bf-title">{pkgName}</h2>
+          </div>
+          <button className="bf-close-btn" aria-label="Close" onClick={onClose}><X size={20}/></button>
+        </div>
+        {step <= 4 && renderStepIndicator()}
+        <div className="bf-panel-scroll">
+          {step === 1 && renderStep1()}
+          {step === 2 && renderStep2()}
+          {step === 3 && renderStep3()}
+          {step === 4 && renderStep4()}
+          {step === 5 && renderStep5()}
+          {step === 6 && renderStep6()}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ── BACKWARD COMPAT: BookingPanel alias ──────────────────────────────────── */
+const BookingPanel = BookingFlowModal;
+
+/* ── ADMIN CONTROL PANEL ─────────────────────────────────────────────────── */
+function AdminControlPanel({ onClose, lang }) {
+  const [pin, setPin]           = useState('');
+  const [unlocked, setUnlocked] = useState(false);
+  const [pinError, setPinError] = useState(false);
+  const [tab, setTab]           = useState('orders'); // 'orders' | 'packages' | 'contract' | 'calendar'
+  const [settings, setSettings] = useState(null);
+  const [orders, setOrders]     = useState([]);
+  const [loading, setLoading]   = useState(false);
+  const [status, setStatus]     = useState('');
+  // Package editing
+  const [editPkg, setEditPkg]   = useState(null);
+  // Contract editing
+  const [contractDraft, setContractDraft] = useState(null);
+  // Blackout
+  const [newBlackout, setNewBlackout] = useState('');
+
+  const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
+
+  const checkPin = (e) => {
+    e.preventDefault();
+    if (pin === 'HOPE2026') { setUnlocked(true); loadData(); }
+    else { setPinError(true); setTimeout(() => setPinError(false), 1200); }
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [sRes, oRes] = await Promise.all([
+        fetch(`${apiBase}/api/settings`).then(r => r.json()),
+        fetch(`${apiBase}/api/orders`).then(r => r.json())
+      ]);
+      setSettings(sRes.settings || {});
+      setContractDraft(sRes.settings?.contractTemplate || {});
+      setOrders(oRes.orders || []);
+    } catch(e) { setStatus('Failed to load data'); }
+    setLoading(false);
+  };
+
+  const patchSettings = async (patch) => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${apiBase}/api/settings`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ action: 'update_settings', ...patch })
+      });
+      const data = await r.json();
+      setSettings(data.settings || settings);
+      setStatus('✓ Saved');
+      setTimeout(() => setStatus(''), 2000);
+    } catch(e) { setStatus('Save failed'); }
+    setLoading(false);
+  };
+
+  const updateOrderStatus = async (id, newStatus) => {
+    try {
+      await fetch(`${apiBase}/api/orders`, {
+        method: 'PATCH',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ id, status: newStatus })
+      });
+      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+      setStatus(`✓ Order ${id} → ${newStatus}`);
+      setTimeout(() => setStatus(''), 2500);
+    } catch(e) { setStatus('Update failed'); }
+  };
+
+  const addBlackout = async () => {
+    if (!newBlackout) return;
+    const current = settings?.blackoutDates || [];
+    if (current.includes(newBlackout)) return;
+    const updated = [...current, newBlackout].sort();
+    await patchSettings({ blackoutDates: updated });
+    setSettings(s => ({...s, blackoutDates: updated}));
+    setNewBlackout('');
+  };
+
+  const removeBlackout = async (date) => {
+    const updated = (settings?.blackoutDates || []).filter(d => d !== date);
+    await patchSettings({ blackoutDates: updated });
+    setSettings(s => ({...s, blackoutDates: updated}));
+  };
+
+  const saveContract = async () => {
+    await patchSettings({ contractTemplate: contractDraft });
+  };
+
+  const statusColor = (s) => {
+    if (s === 'CONFIRMED') return '#22c55e';
+    if (s === 'PENDING_VERIFICATION') return '#f59e0b';
+    if (s === 'REJECTED') return '#ef4444';
+    if (s === 'IN_DISCUSSION') return '#60a5fa';
+    return '#9090a8';
+  };
+
+  if (!unlocked) {
+    return (
+      <div className="admin-overlay" role="dialog">
+        <button className="bf-backdrop" onClick={onClose}/>
+        <div className="admin-pin-panel">
+          <div className="admin-pin-icon"><Lock size={32}/></div>
+          <h3>Admin Access</h3>
+          <p>HOPE Studio Control Panel</p>
+          <form onSubmit={checkPin} className="admin-pin-form">
+            <input
+              type="password"
+              className={`admin-pin-input ${pinError ? 'pin-shake' : ''}`}
+              value={pin} onChange={e => setPin(e.target.value)}
+              placeholder="Enter PIN"
+              autoFocus
+            />
+            <button type="submit" className="bf-primary-btn"><Lock size={15}/> Unlock</button>
+          </form>
+          <button className="bf-back-btn" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    );
+  }
+
+  const tabs = [
+    { id: 'orders', label: 'Orders', icon: <Package size={15}/> },
+    { id: 'calendar', label: 'Calendar', icon: <CalendarDays size={15}/> },
+    { id: 'packages', label: 'Packages', icon: <Star size={15}/> },
+    { id: 'contract', label: 'Contract', icon: <Shield size={15}/> },
+  ];
+
+  return (
+    <div className="admin-overlay" role="dialog">
+      <button className="bf-backdrop" onClick={onClose}/>
+      <div className="admin-panel">
+        <div className="admin-header">
+          <div className="admin-header-left">
+            <Shield size={20} style={{color:'#bd2637'}}/>
+            <div>
+              <h3>HOPE Admin Panel</h3>
+              <p>Studio Control Center</p>
+            </div>
+          </div>
+          <div className="admin-header-right">
+            {status && <span className="admin-status-badge">{status}</span>}
+            <button className="bf-close-btn" onClick={onClose}><X size={18}/></button>
+          </div>
+        </div>
+
+        <div className="admin-tabs">
+          {tabs.map(t => (
+            <button key={t.id} className={`admin-tab ${tab===t.id?'admin-tab-active':''}`} onClick={() => setTab(t.id)}>
+              {t.icon} {t.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="admin-tab-content">
+          {loading && <div className="admin-loading">Loading…</div>}
+
+          {/* ── ORDERS TAB ── */}
+          {tab === 'orders' && (
+            <div className="admin-orders">
+              <div className="admin-section-header">
+                <h4>All Orders ({orders.length})</h4>
+                <button className="bf-copy-btn" onClick={loadData}>↻ Refresh</button>
+              </div>
+              {orders.length === 0 && <p className="admin-empty">No orders yet.</p>}
+              {orders.map(o => (
+                <div key={o.id} className="admin-order-card">
+                  <div className="aoc-top">
+                    <div>
+                      <strong className="aoc-name">{o.clientName}</strong>
+                      <span className="aoc-pkg">{o.packageName}</span>
+                    </div>
+                    <span className="aoc-status" style={{color: statusColor(o.status)}}>{o.status}</span>
+                  </div>
+                  <div className="aoc-meta">
+                    <span>📅 {o.eventDate || 'TBD'}</span>
+                    <span>📞 {o.phone || '—'}</span>
+                    <span>💰 {Number(o.totalPrice||0).toLocaleString()} ETB</span>
+                    <span>🔖 {o.id}</span>
+                  </div>
+                  {o.paymentProof && (
+                    <img src={o.paymentProof} alt="receipt" className="aoc-receipt"/>
+                  )}
+                  {(o.status === 'PENDING_VERIFICATION' || o.status === 'IN_DISCUSSION' || o.status === 'DRAFT') && (
+                    <div className="aoc-actions">
+                      <button className="aoc-approve" onClick={() => updateOrderStatus(o.id, 'CONFIRMED')}>✅ Approve</button>
+                      <button className="aoc-reject" onClick={() => updateOrderStatus(o.id, 'REJECTED')}>❌ Reject</button>
+                    </div>
+                  )}
+                  {o.status === 'CONFIRMED' && <div className="aoc-confirmed-badge">✅ CONFIRMED</div>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── CALENDAR TAB ── */}
+          {tab === 'calendar' && (
+            <div className="admin-calendar">
+              <div className="admin-section-header">
+                <h4>Blackout Date Management</h4>
+              </div>
+              <div className="admin-blackout-add">
+                <input type="date" className="bf-input" value={newBlackout} onChange={e => setNewBlackout(e.target.value)}/>
+                <button className="aoc-approve" onClick={addBlackout}><Plus size={14}/> Block Date</button>
+              </div>
+              <div className="admin-blackout-list">
+                {(settings?.blackoutDates || []).map(d => (
+                  <div key={d} className="admin-blackout-item">
+                    <span>🚫 {d}</span>
+                    <button className="aoc-reject" onClick={() => removeBlackout(d)}><Trash2 size={13}/></button>
+                  </div>
+                ))}
+                {(settings?.blackoutDates || []).length === 0 && <p className="admin-empty">No blackout dates.</p>}
+              </div>
+              <div className="admin-section-header" style={{marginTop:'1.5rem'}}>
+                <h4>Booked Dates</h4>
+              </div>
+              {orders.filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status)).map(o => (
+                <div key={o.id} className="admin-blackout-item">
+                  <span>📅 {o.eventDate} — {o.clientName} ({o.status})</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── PACKAGES TAB ── */}
+          {tab === 'packages' && (
+            <div className="admin-packages">
+              <div className="admin-section-header">
+                <h4>Package Management</h4>
+              </div>
+              {(settings?.packages || []).map(pkg => (
+                <div key={pkg.id} className="admin-pkg-card">
+                  <div className="admin-pkg-top">
+                    <div>
+                      <strong>{pkg.titleEn}</strong>
+                      <span className="aoc-pkg">{pkg.category} / {pkg.tier}</span>
+                    </div>
+                    <div className="admin-pkg-actions">
+                      <span className="admin-pkg-price">{Number(pkg.price).toLocaleString()} ETB</span>
+                      <button className="bf-copy-btn" onClick={() => setEditPkg({...pkg})}><Edit2 size={13}/></button>
+                    </div>
+                  </div>
+                  {editPkg?.id === pkg.id && (
+                    <div className="admin-pkg-edit">
+                      <label className="bf-label">Price (ETB)
+                        <input type="number" className="bf-input" value={editPkg.price}
+                          onChange={e => setEditPkg(p => ({...p, price: Number(e.target.value)}))}/>
+                      </label>
+                      <label className="bf-label">Badge (EN)
+                        <input className="bf-input" value={editPkg.badgeEn || ''}
+                          onChange={e => setEditPkg(p => ({...p, badgeEn: e.target.value}))}/>
+                      </label>
+                      <div className="aoc-actions">
+                        <button className="aoc-approve" onClick={async () => {
+                          const updated = (settings.packages || []).map(p => p.id === editPkg.id ? editPkg : p);
+                          await patchSettings({ packages: updated });
+                          setSettings(s => ({...s, packages: updated}));
+                          setEditPkg(null);
+                        }}>Save</button>
+                        <button className="aoc-reject" onClick={() => setEditPkg(null)}>Cancel</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── CONTRACT EDITOR ── */}
+          {tab === 'contract' && contractDraft && (
+            <div className="admin-contract">
+              <div className="admin-section-header">
+                <h4>Contract Template Editor</h4>
+                <button className="aoc-approve" onClick={saveContract}>💾 Save</button>
+              </div>
+              <label className="bf-label">Contract Title (EN)
+                <input className="bf-input" value={contractDraft.titleEn || ''}
+                  onChange={e => setContractDraft(d => ({...d, titleEn: e.target.value}))}/>
+              </label>
+              <label className="bf-label">Contract Title (AM)
+                <input className="bf-input" value={contractDraft.titleAm || ''}
+                  onChange={e => setContractDraft(d => ({...d, titleAm: e.target.value}))}/>
+              </label>
+              {(contractDraft.clauses || []).map((c, i) => (
+                <div key={c.id || i} className="admin-clause-edit">
+                  <p className="bf-clause-heading">{c.headingEn}</p>
+                  <label className="bf-label">Body (EN)
+                    <textarea className="bf-input" rows="4" value={c.bodyEn || ''}
+                      onChange={e => {
+                        const clauses = [...contractDraft.clauses];
+                        clauses[i] = {...clauses[i], bodyEn: e.target.value};
+                        setContractDraft(d => ({...d, clauses}));
+                      }}/>
+                  </label>
+                  <label className="bf-label">Body (AM)
+                    <textarea className="bf-input" rows="4" value={c.bodyAm || ''}
+                      onChange={e => {
+                        const clauses = [...contractDraft.clauses];
+                        clauses[i] = {...clauses[i], bodyAm: e.target.value};
+                        setContractDraft(d => ({...d, clauses}));
+                      }}/>
+                  </label>
+                </div>
+              ))}
+              <button className="aoc-approve" style={{marginTop:'1rem'}} onClick={saveContract}>💾 Save Contract Template</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── BOOKING PANEL (SIMPLE STUB — kept for reference) ──────────────────── */
+function _OldBookingPanel({ selectedPackage, onClose, lang }) {
   const [submitted, setSubmitted]       = useState(false);
   const [submitting, setSubmitting]     = useState(false);
   const [form, setForm]                 = useState({ name: '', date: '', phone: '', note: '' });
@@ -851,7 +2124,7 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
     const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
 
     try {
-      // 1. Register order into CRM & Unified Admin Message Hub
+      // Register order into CRM & Unified Admin Message Hub
       const orderRes = await fetch(`${apiBase}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -870,20 +2143,6 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
       if (orderData?.order?.id) {
         orderId = orderData.order.id;
       }
-
-      // 2. Send Telegram Notification to studio admins
-      await Promise.all(
-        TELEGRAM_CHAT_IDS.map(chat_id =>
-          fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id,
-              text: formattedMessage + `\n🔖 Order ID: ${orderId}`,
-            }),
-          })
-        )
-      );
     } catch (err) {
       console.error(err);
     }
@@ -900,9 +2159,6 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
     setCreatedOrder(newOrderObj);
     setSubmitting(false);
     setSubmitted(true);
-
-    // DIRECTLY GO TO TG BOT WITH /start AND AGREE ORDER!
-    window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${orderId}`;
   };
 
   return (
@@ -914,7 +2170,7 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
           <div className="booking-success">
             <div className="success-mark"><Check size={36} /></div>
             <p className="eyebrow">{lang === 'am' ? 'የቀጠሮ መረጃዎ ተመዝግቧል!' : lang === 'om' ? 'Galmeen Isini Milkaa\'eera!' : 'Booking Info Registered!'}</p>
-            <h2>{lang === 'am' ? 'ቀጥታ ወደ ቴሌግራም ቦት ይሂዱ!' : lang === 'om' ? 'Gara Bootii Telegram Dhaqaa!' : 'Continue to Telegram Bot!'}</h2>
+            <h2>{lang === 'am' ? 'ቀጠሮዎ በስኬት ተመዝግቧል!' : lang === 'om' ? 'Galmeen Isini Milkaa\'eera!' : 'Booking Request Received!'}</h2>
 
             <div className="booking-success-summary-box">
               <div className="bss-row">
@@ -950,18 +2206,27 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
             </div>
 
             <p className="booking-auto-redirect-note">
-              {lang === 'am' ? 'የመረጡት ፓኬጅ እና መረጃዎ በቀጥታ ወደ ቴሌግራም ቦቱ ተላልፏል:: ካልተከፈተ ከታች ያለውን ይጫኑ:' : 'Your package & user info is linked directly to Telegram Bot. Tap below to continue:'}
+              {lang === 'am' ? 'የትእዛዝ ዝርዝርዎ በስርዓቱ ተመዝግቧል። የHOPE ቡድን አባላት በአጭር ጊዜ ውስጥ በስልክ ደውለው ዝርዝሮችን ያረጋግጣሉ።' : lang === 'om' ? 'Bal\'inni beellama keessanii galmaa\'eera. Gareen HOPE yeroo gabaabaa keessatti isiniif bilbila.' : 'Your booking details have been registered. The HOPE team will call you shortly to confirm your schedule and details.'}
             </p>
 
-            <a
-              className="primary-button direct-tg-cta-button"
-              href={`https://t.me/HoopStudioSystemBot?start=order_${createdOrder?.id || 'wedding-bronze'}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <Send size={18} />
-              <span>{lang === 'am' ? '👉 ወደ ቴሌግራም ቦት ይሂዱ & ውል ይፈራረሙ' : '👉 Open Telegram Bot & Sign Agreement'}</span>
-            </a>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '1rem', width: '100%', maxWidth: '340px' }}>
+              <a
+                className="primary-button"
+                href={`tel:${PHONE_LINK}`}
+                style={{ justifyContent: 'center', textDecoration: 'none' }}
+              >
+                <Phone size={17} />
+                <span>{lang === 'am' ? 'አሁኑኑ ይደውሉልን (09 10 52 69 62)' : lang === 'om' ? 'Amma Nuuf Bilbilaa' : 'Call Us Directly'}</span>
+              </a>
+              <button
+                type="button"
+                className="ghost-button"
+                onClick={onClose}
+                style={{ padding: '0.65rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: '#f5f5f5', cursor: 'pointer' }}
+              >
+                {lang === 'am' ? 'ወደ ዋናው ገጽ ይመለሱ' : lang === 'om' ? 'Fuula Duraatti Deebi\'aa' : 'Return to Website'}
+              </button>
+            </div>
           </div>
         ) : (
           <>
@@ -997,18 +2262,7 @@ function BookingPanel({ selectedPackage, onClose, lang }) {
                 </label>
               ))}
               <button className="primary-button form-button" type="submit" disabled={submitting}>
-                {submitting ? (lang === 'am' ? 'ወደ ቴሌግራም በመሄድ ላይ...' : 'Opening Telegram Bot...') : t.bookingSubmit} <Send size={17} />
-              </button>
-              <button
-                type="button"
-                className="telegram-miniapp-quicklink"
-                onClick={() => {
-                  const pkgId = selectedPackage?.id || 'wedding-bronze';
-                  window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${pkgId}`;
-                }}
-              >
-                <Send size={16} />
-                <span>{lang === 'am' ? 'ቀጥታ በቴሌግራም ቦት ይዘዙ & ውል ይፈራረሙ ➜' : 'Directly Order & Sign Agreement in Telegram Bot ➜'}</span>
+                {submitting ? (lang === 'am' ? 'በመመዝገብ ላይ...' : lang === 'om' ? 'Ergamaa Jira...' : 'Submitting Booking...') : t.bookingSubmit} <CalendarDays size={17} />
               </button>
             </form>
           </>
@@ -1026,8 +2280,7 @@ function PackagesSection({ lang, openBooking }) {
   const currentCards = PACKAGES_BY_CATEGORY[activeCategory] || PACKAGES_BY_CATEGORY.studio;
 
   const handlePackageClick = (pkg) => {
-    const pkgId = pkg?.id || 'wedding-bronze';
-    window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${pkgId}`;
+    openBooking(pkg);
   };
 
   return (
@@ -1065,20 +2318,21 @@ function PackagesSection({ lang, openBooking }) {
         </div>
       </div>
 
-      {/* ── Direct Telegram Bot Booking Banner ── */}
+      {/* ── Direct Booking Banner ── */}
       <div className="pricing-telegram-bot-banner">
         <div className="ptb-left">
-          <span className="ptb-badge">⚡ ቀጥታ በቴሌግራም ቦት (Direct Bot Booking)</span>
-          <h3>{lang === 'am' ? 'ዋጋዎችን በቴሌግራም ቦት ተደራድረው ውልዎን በዲጂታል ፊርማ ያጠናቁ!' : lang === 'om' ? 'Telegram Irratti Gatii Mari\'adhaa Walii Galaa!' : 'Negotiate on Telegram Bot & Sign Your Official Agreement!'}</h3>
-          <p>{lang === 'am' ? 'የትኛውንም ፓኬጅ ሲነኩ በቀጥታ ወደ ቴሌግራም ቦቱ በመሄድ ከስቱዲዮ ማኔጅመንት ጋር መደራደርና ይፋዊ ውል መፈራረም ይችላሉ።' : lang === 'om' ? 'Paakeejii yoo filattan kallattiin gara bootiitti geessitee walii galtee ni mallatteessitu.' : 'When you tap any package, it opens the Telegram Bot to agree on details and sign your digital contract.'}</p>
+          <span className="ptb-badge">✨ {lang === 'am' ? 'ይፋዊ የቀን ማስያዣ' : lang === 'om' ? 'Galmee Guyyaa' : 'Official Booking'}</span>
+          <h3>{lang === 'am' ? 'የመረጡትን ፓኬጅ በቀላሉ ያስይዙ፤ ቡድናችን ወዲያውኑ ያረጋግጥልዎታል!' : lang === 'om' ? 'Paakeejii filadhaa guyyaa keessan amma qabadhaa!' : 'Select your package & book your date directly online!'}</h3>
+          <p>{lang === 'am' ? 'የትኛውንም ፓኬጅ በመጫን የቀጠሮዎን መረጃ ያስገቡ፤ የሆፕ ባለሙያዎች ወዲያውኑ ደውለው ቀጠሮዎን ያረጋግጣሉ።' : lang === 'om' ? 'Paakeejii barbaaddan cuqaasuun beellama keessan guutaa; saffisaan isiniif bilbilla.' : 'Click on any package to customize deliverables and request your booking schedule directly.'}</p>
         </div>
-        <a
-          href={`https://t.me/HoopStudioSystemBot?start=pricing_${activeCategory}`}
+        <button
+          type="button"
+          onClick={() => openBooking(currentCards[0])}
           className="ptb-direct-btn"
         >
-          <Send size={15} />
-          <span>{lang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ ➜' : lang === 'om' ? 'Gara Bootiitti Dhaqaa ➜' : 'Open Telegram Bot ➜'}</span>
-        </a>
+          <CalendarDays size={16} />
+          <span>{lang === 'am' ? 'ቀንዎን ያስይዙ' : lang === 'om' ? 'Guyyaa Qabadhaa' : 'Book Now'}</span>
+        </button>
       </div>
 
       {/* ── 3 Cards Grid (Categorized by 3) ── */}
@@ -1135,7 +2389,7 @@ function PackagesSection({ lang, openBooking }) {
                 ))}
               </ul>
 
-              {/* Action Button: Opens Telegram Bot with package order & agreement */}
+              {/* Action Button: Opens Booking modal */}
               <div className="card-v2-cta-wrap">
                 <button
                   type="button"
@@ -1148,8 +2402,8 @@ function PackagesSection({ lang, openBooking }) {
                   }`}
                   onClick={() => handlePackageClick(pkg)}
                 >
-                  <Send size={14} />
-                  <span>{lang === 'am' ? 'በቴሌግራም እዘዙ & ውል ይዋዋሉ' : lang === 'om' ? 'Telegram Irratti Ajajaa' : 'Order on Bot & Sign Agreement'}</span>
+                  <CalendarDays size={15} />
+                  <span>{t.pkgCta}</span>
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -1168,10 +2422,10 @@ function PackagesSection({ lang, openBooking }) {
         <button
           type="button"
           className="bottom-bar-contact-btn"
-          onClick={() => handlePackageClick({ id: 'custom' })}
+          onClick={() => openBooking({ id: 'custom', titleAm: 'ብጁ ፓኬጅ', titleEn: 'Custom Package', titleOm: 'Paakeejii Addaa' })}
         >
-          <Send size={14} />
-          <span>{lang === 'am' ? 'በቴሌግራም ቦት ይነጋገሩ' : 'Chat on Telegram'}</span>
+          <CalendarDays size={15} />
+          <span>{t.pricingContactBtn}</span>
           <ArrowRight size={16} />
         </button>
       </div>
@@ -1187,47 +2441,24 @@ function Reveal({ children, className = '', delay = 0 }) {
 
 /* ── APP ────────────────────────────────────────────────────────────────── */
 function App() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const isTmaDirect = urlParams.get('tma') === '1' || Boolean(window.Telegram?.WebApp?.initData);
-  const isAdminDirect = window.location.pathname === '/admin' || urlParams.get('admin') === '1';
-
-  const [showAdminModal, setShowAdminModal] = useState(false);
-
-  if (isAdminDirect) {
-    return <AdminDashboard onClose={() => window.location.href = '/'} />;
-  }
-
-  if (isTmaDirect) {
-    return (
-      <>
-        <TelegramMiniApp onOpenAdmin={() => setShowAdminModal(true)} />
-        {showAdminModal && (
-          <div className="tma-modal-backdrop" onClick={() => setShowAdminModal(false)}>
-            <div className="admin-modal-window" onClick={e => e.stopPropagation()}>
-              <AdminDashboard onClose={() => setShowAdminModal(false)} />
-            </div>
-          </div>
-        )}
-      </>
-    );
-  }
-
   const [loaded, setLoaded]   = useState(false);
   const [lang, setLang]       = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingPkg, setBookingPkg] = useState(null);
-  const [showTmaModal, setShowTmaModal] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
   const [activeLocTab, setActiveLocTab] = useState(0);
 
   const t = T[lang];
 
-  useEffect(() => { document.body.style.overflow = (!loaded || bookingPkg || showTmaModal) ? 'hidden' : ''; return () => { document.body.style.overflow = ''; }; }, [loaded, bookingPkg, showTmaModal]);
+  useEffect(() => {
+    document.body.style.overflow = (!loaded || bookingPkg || showAdmin) ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [loaded, bookingPkg, showAdmin]);
 
   const openBooking = (pkg = null) => {
-    const pkgId = pkg?.id || 'wedding-bronze';
-    window.location.href = `https://t.me/HoopStudioSystemBot?start=order_${pkgId}`;
+    setBookingPkg(pkg || PACKAGES_BY_CATEGORY.wedding[0]);
     setMenuOpen(false);
   };
   const nav = (t) => { scrollToSection(t); setMenuOpen(false); };
@@ -1263,13 +2494,6 @@ function App() {
               <Phone size={15} />
               <span className="call-text">{PHONE_DISPLAY}</span>
             </a>
-            <button className="header-tma-btn" onClick={() => setShowTmaModal(true)} title="HOPE Telegram Mini App">
-              <Sparkles size={14} />
-              <span>Mini App</span>
-            </button>
-            <button className="header-admin-btn" onClick={() => setShowAdminModal(true)} title="Admin Control Dashboard">
-              <Lock size={14} />
-            </button>
             <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
               <Globe size={15} />
               <span>{lang === 'am' ? 'አማ' : lang === 'en' ? 'EN' : 'OR'}</span>
@@ -1654,41 +2878,25 @@ function App() {
             <button onClick={() => scrollToSection('faq')}>{t.nav.faq}</button>
             <a href={`tel:${PHONE_LINK}`}>{t.nav.call}</a>
           </div>
-          <a className="whatsapp-link" href={TELEGRAM_LINK} target="_blank" rel="noreferrer">
-            <Send size={17} />{t.footerTg}
+          <a className="whatsapp-link" href={`tel:${PHONE_LINK}`} aria-label="Call HOPE">
+            <Phone size={17} />
+            <span>{PHONE_DISPLAY}</span>
           </a>
-          <p className="copyright">© {new Date().getFullYear()} HOPE Photo &amp; Velo</p>
+          <p className="copyright">© {new Date().getFullYear()} HOPE Photo &amp; Velo <button className="admin-secret-link" onClick={() => setShowAdmin(true)} aria-label="Admin">·</button></p>
         </footer>
 
         {bookingPkg && (
-          <BookingPanel
+          <BookingFlowModal
             selectedPackage={bookingPkg}
             onClose={() => setBookingPkg(null)}
             lang={lang}
-            onOpenTma={() => setShowTmaModal(true)}
           />
         )}
-
-        {showTmaModal && (
-          <div className="tma-modal-backdrop" onClick={() => setShowTmaModal(false)}>
-            <div className="tma-modal-window" onClick={e => e.stopPropagation()}>
-              <TelegramMiniApp
-                onClose={() => setShowTmaModal(false)}
-                onOpenAdmin={() => {
-                  setShowTmaModal(false);
-                  setShowAdminModal(true);
-                }}
-              />
-            </div>
-          </div>
-        )}
-
-        {showAdminModal && (
-          <div className="tma-modal-backdrop" onClick={() => setShowAdminModal(false)}>
-            <div className="admin-modal-window" onClick={e => e.stopPropagation()}>
-              <AdminDashboard onClose={() => setShowAdminModal(false)} />
-            </div>
-          </div>
+        {showAdmin && (
+          <AdminControlPanel
+            onClose={() => setShowAdmin(false)}
+            lang={lang}
+          />
         )}
       </main>
     </>

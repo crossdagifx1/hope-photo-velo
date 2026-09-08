@@ -76,40 +76,6 @@ export default async function handler(req, res) {
         data: { agreementId: agreement.id, verificationHash: agreement.verificationHash }
       });
 
-      // Rich Telegram Notification to Company Owners
-      const contractAlert = `📜 <b>OFFICIAL DIGITAL AGREEMENT SIGNED!</b>\n\n` +
-        `🆔 <b>Contract ID:</b> <code>${agreement.id}</code>\n` +
-        `📦 <b>Order:</b> <code>${order.id}</code>\n` +
-        `👤 <b>Client:</b> ${agreement.clientName}\n` +
-        `📅 <b>Event Date:</b> ${agreement.eventDate}\n` +
-        `📍 <b>Location:</b> ${agreement.location}\n` +
-        `💎 <b>Package:</b> ${order.packageName}\n` +
-        `💰 <b>Agreed Total:</b> <b>${agreement.agreedPrice.toLocaleString()} ETB</b>\n` +
-        `💳 <b>Deposit Due (30%):</b> <b>${agreement.depositAmount.toLocaleString()} ETB</b>\n` +
-        `🔒 <b>Digital Hash:</b> <code>${agreement.verificationHash}</code>\n` +
-        `✍️ <b>E-Signature:</b> Captured and Verified on Canvas\n\n` +
-        `👇 Tap below to confirm client deposit payment:`;
-
-      await notifyAdmins(contractAlert, {
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: '✅ Confirm 30% Deposit Received', callback_data: `confirm:${order.id}` }],
-            [{ text: '💬 Message Client', callback_data: `reply:${order.id}` }]
-          ]
-        }
-      });
-
-      // If client has Telegram ID, send them a confirmation certificate
-      if (order.telegramUserId) {
-        await sendTelegramMessage(order.telegramUserId, `🎉 <b>Congratulations! Your Agreement is Officially Signed.</b>\n\n` +
-          `Thank you for booking with <b>HOPE Photo & Velo</b>!\n` +
-          `• Contract ID: <code>${agreement.id}</code>\n` +
-          `• Total Agreed: <b>${agreement.agreedPrice.toLocaleString()} ETB</b>\n` +
-          `• Deposit (30%): <b>${agreement.depositAmount.toLocaleString()} ETB</b>\n` +
-          `• Hash: <code>${agreement.verificationHash}</code>\n\n` +
-          `Our team is preparing our equipment and schedule for your special day!`);
-      }
-
       return res.status(201).json({ success: true, agreement });
     } catch (e) {
       console.error('Agreement error:', e);
