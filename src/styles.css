@@ -2218,79 +2218,84 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
    Full-screen dedicated executive studio management suite
    ══════════════════════════════════════════════════════════════════════════ */
 
+/* ══════════════════════════════════════════════════════════════════════════
+   ADMIN PORTAL — LUXURY WHITE & BRAND BURGUNDY (#bd2637) DESIGN SYSTEM
+   ══════════════════════════════════════════════════════════════════════════ */
+
 /* ── 1. PIN LOCK SCREEN ── */
 .admin-lock-screen {
   position: fixed; inset: 0; z-index: 9999;
-  background: #08080c;
+  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
   display: flex; align-items: center; justify-content: center;
   padding: 1.5rem;
 }
 .admin-lock-card {
   position: relative; width: 100%; max-width: 440px;
-  background: #111118; border: 1px solid rgba(255,255,255,.09);
+  background: #ffffff; border: 1px solid #e2e8f0;
   border-radius: 24px; padding: 2.8rem 2.2rem;
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  box-shadow: 0 40px 100px rgba(0,0,0,.85); overflow: hidden;
+  box-shadow: 0 25px 60px -15px rgba(0,0,0,.08), 0 10px 25px -5px rgba(189,38,55,.05);
+  overflow: hidden;
 }
 .admin-lock-glow {
   position: absolute; top: -120px; left: 50%; transform: translateX(-50%);
   width: 280px; height: 280px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(189,38,55,.32) 0%, rgba(212,175,55,.12) 60%, transparent 80%);
+  background: radial-gradient(circle, rgba(189,38,55,.12) 0%, rgba(212,175,55,.08) 60%, transparent 80%);
   pointer-events: none;
 }
-.admin-lock-logo { height: 38px; object-fit: contain; margin-bottom: 1.25rem; }
+.admin-lock-logo { height: 42px; object-fit: contain; margin-bottom: 1.25rem; }
 .admin-lock-icon {
   width: 58px; height: 58px; border-radius: 16px;
-  background: rgba(189,38,55,.12); border: 1px solid rgba(189,38,55,.25);
+  background: rgba(189,38,55,.08); border: 1px solid rgba(189,38,55,.2);
   display: flex; align-items: center; justify-content: center;
   margin-bottom: 1rem;
 }
 .admin-lock-card h2 {
-  font-size: 1.3rem; font-weight: 800; color: #f5f5f5;
+  font-size: 1.3rem; font-weight: 800; color: #0f172a;
   letter-spacing: .08em; margin: 0 0 .4rem;
 }
-.admin-lock-sub { font-size: .82rem; color: #9090a8; margin: 0 0 1.75rem; }
+.admin-lock-sub { font-size: .82rem; color: #64748b; margin: 0 0 1.75rem; }
 .admin-lock-form { width: 100%; display: flex; flex-direction: column; gap: .85rem; }
 .admin-lock-input-wrap { position: relative; width: 100%; }
 .admin-lock-field-icon {
   position: absolute; left: 1.1rem; top: 50%; transform: translateY(-50%);
-  color: #66667a; pointer-events: none;
+  color: #94a3b8; pointer-events: none;
 }
 .admin-lock-input {
   width: 100%; box-sizing: border-box;
   padding: .85rem 1rem .85rem 2.8rem; border-radius: 14px;
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.12);
-  color: #f5f5f5; font-size: 1rem; font-weight: 700;
-  transition: border-color .2s;
+  background: #ffffff; border: 1.5px solid #cbd5e1;
+  color: #0f172a; font-size: 1rem; font-weight: 700;
+  transition: all .2s;
 }
-.admin-lock-input:focus { outline: none; border-color: #bd2637; }
+.admin-lock-input:focus { outline: none; border-color: #bd2637; box-shadow: 0 0 0 3px rgba(189,38,55,.15); }
 .admin-lock-input.pin-shake { animation: pin-shake .4s ease; }
 @keyframes pin-shake {
   0%,100% { transform: translateX(0); }
   20%,60%  { transform: translateX(-6px); }
   40%,80%  { transform: translateX(6px); }
 }
-.admin-lock-err { font-size: .78rem; color: #ef4444; margin: 0; font-weight: 600; }
+.admin-lock-err { font-size: .78rem; color: #dc2626; margin: 0; font-weight: 600; }
 .admin-lock-btn {
   width: 100%; display: flex; align-items: center; justify-content: center; gap: .5rem;
   padding: .85rem 1.25rem; border-radius: 14px;
   background: linear-gradient(135deg, #bd2637, #9b1c2b);
-  border: none; color: #f5f5f5; font-size: .92rem; font-weight: 700;
-  cursor: pointer; transition: opacity .2s;
+  border: none; color: #ffffff; font-size: .92rem; font-weight: 700;
+  cursor: pointer; transition: opacity .2s, transform .15s;
   box-shadow: 0 8px 24px rgba(189,38,55,.3);
 }
-.admin-lock-btn:hover { opacity: .92; }
+.admin-lock-btn:hover { opacity: .95; transform: translateY(-1px); }
 .admin-lock-exit {
   margin-top: 1.5rem; background: none; border: none;
-  color: #77778c; font-size: .82rem; font-weight: 600;
+  color: #64748b; font-size: .82rem; font-weight: 600;
   cursor: pointer; transition: color .2s;
 }
-.admin-lock-exit:hover { color: #f5f5f5; }
+.admin-lock-exit:hover { color: #bd2637; }
 
 /* ── 2. STANDALONE DASHBOARD CONTAINER ── */
 .admin-portal-standalone {
   min-height: 100vh; width: 100%;
-  background: #08080c; color: #f5f5f5;
+  background: #f8fafc; color: #0f172a;
   display: flex; flex-direction: column;
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   box-sizing: border-box;
@@ -2300,77 +2305,81 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 
 /* ── Top Executive Bar ── */
 .admin-portal-topbar {
-  background: #0d0d14; border-bottom: 1px solid rgba(255,255,255,.07);
+  background: #ffffff; border-bottom: 1px solid #e2e8f0;
   padding: .85rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
   position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px);
+  box-shadow: 0 2px 10px rgba(0,0,0,.02);
 }
 .apt-left { display: flex; align-items: center; gap: 1rem; }
-.apt-logo { height: 34px; object-fit: contain; }
+.apt-logo { height: 38px; object-fit: contain; }
 .apt-brand-row { display: flex; align-items: center; gap: .6rem; }
-.apt-title { font-size: 1.05rem; font-weight: 900; letter-spacing: .06em; color: #f5f5f5; }
+.apt-title { font-size: 1.05rem; font-weight: 900; letter-spacing: .06em; color: #0f172a; }
 .apt-badge {
   font-size: .62rem; font-weight: 800; letter-spacing: .08em;
-  background: rgba(189,38,55,.15); border: 1px solid rgba(189,38,55,.3);
-  color: #ff5263; padding: .15rem .5rem; border-radius: 6px;
+  background: rgba(189,38,55,.08); border: 1px solid rgba(189,38,55,.2);
+  color: #bd2637; padding: .15rem .5rem; border-radius: 6px;
 }
 .apt-live-dot {
-  font-size: .65rem; font-weight: 700; color: #22c55e;
-  background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.2);
+  font-size: .65rem; font-weight: 700; color: #16a34a;
+  background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.2);
   padding: .12rem .5rem; border-radius: 12px;
 }
-.apt-sub { font-size: .72rem; color: #88889c; margin: .1rem 0 0; }
+.apt-sub { font-size: .72rem; color: #64748b; margin: .1rem 0 0; }
 
 .apt-kpis { display: flex; align-items: center; gap: 1rem; }
 .apt-kpi-item {
   display: flex; flex-direction: column; align-items: center;
   padding: .35rem .9rem; border-radius: 10px;
-  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05);
+  background: #f8fafc; border: 1px solid #e2e8f0;
 }
-.apt-kpi-val { font-size: 1.05rem; font-weight: 800; color: #f5f5f5; }
-.apt-kpi-lbl { font-size: .65rem; color: #88889c; text-transform: uppercase; letter-spacing: .05em; margin-top: .1rem; }
-.apt-kpi-amber .apt-kpi-val { color: #f59e0b; }
-.apt-kpi-green .apt-kpi-val { color: #22c55e; }
-.apt-kpi-gold .apt-kpi-val { color: #d4af37; font-family: 'DM Mono', monospace; }
+.apt-kpi-val { font-size: 1.05rem; font-weight: 800; color: #0f172a; }
+.apt-kpi-lbl { font-size: .65rem; color: #64748b; text-transform: uppercase; letter-spacing: .05em; margin-top: .1rem; }
+.apt-kpi-amber .apt-kpi-val { color: #d97706; }
+.apt-kpi-green .apt-kpi-val { color: #16a34a; }
+.apt-kpi-gold .apt-kpi-val { color: #b45309; font-family: 'DM Mono', monospace; }
 
 .apt-right { display: flex; align-items: center; gap: .75rem; }
 .apt-status-toast {
-  font-size: .72rem; font-weight: 700; color: #22c55e;
-  background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.25);
+  font-size: .72rem; font-weight: 700; color: #16a34a;
+  background: rgba(22,163,74,.1); border: 1px solid rgba(22,163,74,.25);
   padding: .35rem .8rem; border-radius: 20px;
 }
 .apt-btn-secondary {
   display: flex; align-items: center; gap: .4rem; padding: .5rem .95rem;
-  border-radius: 10px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
-  color: #d0d0e0; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  border-radius: 10px; background: #ffffff; border: 1px solid #cbd5e1;
+  color: #334155; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .2s;
   text-decoration: none;
 }
-.apt-btn-secondary:hover { background: rgba(255,255,255,.1); }
+.apt-btn-secondary:hover { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
 .apt-btn-exit {
   display: flex; align-items: center; gap: .4rem; padding: .5rem 1rem;
-  border-radius: 10px; background: rgba(189,38,55,.12); border: 1px solid rgba(189,38,55,.3);
-  color: #ff6b7d; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  border-radius: 10px; background: rgba(189,38,55,.08); border: 1px solid rgba(189,38,55,.2);
+  color: #bd2637; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .2s;
 }
-.apt-btn-exit:hover { background: rgba(189,38,55,.22); color: #fff; }
+.apt-btn-exit:hover { background: #bd2637; color: #ffffff; }
 
 /* ── Navigation Strip ── */
 .admin-portal-nav {
-  background: #0a0a0f; border-bottom: 1px solid rgba(255,255,255,.06);
+  background: #ffffff; border-bottom: 1px solid #e2e8f0;
   padding: 0 2rem; position: sticky; top: 62px; z-index: 90;
+  box-shadow: 0 1px 3px rgba(0,0,0,.02);
 }
 .admin-portal-tabs {
-  display: flex; gap: .5rem; max-width: 1440px; margin: 0 auto; overflow-x: auto;
+  display: flex; gap: .35rem; max-width: 1440px; margin: 0 auto; overflow-x: auto;
+  padding-top: .35rem;
 }
 .apt-tab {
-  display: flex; align-items: center; gap: .5rem; padding: .9rem 1.25rem;
-  font-size: .82rem; font-weight: 700; color: #88889c; background: none; border: none;
-  border-bottom: 2px solid transparent; cursor: pointer; transition: all .2s; white-space: nowrap;
+  display: flex; align-items: center; gap: .5rem; padding: .75rem 1.15rem;
+  font-size: .82rem; font-weight: 700; color: #64748b; background: none; border: none;
+  border-bottom: 3px solid transparent; cursor: pointer; transition: all .2s; white-space: nowrap;
+  border-radius: 8px 8px 0 0;
 }
-.apt-tab:hover { color: #f5f5f5; }
+.apt-tab:hover { color: #bd2637; background: rgba(189,38,55,.04); }
 .apt-tab-active {
-  color: #f5f5f5; border-bottom-color: #bd2637; background: rgba(189,38,55,.06);
+  color: #bd2637 !important; border-bottom-color: #bd2637; background: rgba(189,38,55,.07) !important;
 }
 .apt-tab-pill-amber {
-  background: #f59e0b; color: #000; font-size: .65rem; font-weight: 800;
+  background: #f59e0b; color: #ffffff; font-size: .65rem; font-weight: 800;
   padding: .1rem .45rem; border-radius: 12px;
 }
 
@@ -2380,7 +2389,7 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   padding: 2rem; box-sizing: border-box;
 }
 .admin-portal-loader {
-  display: flex; align-items: center; gap: .6rem; color: #88889c;
+  display: flex; align-items: center; gap: .6rem; color: #64748b;
   font-size: .82rem; margin-bottom: 1rem;
 }
 .apt-tab-section { display: flex; flex-direction: column; gap: 1.5rem; }
@@ -2388,65 +2397,67 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 /* ── Orders Toolbar ── */
 .apt-orders-toolbar {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;
-  background: #111118; border: 1px solid rgba(255,255,255,.07);
+  background: #ffffff; border: 1px solid #e2e8f0;
   border-radius: 16px; padding: 1rem 1.25rem;
+  box-shadow: 0 4px 16px -2px rgba(0,0,0,.03);
 }
 .apt-search-box {
   display: flex; align-items: center; gap: .6rem;
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.1);
+  background: #f8fafc; border: 1.5px solid #cbd5e1;
   border-radius: 12px; padding: .55rem .9rem; flex: 1; min-width: 280px; max-width: 480px;
 }
-.apt-search-icon { color: #66667a; flex-shrink: 0; }
+.apt-search-icon { color: #94a3b8; flex-shrink: 0; }
 .apt-search-input {
-  background: none; border: none; color: #f5f5f5; font-size: .82rem; font-weight: 600;
+  background: none; border: none; color: #0f172a; font-size: .82rem; font-weight: 600;
   width: 100%; outline: none;
 }
-.apt-search-clear { background: none; border: none; color: #888; cursor: pointer; padding: 0; }
+.apt-search-input::placeholder { color: #94a3b8; }
+.apt-search-clear { background: none; border: none; color: #94a3b8; cursor: pointer; padding: 0; }
 .apt-filter-pills { display: flex; flex-wrap: wrap; gap: .4rem; }
 .apt-filter-pill {
   padding: .45rem .85rem; border-radius: 10px;
-  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07);
-  color: #88889c; font-size: .75rem; font-weight: 700; cursor: pointer; transition: all .2s;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  color: #64748b; font-size: .75rem; font-weight: 700; cursor: pointer; transition: all .2s;
 }
-.apt-filter-pill:hover { color: #f5f5f5; border-color: rgba(255,255,255,.15); }
-.apt-filter-pill.active { background: #bd2637; border-color: #bd2637; color: #f5f5f5; }
-.apt-filter-pill.amber.active { background: #f59e0b; border-color: #f59e0b; color: #000; }
-.apt-filter-pill.green.active { background: #22c55e; border-color: #22c55e; color: #000; }
+.apt-filter-pill:hover { color: #0f172a; border-color: #cbd5e1; background: #f1f5f9; }
+.apt-filter-pill.active { background: #bd2637; border-color: #bd2637; color: #ffffff; }
+.apt-filter-pill.amber.active { background: #d97706; border-color: #d97706; color: #ffffff; }
+.apt-filter-pill.green.active { background: #16a34a; border-color: #16a34a; color: #ffffff; }
 
 .apt-empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 4rem 2rem; text-align: center; color: #55556a;
+  padding: 4rem 2rem; text-align: center; color: #94a3b8;
 }
-.apt-empty-state h4 { color: #88889c; margin: .8rem 0 .2rem; font-size: 1rem; }
-.apt-empty-state p  { font-size: .8rem; margin: 0; }
+.apt-empty-state h4 { color: #334155; margin: .8rem 0 .2rem; font-size: 1rem; font-weight: 700; }
+.apt-empty-state p  { font-size: .8rem; margin: 0; color: #64748b; }
 
 /* ── Order Cards ── */
 .apt-orders-grid { display: flex; flex-direction: column; gap: 1.25rem; }
 .apt-order-card {
-  background: #111118; border: 1px solid rgba(255,255,255,.08);
+  background: #ffffff; border: 1px solid #e2e8f0;
   border-radius: 18px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,.4); transition: border-color .2s;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,.04); transition: all .2s;
 }
-.apt-order-card:hover { border-color: rgba(255,255,255,.14); }
+.apt-order-card:hover { border-color: #cbd5e1; box-shadow: 0 8px 30px -4px rgba(0,0,0,.07); }
 .aoc-head {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
-  border-bottom: 1px solid rgba(255,255,255,.05); padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem;
 }
 .aoc-id-row { display: flex; align-items: center; gap: .6rem; margin-bottom: .3rem; }
 .aoc-ref-id {
-  font-family: 'DM Mono', monospace; font-size: .85rem; font-weight: 800; color: #d4af37;
-  background: rgba(212,175,55,.1); border: 1px solid rgba(212,175,55,.25);
+  font-family: 'DM Mono', monospace; font-size: .85rem; font-weight: 800; color: #b45309;
+  background: #fef3c7; border: 1px solid #fde68a;
   padding: .2rem .55rem; border-radius: 6px;
 }
 .aoc-category-tag {
   font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
-  color: #88889c; background: rgba(255,255,255,.05); padding: .2rem .5rem; border-radius: 6px;
+  color: #64748b; background: #f1f5f9; padding: .2rem .5rem; border-radius: 6px;
 }
-.aoc-client-name { font-size: 1.25rem; font-weight: 800; color: #f5f5f5; margin: .15rem 0; }
-.aoc-pkg-name { font-size: .85rem; color: #88889c; margin: 0; }
+.aoc-client-name { font-size: 1.25rem; font-weight: 800; color: #0f172a; margin: .15rem 0; }
+.aoc-pkg-name { font-size: .85rem; color: #64748b; margin: 0; }
 .aoc-status-pill {
   font-size: .72rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
-  border: 1px solid currentColor; padding: .35rem .85rem; border-radius: 20px; background: rgba(0,0,0,.2);
+  border: 1.5px solid currentColor; padding: .35rem .85rem; border-radius: 20px; background: #ffffff;
 }
 
 .aoc-body-grid {
@@ -2454,204 +2465,209 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 .aoc-info-col { display: flex; flex-direction: column; gap: .5rem; }
 .aoc-info-row { display: flex; align-items: center; gap: .5rem; font-size: .82rem; }
-.aoc-lbl { color: #66667a; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
-.aoc-val { color: #e0e0e8; font-weight: 600; }
-.aoc-phone-link { color: #38bdf8; font-weight: 700; text-decoration: none; }
+.aoc-lbl { color: #64748b; font-weight: 600; font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; }
+.aoc-val { color: #1e293b; font-weight: 600; }
+.aoc-phone-link { color: #0284c7; font-weight: 700; text-decoration: none; }
 .aoc-phone-link:hover { text-decoration: underline; }
 .aoc-pay-badge {
-  font-size: .72rem; font-weight: 700; background: rgba(56,189,248,.12); color: #38bdf8;
-  border: 1px solid rgba(56,189,248,.25); padding: .15rem .55rem; border-radius: 6px;
+  font-size: .72rem; font-weight: 700; background: #e0f2fe; color: #0369a1;
+  border: 1px solid #bae6fd; padding: .15rem .55rem; border-radius: 6px;
 }
 .aoc-notes-box {
-  margin-top: .4rem; background: rgba(255,255,255,.03); border-radius: 10px;
-  padding: .6rem .8rem; font-size: .78rem; color: #9090a8;
+  margin-top: .4rem; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;
+  padding: .6rem .8rem; font-size: .78rem; color: #475569;
 }
 
 .aoc-financials-col { display: flex; flex-direction: column; gap: .75rem; }
 .aoc-fin-box {
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.06); border-radius: 12px;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
   padding: .85rem 1rem; display: flex; flex-direction: column; gap: .45rem;
 }
-.aoc-fin-row { display: flex; justify-content: space-between; font-size: .8rem; color: #88889c; }
-.aoc-fin-row strong { color: #f5f5f5; font-family: 'DM Mono', monospace; }
+.aoc-fin-row { display: flex; justify-content: space-between; font-size: .8rem; color: #64748b; }
+.aoc-fin-row strong { color: #0f172a; font-family: 'DM Mono', monospace; }
 .aoc-deposit-row {
-  border-top: 1px solid rgba(255,255,255,.05); border-bottom: 1px solid rgba(255,255,255,.05);
+  border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;
   padding: .35rem 0;
 }
-.text-green { color: #22c55e !important; }
+.text-green { color: #16a34a !important; }
 .aoc-sig-badge {
-  display: flex; align-items: center; gap: .4rem; font-size: .75rem; color: #22c55e;
-  font-weight: 700; background: rgba(34,197,94,.08); border: 1px solid rgba(34,197,94,.18);
+  display: flex; align-items: center; gap: .4rem; font-size: .75rem; color: #15803d;
+  font-weight: 700; background: #dcfce7; border: 1px solid #bbf7d0;
   padding: .4rem .7rem; border-radius: 8px;
 }
 
 .aoc-receipt-col { display: flex; flex-direction: column; gap: .5rem; }
 .aoc-receipt-thumb-wrap {
   position: relative; width: 100%; height: 130px; border-radius: 12px; overflow: hidden;
-  border: 1px solid rgba(255,255,255,.1); cursor: pointer; background: #0a0a0f;
+  border: 1px solid #cbd5e1; cursor: pointer; background: #f1f5f9;
 }
 .aoc-receipt-thumb { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
 .aoc-receipt-thumb-wrap:hover .aoc-receipt-thumb { transform: scale(1.05); }
 .aoc-receipt-hover {
-  position: absolute; inset: 0; background: rgba(0,0,0,.65);
+  position: absolute; inset: 0; background: rgba(15,23,42,.65);
   display: flex; align-items: center; justify-content: center; gap: .4rem;
-  opacity: 0; transition: opacity .2s; color: #f5f5f5; font-size: .78rem; font-weight: 700;
+  opacity: 0; transition: opacity .2s; color: #ffffff; font-size: .78rem; font-weight: 700;
 }
 .aoc-receipt-thumb-wrap:hover .aoc-receipt-hover { opacity: 1; }
 .aoc-no-receipt {
-  height: 130px; border-radius: 12px; border: 1px dashed rgba(255,255,255,.08);
-  display: flex; align-items: center; justify-content: center; font-size: .75rem; color: #55556a;
+  height: 130px; border-radius: 12px; border: 1px dashed #cbd5e1;
+  display: flex; align-items: center; justify-content: center; font-size: .75rem; color: #94a3b8;
+  background: #f8fafc;
 }
 
 .aoc-card-actions {
   display: flex; flex-wrap: wrap; align-items: center; gap: .6rem;
-  border-top: 1px solid rgba(255,255,255,.05); padding-top: 1rem;
+  border-top: 1px solid #f1f5f9; padding-top: 1rem;
 }
 .aoc-btn-approve {
   display: flex; align-items: center; gap: .4rem;
-  background: rgba(34,197,94,.12); border: 1px solid rgba(34,197,94,.3);
-  color: #22c55e; padding: .55rem 1.15rem; border-radius: 10px;
+  background: #dcfce7; border: 1px solid #bbf7d0;
+  color: #15803d; padding: .55rem 1.15rem; border-radius: 10px;
   font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .2s;
 }
-.aoc-btn-approve:hover { background: rgba(34,197,94,.22); }
+.aoc-btn-approve:hover { background: #bbf7d0; color: #166534; }
 .aoc-btn-reject {
   display: flex; align-items: center; gap: .4rem;
-  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
-  color: #ef4444; padding: .55rem 1.15rem; border-radius: 10px;
+  background: #fee2e2; border: 1px solid #fecaca;
+  color: #dc2626; padding: .55rem 1.15rem; border-radius: 10px;
   font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .2s;
 }
-.aoc-btn-reject:hover { background: rgba(239,68,68,.2); }
+.aoc-btn-reject:hover { background: #fecaca; color: #991b1b; }
 .aoc-btn-discuss {
   display: flex; align-items: center; gap: .4rem;
-  background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.25);
-  color: #38bdf8; padding: .55rem 1.15rem; border-radius: 10px;
+  background: rgba(189,38,55,.08); border: 1px solid rgba(189,38,55,.2);
+  color: #bd2637; padding: .55rem 1.15rem; border-radius: 10px;
   font-size: .8rem; font-weight: 700; cursor: pointer; transition: all .2s;
 }
-.aoc-btn-discuss:hover { background: rgba(56,189,248,.2); }
+.aoc-btn-discuss:hover { background: #bd2637; color: #ffffff; }
 .aoc-btn-call {
   display: flex; align-items: center; gap: .4rem;
-  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
-  color: #d0d0e0; padding: .55rem 1rem; border-radius: 10px;
+  background: #f8fafc; border: 1px solid #cbd5e1;
+  color: #334155; padding: .55rem 1rem; border-radius: 10px;
   font-size: .8rem; font-weight: 700; text-decoration: none; transition: all .2s;
   margin-left: auto;
 }
-.aoc-btn-call:hover { background: rgba(255,255,255,.08); color: #fff; }
+.aoc-btn-call:hover { background: #f1f5f9; color: #0f172a; }
 
 /* ── Split Grid & Boxes ── */
 .apt-split-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .apt-card-box {
-  background: #111118; border: 1px solid rgba(255,255,255,.08); border-radius: 18px;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 18px;
   padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,.03);
 }
 .apt-box-header {
   display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
-  border-bottom: 1px solid rgba(255,255,255,.05); padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f5f9; padding-bottom: 1rem;
 }
-.apt-box-header h4 { font-size: 1.1rem; font-weight: 800; color: #f5f5f5; margin: 0; }
-.apt-box-header p  { font-size: .8rem; color: #88889c; margin: .25rem 0 0; }
+.apt-box-header h4 { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0; }
+.apt-box-header p  { font-size: .8rem; color: #64748b; margin: .25rem 0 0; }
 
 /* Blackout */
 .apt-blackout-add-row { display: flex; gap: .75rem; align-items: center; }
 .apt-date-input {
-  padding: .55rem .9rem; border-radius: 10px; background: #0a0a0f;
-  border: 1px solid rgba(255,255,255,.12); color: #f5f5f5; font-size: .85rem; font-weight: 600;
+  padding: .55rem .9rem; border-radius: 10px; background: #ffffff;
+  border: 1.5px solid #cbd5e1; color: #0f172a; font-size: .85rem; font-weight: 600;
 }
-.apt-blackout-list h5 { font-size: .82rem; font-weight: 800; color: #88889c; margin: .5rem 0 .75rem; text-transform: uppercase; letter-spacing: .06em; }
+.apt-blackout-list h5 { font-size: .82rem; font-weight: 800; color: #64748b; margin: .5rem 0 .75rem; text-transform: uppercase; letter-spacing: .06em; }
 .apt-chips-list { display: flex; flex-wrap: wrap; gap: .5rem; }
 .apt-blackout-chip {
   display: flex; align-items: center; gap: .5rem; padding: .4rem .75rem;
-  background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
-  border-radius: 8px; font-size: .8rem; color: #fca5a5; font-weight: 600;
+  background: #fee2e2; border: 1px solid #fecaca;
+  border-radius: 8px; font-size: .8rem; color: #991b1b; font-weight: 600;
 }
-.apt-blackout-chip button { background: none; border: none; color: #ef4444; cursor: pointer; padding: 0; }
+.apt-blackout-chip button { background: none; border: none; color: #dc2626; cursor: pointer; padding: 0; }
 
 .apt-booked-list { display: flex; flex-direction: column; gap: .6rem; }
 .apt-booked-row {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.05); border-radius: 12px;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
   padding: .75rem 1rem; font-size: .82rem;
 }
-.apt-booked-date strong { color: #f5f5f5; }
+.apt-booked-date strong { color: #0f172a; }
 .apt-booked-info { display: flex; flex-direction: column; }
-.apt-booked-info strong { color: #f5f5f5; }
-.apt-booked-info span   { color: #88889c; font-size: .75rem; }
+.apt-booked-info strong { color: #0f172a; }
+.apt-booked-info span   { color: #64748b; font-size: .75rem; }
 
 /* Packages grid */
 .apt-packages-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem;
 }
 .apt-pkg-card {
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.06); border-radius: 14px;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
   padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem;
+  box-shadow: 0 4px 16px -2px rgba(0,0,0,.03); transition: all .2s;
 }
+.apt-pkg-card:hover { border-color: #cbd5e1; box-shadow: 0 8px 24px -3px rgba(0,0,0,.06); }
 .apt-pkg-top { display: flex; justify-content: space-between; align-items: flex-start; gap: .5rem; }
-.apt-pkg-top h4 { margin: .2rem 0 0; font-size: 1rem; font-weight: 800; color: #f5f5f5; }
+.apt-pkg-top h4 { margin: .2rem 0 0; font-size: 1rem; font-weight: 800; color: #0f172a; }
 .apt-pkg-price-badge {
-  font-size: 1.1rem; font-weight: 800; color: #d4af37; font-family: 'DM Mono', monospace;
+  font-size: 1.1rem; font-weight: 800; color: #bd2637; font-family: 'DM Mono', monospace;
 }
-.apt-pkg-price-badge span { font-size: .7rem; color: #88889c; }
-.apt-pkg-badge-preview { font-size: .78rem; color: #88889c; }
-.apt-pkg-badge-preview strong { color: #f5f5f5; }
+.apt-pkg-price-badge span { font-size: .7rem; color: #64748b; }
+.apt-pkg-badge-preview { font-size: .78rem; color: #64748b; }
+.apt-pkg-badge-preview strong { color: #0f172a; }
 .apt-edit-btn {
   display: flex; align-items: center; justify-content: center; gap: .4rem;
-  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1);
-  color: #d0d0e0; padding: .5rem; border-radius: 8px; font-size: .75rem; font-weight: 700;
+  background: #f8fafc; border: 1px solid #cbd5e1;
+  color: #334155; padding: .5rem; border-radius: 8px; font-size: .75rem; font-weight: 700;
   cursor: pointer; transition: all .2s; margin-top: .5rem;
 }
-.apt-edit-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+.apt-edit-btn:hover { background: #f1f5f9; color: #0f172a; border-color: #94a3b8; }
 .apt-pkg-edit-form {
   display: flex; flex-direction: column; gap: .5rem;
-  padding-top: .75rem; border-top: 1px solid rgba(255,255,255,.05);
+  padding-top: .75rem; border-top: 1px solid #f1f5f9;
 }
 
 /* Contract & Accounts */
 .apt-contract-token-bar {
   display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
-  background: #0a0a0f; border-radius: 10px; padding: .6rem .9rem; font-size: .78rem; color: #88889c;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: .6rem .9rem; font-size: .78rem; color: #64748b;
 }
 .apt-contract-token-bar code {
-  color: #d4af37; background: rgba(212,175,55,.1); padding: .15rem .45rem; border-radius: 4px;
+  color: #b45309; background: #fef3c7; padding: .15rem .45rem; border-radius: 4px; font-weight: 700;
 }
 .apt-clauses-editor { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
 .apt-clause-card {
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.06); border-radius: 12px;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
   padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem;
 }
 .apt-clause-num { font-size: .72rem; font-weight: 800; color: #bd2637; text-transform: uppercase; letter-spacing: .08em; }
 
 .apt-account-edit-box {
-  background: #0a0a0f; border: 1px solid rgba(255,255,255,.06); border-radius: 14px;
+  background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
   padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem;
+  box-shadow: 0 4px 16px -2px rgba(0,0,0,.03);
 }
 .apt-account-head { display: flex; align-items: center; gap: .75rem; margin-bottom: .25rem; }
-.apt-account-head h4 { margin: 0; font-size: .95rem; font-weight: 800; color: #f5f5f5; }
-.apt-account-head small { color: #88889c; font-size: .72rem; }
+.apt-account-head h4 { margin: 0; font-size: .95rem; font-weight: 800; color: #0f172a; }
+.apt-account-head small { color: #64748b; font-size: .72rem; }
 
 /* Lightbox */
 .admin-receipt-lightbox {
   position: fixed; inset: 0; z-index: 9999;
-  background: rgba(0,0,0,.85); backdrop-filter: blur(10px);
+  background: rgba(15,23,42,.85); backdrop-filter: blur(10px);
   display: flex; align-items: center; justify-content: center; padding: 2rem;
 }
 .arl-content {
-  background: #111118; border: 1px solid rgba(255,255,255,.12); border-radius: 20px;
+  background: #ffffff; border: 1px solid #cbd5e1; border-radius: 20px;
   max-width: 900px; width: 100%; max-height: 90vh;
   display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 40px 100px rgba(0,0,0,.9);
+  box-shadow: 0 40px 100px rgba(0,0,0,.5);
 }
 .arl-topbar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 1rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,.07);
+  padding: 1rem 1.5rem; border-bottom: 1px solid #e2e8f0;
 }
-.arl-topbar h4 { margin: 0; font-size: 1rem; font-weight: 800; color: #f5f5f5; }
+.arl-topbar h4 { margin: 0; font-size: 1rem; font-weight: 800; color: #0f172a; }
 .arl-body {
   flex: 1; overflow: auto; padding: 1.5rem; display: flex; align-items: center;
-  justify-content: center; background: #0a0a0f;
+  justify-content: center; background: #f8fafc;
 }
 .arl-img { max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 10px; }
 .arl-footer {
   display: flex; align-items: center; justify-content: flex-end; gap: .75rem;
-  padding: 1rem 1.5rem; border-top: 1px solid rgba(255,255,255,.07);
+  padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0;
 }
 
 /* ── Responsive ── */
@@ -2869,84 +2885,91 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 @keyframes brc-spin { to { transform: rotate(360deg); } }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ADMIN CHAT INBOX STYLES
+   ADMIN CHAT INBOX STYLES (PURE WHITE & BRAND BURGUNDY)
    ══════════════════════════════════════════════════════════════════════════ */
 
 .admin-chat-layout {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 290px 1fr;
   gap: 0;
-  height: calc(100vh - 200px);
-  min-height: 500px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  height: calc(100vh - 190px);
+  min-height: 520px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,.03);
 }
 
 .admin-chat-sidebar {
-  background: #111118;
-  border-right: 1px solid var(--border);
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
 .admin-chat-sidebar-header {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 18px;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: #f8fafc;
 }
 
 .admin-chat-sidebar-header h4 {
   margin: 0;
   font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
+  font-weight: 800;
+  color: #0f172a;
 }
 
 .admin-chat-list-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 12px 16px;
   border: none;
   background: none;
   cursor: pointer;
   text-align: left;
-  border-bottom: 1px solid rgba(255,255,255,.04);
-  transition: background .15s;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all .15s;
   width: 100%;
 }
 
-.admin-chat-list-item:hover { background: rgba(255,255,255,.04); }
-.admin-chat-item-active { background: rgba(212,175,55,.08) !important; border-left: 3px solid #d4af37; }
+.admin-chat-list-item:hover { background: #f8fafc; }
+.admin-chat-item-active {
+  background: rgba(189,38,55,.06) !important;
+  border-left: 4px solid #bd2637;
+}
 
 .acli-avatar {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #bd2637, #8f1729);
+  background: linear-gradient(135deg, #bd2637, #9b1c2b);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 14px;
-  color: #fff;
+  color: #ffffff;
   flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(189,38,55,.25);
 }
 
 .acli-info { flex: 1; min-width: 0; }
-.acli-name { font-size: 13px; font-weight: 600; color: #f5f5f5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.acli-handle { color: #9090a8; font-weight: 400; font-size: 12px; }
-.acli-last { font-size: 11px; color: #9090a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-.acli-badge { background: #ef4444; color: #fff; border-radius: 10px; font-size: 10px; font-weight: 700; padding: 2px 6px; flex-shrink: 0; }
+.acli-name { font-size: 13px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acli-handle { color: #64748b; font-weight: 400; font-size: 12px; }
+.acli-last { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+.acli-badge { background: #ef4444; color: #ffffff; border-radius: 10px; font-size: 10px; font-weight: 800; padding: 2px 7px; flex-shrink: 0; }
 
 .admin-chat-thread {
   display: flex;
   flex-direction: column;
-  background: #0f0f18;
+  background: #f8fafc;
   overflow: hidden;
 }
 
@@ -2957,34 +2980,34 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #55556a;
+  color: #94a3b8;
   text-align: center;
   padding: 32px;
 }
-.admin-chat-empty h4 { color: #9090a8; margin: 0; }
-.admin-chat-empty p { font-size: 13px; color: #55556a; margin: 0; }
+.admin-chat-empty h4 { color: #334155; margin: 0; font-weight: 700; }
+.admin-chat-empty p { font-size: 13px; color: #64748b; margin: 0; }
 
 .admin-chat-thread-header {
   padding: 14px 20px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #111118;
+  background: #ffffff;
 }
 
-.admin-chat-thread-header h4 { margin: 0; font-size: 16px; font-weight: 700; }
-.admin-chat-thread-header span { font-size: 11px; color: #9090a8; }
-.admin-chat-thread-header code { color: #d4af37; }
+.admin-chat-thread-header h4 { margin: 0; font-size: 15px; font-weight: 800; color: #0f172a; }
+.admin-chat-thread-header span { font-size: 12px; color: #64748b; }
+.admin-chat-thread-header code { color: #b45309; font-weight: 700; background: #fef3c7; padding: 2px 6px; border-radius: 4px; }
 .admin-chat-thread-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .admin-chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .admin-chat-msg { display: flex; }
@@ -2992,65 +3015,61 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 .msg-client { justify-content: flex-start; }
 
 .admin-chat-msg-bubble {
-  max-width: 70%;
-  padding: 10px 14px;
-  border-radius: 14px;
+  max-width: 72%;
+  padding: 11px 16px;
+  border-radius: 16px;
   font-size: 13px;
   line-height: 1.5;
 }
 
 .msg-admin .admin-chat-msg-bubble {
-  background: linear-gradient(135deg, #1e3a5f, #162d47);
-  border: 1px solid rgba(56, 189, 248, .2);
+  background: linear-gradient(135deg, #bd2637, #9b1c2b);
+  color: #ffffff;
   border-bottom-right-radius: 4px;
+  box-shadow: 0 4px 14px rgba(189,38,55,.2);
 }
 
 .msg-client .admin-chat-msg-bubble {
-  background: #1a1a25;
-  border: 1px solid var(--border);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
   border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.03);
 }
 
-.admin-chat-msg-sender { font-size: 10px; font-weight: 700; opacity: .7; margin-bottom: 4px; }
-.admin-chat-msg-text { color: #f5f5f5; }
-.admin-chat-msg-time { font-size: 10px; color: #55556a; margin-top: 4px; text-align: right; }
+.admin-chat-msg-sender { font-size: 11px; font-weight: 800; opacity: .85; margin-bottom: 4px; }
+.admin-chat-msg-text { color: inherit; }
+.admin-chat-msg-time { font-size: 10px; opacity: .7; margin-top: 4px; text-align: right; }
 
 .admin-chat-reply-bar {
   display: flex;
   gap: 8px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  background: #111118;
+  padding: 14px 18px;
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
   align-items: flex-end;
 }
 
 .admin-chat-reply-input {
   flex: 1;
-  background: #1a1a25;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  color: #f5f5f5;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #0f172a;
   font-family: inherit;
   font-size: 13px;
   resize: none;
   outline: none;
-  transition: border-color .2s;
+  transition: all .2s;
 }
 
-.admin-chat-reply-input:focus { border-color: #d4af37; }
-.admin-chat-reply-input::placeholder { color: #55556a; }
-
-/* Tab pill */
-.apt-tab-pill-amber {
-  background: #f59e0b;
-  color: #0a0a0f;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 1px 6px;
-  margin-left: 4px;
+.admin-chat-reply-input:focus {
+  border-color: #bd2637;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(189,38,55,.12);
 }
+.admin-chat-reply-input::placeholder { color: #94a3b8; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    ADMIN AGREEMENTS TAB STYLES
@@ -3070,14 +3089,15 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 14px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
   flex-wrap: wrap;
+  box-shadow: 0 2px 6px rgba(0,0,0,.02);
 }
 
-.admin-agr-custom { border-color: rgba(212,175,55,.2); }
+.admin-agr-custom { border-color: rgba(189,38,55,.25); background: #fffdfd; }
 
 .admin-agr-info {
   display: flex;
@@ -3088,9 +3108,10 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 
 .admin-agr-price {
-  font-weight: 700;
-  color: #d4af37;
+  font-weight: 800;
+  color: #bd2637;
   font-size: 13px;
+  font-family: 'DM Mono', monospace;
 }
 
 .admin-agr-editor {
@@ -3104,19 +3125,19 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   flex-direction: column;
   gap: 4px;
   font-size: 12px;
-  color: #9090a8;
-  font-weight: 600;
+  color: #475569;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .5px;
 }
 
 .admin-agr-editor input,
 .admin-agr-editor textarea {
-  background: #1a1a25;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
   padding: 8px 12px;
-  color: #f5f5f5;
+  color: #0f172a;
   font-family: inherit;
   font-size: 13px;
   outline: none;
@@ -3124,7 +3145,10 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 
 .admin-agr-editor input:focus,
-.admin-agr-editor textarea:focus { border-color: #d4af37; }
+.admin-agr-editor textarea:focus {
+  border-color: #bd2637;
+  box-shadow: 0 0 0 3px rgba(189,38,55,.12);
+}
 
 .admin-agr-editor-actions {
   display: flex;
@@ -3132,6 +3156,144 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   justify-content: flex-end;
   margin-top: 4px;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ADMIN: CONTENT MANAGEMENT & EXPANDED PACKAGES MANAGEMENT STYLES
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.apt-section-hero {
+  background: linear-gradient(135deg, rgba(189,38,55,.05) 0%, rgba(212,175,55,.05) 100%);
+  border: 1px solid rgba(189,38,55,.15);
+  border-radius: 16px;
+  padding: 1.25rem 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.apt-section-hero h3 { margin: 0; font-size: 1.2rem; font-weight: 800; color: #0f172a; }
+.apt-section-hero p { margin: .25rem 0 0; font-size: .85rem; color: #64748b; }
+
+/* Content Cards Grid */
+.apt-cms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 960px) {
+  .apt-cms-grid { grid-template-columns: 1fr; }
+}
+
+.apt-cms-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 4px 16px -2px rgba(0,0,0,.03);
+}
+
+.apt-cms-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1rem;
+}
+.apt-cms-head h4 {
+  margin: 0; font-size: 1.05rem; font-weight: 800; color: #0f172a;
+  display: flex; align-items: center; gap: .5rem;
+}
+
+.apt-cms-toggle {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .8rem; font-weight: 700; color: #334155; cursor: pointer;
+}
+.apt-cms-toggle input[type="checkbox"] {
+  accent-color: #bd2637;
+  width: 18px; height: 18px; cursor: pointer;
+}
+
+.apt-live-preview {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  padding: .75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.apt-preview-badge {
+  background: #bd2637;
+  color: #ffffff;
+  font-size: .7rem;
+  font-weight: 800;
+  padding: .2rem .5rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+.apt-preview-text {
+  font-size: .8rem;
+  color: #881337;
+  font-weight: 600;
+}
+
+/* Modal Popup */
+.apt-modal-backdrop {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(15,23,42,.6); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+}
+.apt-modal-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  max-width: 680px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 30px 80px -15px rgba(0,0,0,.25);
+  display: flex; flex-direction: column;
+}
+.apt-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 1.75rem; border-bottom: 1px solid #e2e8f0;
+}
+.apt-modal-header h3 { margin: 0; font-size: 1.15rem; font-weight: 800; color: #0f172a; }
+.apt-modal-close {
+  background: none; border: none; color: #94a3b8; cursor: pointer; padding: 4px;
+}
+.apt-modal-close:hover { color: #0f172a; }
+.apt-modal-body {
+  padding: 1.75rem; display: flex; flex-direction: column; gap: 1.25rem;
+}
+.apt-modal-footer {
+  display: flex; justify-content: flex-end; gap: .75rem;
+  padding: 1.25rem 1.75rem; border-top: 1px solid #e2e8f0; background: #f8fafc;
+}
+
+/* Deliverable items tags */
+.apt-deliv-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .4rem; }
+.apt-deliv-tag {
+  background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px;
+  padding: .25rem .55rem; font-size: .75rem; color: #334155; font-weight: 600;
+  display: flex; align-items: center; gap: .4rem;
+}
+.apt-deliv-tag button {
+  background: none; border: none; color: #dc2626; cursor: pointer; padding: 0; font-weight: 800;
+}
+
+/* FAQ Accordion List */
+.apt-faq-list { display: flex; flex-direction: column; gap: .85rem; }
+.apt-faq-item {
+  background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px;
+  padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: .6rem;
+  transition: all .2s;
+}
+.apt-faq-item:hover { border-color: #cbd5e1; }
+.apt-faq-q { font-weight: 800; font-size: .92rem; color: #0f172a; display: flex; justify-content: space-between; align-items: center; }
+.apt-faq-a { font-size: .84rem; color: #475569; line-height: 1.5; }
 
 /* ══════════════════════════════════════════════════════════════════════════
    AGREEMENT GALLERY (booking flow step)

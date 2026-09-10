@@ -383,6 +383,61 @@ const DEFAULT_CONTRACT_TEMPLATE = {
   ]
 };
 
+const DEFAULT_CONTENT = {
+  announcement: {
+    active: true,
+    textEn: '✨ Special Wedding Season Offer: Book 30+ days in advance & receive a Complimentary 50×80 Gallery Canvas Board!',
+    textAm: '✨ ልዩ የወቅቱ ቅናሽ፡ ከ 30 ቀናት በፊት አስቀድመው ሲመዘገቡ የ 50×80 ሳሎን ጋለሪ ካንቫስ ቦርድ በነጻ ያገኛሉ!',
+    badgeEn: 'Limited Offer',
+    badgeAm: 'ልዩ ቅናሽ'
+  },
+  story: {
+    titleEn: '10+ Years of Pure Cinema & Timeless Moments',
+    titleAm: 'ከ 10 ዓመታት በላይ የዘለቀ ሲኒማቲክ የፍቅር ታሪክ',
+    subtitleEn: "Capturing Ethiopia's finest weddings, heritage, and studio portraits with museum-grade artistic integrity.",
+    subtitleAm: 'የኢትዮጵያ ምርጥ ሰርጎችን፣ ባህላዊ ቅርሶችን እና የስቱዲዮ ፎቶግራፊዎችን በከፍተኛ ጥበባዊ ጥራት እንቀርጻለን።',
+    yearsExp: '10+',
+    weddingsCount: '850+',
+    satisfactionRate: '100%',
+    gearSummary: 'Sony Cinema FX Line & Aputure Studio Rig'
+  },
+  contact: {
+    phone: '09 10 52 69 62',
+    secondaryPhone: '09 11 00 00 00',
+    email: 'contact@hopestudio.et',
+    telegramHandle: '@HoopStudioSystemBot',
+    channelLink: 'https://t.me/hopephotovelo',
+    instagramLink: 'https://instagram.com/hope_photo_velo',
+    addressEn: 'Bole Medhanialem & Hayahulet, Addis Ababa, Ethiopia',
+    addressAm: 'ቦሌ መድሃኒዓለም እና ሃያ ሁለት፣ አዲስ አበባ፣ ኢትዮጵያ',
+    workingHoursEn: 'Mon - Sun: 8:00 AM - 8:00 PM',
+    workingHoursAm: 'ከሰኞ - እሑድ፡ ከጠዋቱ 2:00 - ከምሽቱ 2:00'
+  },
+  faqs: [
+    {
+      id: 'faq-1',
+      qEn: 'How far in advance should we reserve our wedding date?',
+      qAm: 'ለሰርጋችን ቀኑን ምን ያህል ቀደም ብለን መያዝ አለብን?',
+      aEn: 'We recommend reserving at least 1 to 3 months in advance to secure prime dates and our master cinema team.',
+      aAm: 'ተመራጭ ቀኖችን እና ዋናውን የሲኒማ ቡድን ለማስያዝ ቢያንስ ከ1 እስከ 3 ወራት አስቀድመው እንዲይዙ እንመክራለን።'
+    },
+    {
+      id: 'faq-2',
+      qEn: 'What is the deposit and payment schedule?',
+      qAm: 'የቅድሚያ ክፍያ እና የክፍያ ሁኔታው እንዴት ነው?',
+      aEn: 'A 50% deposit secures your date and triggers contract generation. The remaining 50% is settled upon final delivery of master videos and albums.',
+      aAm: '50% ቅድሚያ ክፍያ ቀኑን ያስይዛል እንዲሁም ይፋዊ ውል ያመነጫል። ቀሪው 50% የተጠናቀቁ ቪዲዮዎችና አልበሞች ሲረከቡ ይፈጸማል።'
+    },
+    {
+      id: 'faq-3',
+      qEn: 'Can we customize our package or request custom add-ons?',
+      qAm: 'ፓኬጁን ማስተካከል ወይም ተጨማሪ አገልግሎቶችን ማካተት ይቻላል?',
+      aEn: 'Yes! You can choose from our 9 physical contract packages or use our custom agreement builder in the admin portal to craft any scope.',
+      aAm: 'አዎ! ከ 9ኙ የውል ፓኬጆች መምረጥ ወይም በአስተዳዳሪ ፖርታል በኩል እንደ ፍላጎትዎ የተዘጋጀ ልዩ ውል ማዘጋጀት ይችላሉ።'
+    }
+  ]
+};
+
 let memoryStore = {
   orders: {},
   messages: {},
@@ -401,7 +456,8 @@ let memoryStore = {
     paymentAccounts: DEFAULT_PAYMENT_ACCOUNTS,
     contractTemplate: DEFAULT_CONTRACT_TEMPLATE,
     defaultAgreements9: DEFAULT_AGREEMENTS_9,
-    blackoutDates: ['2026-09-12', '2026-09-13', '2026-09-20']
+    blackoutDates: ['2026-09-12', '2026-09-13', '2026-09-20'],
+    content: DEFAULT_CONTENT
   }
 };
 
@@ -449,6 +505,9 @@ export async function syncFromCloud() {
         }
         if (row.key === 'signed_agreements' && Array.isArray(row.data)) {
           memoryStore.signedAgreements = row.data;
+        }
+        if (row.key === 'settings' && row.data) {
+          memoryStore.settings = { ...memoryStore.settings, ...row.data };
         }
       }
       return; // Loaded successfully from Supabase!
@@ -514,7 +573,8 @@ export async function syncToCloud() {
       { key: 'chats', data: memoryStore.chats || {}, updated_at: new Date().toISOString() },
       { key: 'orders', data: memoryStore.orders || {}, updated_at: new Date().toISOString() },
       { key: 'custom_agreements', data: memoryStore.customAgreements || [], updated_at: new Date().toISOString() },
-      { key: 'signed_agreements', data: memoryStore.signedAgreements || [], updated_at: new Date().toISOString() }
+      { key: 'signed_agreements', data: memoryStore.signedAgreements || [], updated_at: new Date().toISOString() },
+      { key: 'settings', data: memoryStore.settings || {}, updated_at: new Date().toISOString() }
     ];
     await supabase.from('app_store').upsert(upserts);
   } catch (e) {
@@ -554,6 +614,7 @@ export const db = {
   updateSettings(patch) {
     memoryStore.settings = { ...memoryStore.settings, ...patch };
     persistStore();
+    syncToCloud();
     return memoryStore.settings;
   },
   getOrders() {
@@ -749,17 +810,25 @@ export const db = {
     if (!pkg.id) pkg.id = 'pkg-' + Date.now();
     memoryStore.settings.packages = [...(memoryStore.settings.packages || []), pkg];
     persistStore();
+    syncToCloud();
     return memoryStore.settings.packages;
   },
   updatePackage(id, patch) {
     const pkgs = memoryStore.settings.packages || [];
     const idx = pkgs.findIndex(p => p.id === id);
-    if (idx !== -1) { pkgs[idx] = { ...pkgs[idx], ...patch }; memoryStore.settings.packages = [...pkgs]; persistStore(); return pkgs[idx]; }
+    if (idx !== -1) { 
+      pkgs[idx] = { ...pkgs[idx], ...patch }; 
+      memoryStore.settings.packages = [...pkgs]; 
+      persistStore(); 
+      syncToCloud();
+      return pkgs[idx]; 
+    }
     return null;
   },
   deletePackage(id) {
     memoryStore.settings.packages = (memoryStore.settings.packages || []).filter(p => p.id !== id);
     persistStore();
+    syncToCloud();
     return memoryStore.settings.packages;
   }
 };

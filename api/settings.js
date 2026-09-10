@@ -60,13 +60,46 @@ export default async function handler(req, res) {
       if (action === 'update_packages') {
         const { packages } = payload;
         db.updateSettings({ packages });
-        await notifyAdmins(`⚙️ <b>ADMIN UPDATE:</b> Package deliverables & prices updated across the catalog.`);
+        await notifyAdmins(`⚙️ <b>ADMIN UPDATE:</b> Package catalog updated (${packages.length} packages active).`);
         return res.status(200).json({ success: true, packages });
+      }
+
+      if (action === 'add_package') {
+        const { newPackage } = payload;
+        const packages = db.addPackage(newPackage);
+        await notifyAdmins(`📦 <b>NEW PACKAGE ADDED:</b> <b>${newPackage.titleEn || newPackage.titleAm}</b> (${Number(newPackage.price).toLocaleString()} ETB).`);
+        return res.status(200).json({ success: true, packages });
+      }
+
+      if (action === 'update_package') {
+        const { packageId, patch } = payload;
+        const updated = db.updatePackage(packageId, patch);
+        if (updated) {
+          await notifyAdmins(`⚙️ <b>PACKAGE UPDATED:</b> <b>${updated.titleEn || updated.titleAm}</b> (${Number(updated.price).toLocaleString()} ETB).`);
+          return res.status(200).json({ success: true, package: updated, packages: db.getSettings().packages });
+        }
+        return res.status(404).json({ error: 'Package not found' });
+      }
+
+      if (action === 'delete_package') {
+        const { packageId } = payload;
+        const packages = db.deletePackage(packageId);
+        await notifyAdmins(`🗑️ <b>PACKAGE ARCHIVED:</b> ID <code>${packageId}</code> removed from catalog.`);
+        return res.status(200).json({ success: true, packages });
+      }
+
+      if (action === 'update_content') {
+        const { content } = payload;
+        const currentContent = currentSettings.content || {};
+        const mergedContent = { ...currentContent, ...content };
+        const updated = db.updateSettings({ content: mergedContent });
+        await notifyAdmins(`📝 <b>CONTENT UPDATED:</b> Studio content, announcements or FAQs were updated.`);
+        return res.status(200).json({ success: true, content: updated.content });
       }
 
       if (action === 'add_custom_service') {
         const { newService } = payload;
-        const addons = [...currentSettings.addons, newService];
+        const addons = [...(currentSettings.addons || []), newService];
         db.updateSettings({ addons });
         await notifyAdmins(`⚙️ <b>NEW SERVICE ADDED:</b> <b>${newService.name}</b> (+${Number(newService.price).toLocaleString()} ETB).`);
         return res.status(200).json({ success: true, addons });

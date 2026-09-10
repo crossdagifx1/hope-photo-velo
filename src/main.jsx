@@ -7,7 +7,7 @@ import {
   Phone, Play, Plus, Printer, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X, FileText, Download
 } from 'lucide-react';
 import './styles.css';
-import { DEFAULT_AGREEMENTS_9, resolveAgreementForPackage } from './agreementsData.js';
+import { DEFAULT_AGREEMENTS_9, resolveAgreementForPackage, DEFAULT_PACKAGES, DEFAULT_CONTENT } from './agreementsData.js';
 import DocumentStyleAgreement from './DocumentStyleAgreement.jsx';
 
 /* ── CONSTANTS ──────────────────────────────────────────────────────────── */
@@ -1887,6 +1887,27 @@ function AdminControlPanel({ onClose, lang }) {
   const [newBlackout, setNewBlackout]     = useState('');
   const [payDraft, setPayDraft]           = useState(null);
 
+  // Content CMS state
+  const [contentDraft, setContentDraft]   = useState(null);
+  const [activeContentTab, setActiveContentTab] = useState('announcement'); // 'announcement'|'story'|'contact'|'faqs'
+  const [newFaq, setNewFaq]               = useState({ qEn: '', qAm: '', aEn: '', aAm: '' });
+
+  // Packages Catalog Management state
+  const [pkgCategoryFilter, setPkgCategoryFilter] = useState('all');
+  const [showAddPkgModal, setShowAddPkgModal] = useState(false);
+  const [newPkg, setNewPkg]               = useState({
+    titleEn: '', titleAm: '', titleOm: '',
+    category: 'wedding', tier: 'standard', price: 50000,
+    badgeEn: '', badgeAm: '', badgeOm: '',
+    deliverablesEn: ['3 Professional Cameras', 'Highlight Trailer & Cinema Edit', 'All Soft Copies Free'],
+    deliverablesAm: ['3 ካሜራዎች', 'ትሬይለር እና ሙሉ ቪዲዮ', 'ሙሉ ሶፍት ኮፒ በነጻ'],
+    deliverablesOm: ['Kaameraa 3', 'Tireeyilara & Fiilmii', 'Soft copy guutuu']
+  });
+  const [delivEnInput, setDelivEnInput]   = useState('');
+  const [delivAmInput, setDelivAmInput]   = useState('');
+  const [deletePkgConfirmId, setDeletePkgConfirmId] = useState(null);
+  const [newAddon, setNewAddon]           = useState({ name: '', price: 4000, desc: '', active: true });
+
   const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
 
   const checkPin = (e) => {
@@ -1912,6 +1933,7 @@ function AdminControlPanel({ onClose, lang }) {
       setSettings(sRes.settings || {});
       setContractDraft(sRes.settings?.contractTemplate || {});
       setPayDraft(sRes.settings?.paymentAccounts || {});
+      setContentDraft(sRes.settings?.content || DEFAULT_CONTENT);
       setOrders(oRes.orders || []);
       setChats(chatRes.chats || []);
       setDefaultAgr9(agrRes.defaultAgreements || sRes.settings?.defaultAgreements9 || []);
@@ -2093,6 +2115,123 @@ function AdminControlPanel({ onClose, lang }) {
     await patchSettings({ paymentAccounts: payDraft });
   };
 
+  const saveContent = async (sectionKey) => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${apiBase}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'HOPE2026' },
+        body: JSON.stringify({ action: 'update_content', payload: { content: contentDraft } })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setStatus(`✓ ${sectionKey ? sectionKey.toUpperCase() : 'Content'} saved successfully`);
+        setTimeout(() => setStatus(''), 2500);
+      }
+    } catch(e) { setStatus('Save content failed'); }
+    setLoading(false);
+  };
+
+  const handleCreatePackage = async () => {
+    if (!newPkg.titleEn.trim() && !newPkg.titleAm.trim()) return;
+    setLoading(true);
+    try {
+      const pkgToSave = {
+        ...newPkg,
+        id: 'pkg-' + Date.now(),
+        price: Number(newPkg.price) || 0
+      };
+      const r = await fetch(`${apiBase}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'HOPE2026' },
+        body: JSON.stringify({ action: 'add_package', payload: { newPackage: pkgToSave } })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setSettings(s => ({ ...s, packages: d.packages }));
+        setShowAddPkgModal(false);
+        setNewPkg({
+          titleEn: '', titleAm: '', titleOm: '',
+          category: 'wedding', tier: 'standard', price: 50000,
+          badgeEn: '', badgeAm: '', badgeOm: '',
+          deliverablesEn: ['3 Professional Cameras', 'Highlight Trailer & Cinema Edit', 'All Soft Copies Free'],
+          deliverablesAm: ['3 ካሜራዎች', 'ትሬይለር እና ሙሉ ቪዲዮ', 'ሙሉ ሶፍት ኮፒ በነጻ'],
+          deliverablesOm: ['Kaameraa 3', 'Tireeyilara & Fiilmii', 'Soft copy guutuu']
+        });
+        setStatus('✓ New package added to catalog');
+        setTimeout(() => setStatus(''), 2500);
+      }
+    } catch(e) { setStatus('Failed to add package'); }
+    setLoading(false);
+  };
+
+  const handleDeletePackage = async (packageId) => {
+    setLoading(true);
+    try {
+      const r = await fetch(`${apiBase}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'HOPE2026' },
+        body: JSON.stringify({ action: 'delete_package', payload: { packageId } })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setSettings(s => ({ ...s, packages: d.packages }));
+        setDeletePkgConfirmId(null);
+        setStatus('✓ Package removed from catalog');
+        setTimeout(() => setStatus(''), 2500);
+      }
+    } catch(e) { setStatus('Failed to delete package'); }
+    setLoading(false);
+  };
+
+  const handleSavePackageEdit = async () => {
+    if (!editPkg) return;
+    setLoading(true);
+    try {
+      const r = await fetch(`${apiBase}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'HOPE2026' },
+        body: JSON.stringify({ action: 'update_package', payload: { packageId: editPkg.id, patch: editPkg } })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setSettings(s => ({ ...s, packages: d.packages }));
+        setEditPkg(null);
+        setStatus('✓ Package updated');
+        setTimeout(() => setStatus(''), 2500);
+      }
+    } catch(e) { setStatus('Update package failed'); }
+    setLoading(false);
+  };
+
+  const handleAddAddonService = async () => {
+    if (!newAddon.name.trim()) return;
+    setLoading(true);
+    try {
+      const service = { ...newAddon, id: 'addon-' + Date.now(), price: Number(newAddon.price) || 0 };
+      const r = await fetch(`${apiBase}/api/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'HOPE2026' },
+        body: JSON.stringify({ action: 'add_custom_service', payload: { newService: service } })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setSettings(s => ({ ...s, addons: d.addons }));
+        setNewAddon({ name: '', price: 4000, desc: '', active: true });
+        setStatus('✓ Add-on service added');
+        setTimeout(() => setStatus(''), 2500);
+      }
+    } catch(e) { setStatus('Failed to add service'); }
+    setLoading(false);
+  };
+
+  const handleToggleAddon = async (addonId) => {
+    const current = settings?.addons || [];
+    const updated = current.map(a => a.id === addonId ? { ...a, active: !a.active } : a);
+    await patchSettings({ addons: updated });
+    setSettings(s => ({ ...s, addons: updated }));
+  };
+
   const statusColor = (s) => {
     if (s === 'CONFIRMED') return '#22c55e';
     if (s === 'PENDING_VERIFICATION') return '#f59e0b';
@@ -2224,14 +2363,17 @@ function AdminControlPanel({ onClose, lang }) {
               <span className="apt-tab-pill-amber">{chats.reduce((s,c) => s + (c.unreadCount||0), 0)}</span>
             )}
           </button>
+          <button className={`apt-tab ${tab === 'packages' ? 'apt-tab-active' : ''}`} onClick={() => setTab('packages')}>
+            <Star size={16}/> <span>📦 Packages</span>
+          </button>
+          <button className={`apt-tab ${tab === 'content' ? 'apt-tab-active' : ''}`} onClick={() => setTab('content')}>
+            <FileText size={16}/> <span>📝 Content</span>
+          </button>
           <button className={`apt-tab ${tab === 'agreements' ? 'apt-tab-active' : ''}`} onClick={() => setTab('agreements')}>
             <Layers size={16}/> <span>📜 Agreements</span>
           </button>
           <button className={`apt-tab ${tab === 'calendar' ? 'apt-tab-active' : ''}`} onClick={() => setTab('calendar')}>
             <CalendarDays size={16}/> <span>Calendar</span>
-          </button>
-          <button className={`apt-tab ${tab === 'packages' ? 'apt-tab-active' : ''}`} onClick={() => setTab('packages')}>
-            <Star size={16}/> <span>Packages</span>
           </button>
           <button className={`apt-tab ${tab === 'contract' ? 'apt-tab-active' : ''}`} onClick={() => setTab('contract')}>
             <Shield size={16}/> <span>Contract</span>
@@ -2740,25 +2882,58 @@ function AdminControlPanel({ onClose, lang }) {
           </section>
         )}
 
-        {/* ════ TAB 3: PACKAGES & PRICING ════ */}
+        {/* ════ TAB: PACKAGES CATALOG MANAGEMENT ════ */}
         {tab === 'packages' && (
           <section className="apt-tab-section">
-            <div className="apt-card-box">
-              <div className="apt-box-header">
-                <div>
-                  <h4>Service Packages Management</h4>
-                  <p>Update official prices in ETB, tier badges, and client deliverables.</p>
+            {/* Header / Hero */}
+            <div className="apt-section-hero">
+              <div>
+                <h3>📦 Studio Packages & Catalog Management</h3>
+                <p>Add new service packages, update pricing in ETB, customize deliverables, and manage add-on extras.</p>
+              </div>
+              <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.4rem'}} onClick={() => setShowAddPkgModal(true)}>
+                <Plus size={16}/> Add New Package
+              </button>
+            </div>
+
+            {/* Toolbar & Category Filters */}
+            <div className="apt-orders-toolbar">
+              <div style={{display:'flex', alignItems:'center', gap:'.75rem', flexWrap:'wrap'}}>
+                <span style={{fontSize:'.82rem', fontWeight:800, color:'#0f172a'}}>Category Filter:</span>
+                <div className="apt-filter-pills">
+                  {[
+                    { id: 'all', label: `All Packages (${(settings?.packages || DEFAULT_PACKAGES).length})` },
+                    { id: 'wedding', label: `Wedding (${(settings?.packages || DEFAULT_PACKAGES).filter(p=>p.category==='wedding').length})` },
+                    { id: 'studio', label: `Studio (${(settings?.packages || DEFAULT_PACKAGES).filter(p=>p.category==='studio').length})` },
+                    { id: 'mesk', label: `Mesk (${(settings?.packages || DEFAULT_PACKAGES).filter(p=>p.category==='mesk').length})` },
+                    { id: 'commercial', label: `Commercial (${(settings?.packages || DEFAULT_PACKAGES).filter(p=>p.category==='commercial').length})` },
+                  ].map(f => (
+                    <button
+                      key={f.id}
+                      className={`apt-filter-pill ${pkgCategoryFilter === f.id ? 'active' : ''}`}
+                      onClick={() => setPkgCategoryFilter(f.id)}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
                 </div>
               </div>
+            </div>
 
-              <div className="apt-packages-grid">
-                {(settings?.packages || DEFAULT_PACKAGES).map(pkg => (
+            {/* Packages Grid */}
+            <div className="apt-packages-grid">
+              {(settings?.packages || DEFAULT_PACKAGES)
+                .filter(pkg => pkgCategoryFilter === 'all' || pkg.category === pkgCategoryFilter)
+                .map(pkg => (
                   <div key={pkg.id} className="apt-pkg-card">
                     <div className="apt-pkg-top">
                       <div>
-                        <span className="aoc-category-tag">{pkg.category} · {pkg.tier}</span>
-                        <h4>{pkg.titleEn}</h4>
-                        <small className="text-muted">{pkg.titleAm}</small>
+                        <div style={{display:'flex', alignItems:'center', gap:'.4rem'}}>
+                          <span className="aoc-category-tag">{pkg.category}</span>
+                          <span className="aoc-category-tag" style={{background:'#fef3c7', color:'#b45309'}}>{pkg.tier}</span>
+                        </div>
+                        <h4 style={{marginTop:'.4rem'}}>{pkg.titleEn}</h4>
+                        <small style={{color:'#64748b'}}>{pkg.titleAm}</small>
                       </div>
                       <div className="apt-pkg-price-badge">
                         {Number(pkg.price).toLocaleString()} <span>ETB</span>
@@ -2766,36 +2941,104 @@ function AdminControlPanel({ onClose, lang }) {
                     </div>
 
                     <div className="apt-pkg-badge-preview">
-                      Badge: <strong>{pkg.badgeEn || 'None'}</strong>
+                      Badge: <strong>{pkg.badgeEn || 'Standard'}</strong>
+                      {pkg.badgeAm && <span style={{marginLeft:'.4rem', color:'#64748b'}}>({pkg.badgeAm})</span>}
+                    </div>
+
+                    {/* Deliverables List preview */}
+                    <div style={{background:'#f8fafc', borderRadius:'10px', padding:'.75rem .9rem', border:'1px solid #e2e8f0'}}>
+                      <span style={{fontSize:'.72rem', fontWeight:800, color:'#64748b', textTransform:'uppercase', letterSpacing:'.04em'}}>Included Deliverables:</span>
+                      <ul style={{margin:'.4rem 0 0', paddingLeft:'1.2rem', fontSize:'.78rem', color:'#334155', lineHeight:1.5}}>
+                        {(pkg.deliverablesEn || []).slice(0, 4).map((d, i) => (
+                          <li key={i}>{d}</li>
+                        ))}
+                        {(pkg.deliverablesEn || []).length > 4 && (
+                          <li style={{color:'#bd2637', fontWeight:700}}>+ {(pkg.deliverablesEn || []).length - 4} more items...</li>
+                        )}
+                      </ul>
                     </div>
 
                     {editPkg?.id === pkg.id ? (
                       <div className="apt-pkg-edit-form">
-                        <label className="bf-label">Price (ETB)
-                          <input
-                            type="number"
-                            className="bf-input"
-                            value={editPkg.price}
-                            onChange={e => setEditPkg(p => ({...p, price: Number(e.target.value)}))}
-                          />
-                        </label>
-                        <label className="bf-label">Badge Label (EN)
-                          <input
-                            className="bf-input"
-                            value={editPkg.badgeEn || ''}
-                            onChange={e => setEditPkg(p => ({...p, badgeEn: e.target.value}))}
-                          />
-                        </label>
-                        <div className="aoc-card-actions" style={{marginTop:'8px'}}>
-                          <button
-                            className="aoc-btn-approve"
-                            onClick={async () => {
-                              const updated = (settings.packages || DEFAULT_PACKAGES).map(p => p.id === editPkg.id ? editPkg : p);
-                              await patchSettings({ packages: updated });
-                              setSettings(s => ({...s, packages: updated}));
-                              setEditPkg(null);
-                            }}
-                          >
+                        <div className="apt-split-grid" style={{gap:'.75rem'}}>
+                          <label className="bf-label">Title (English)
+                            <input
+                              className="bf-input"
+                              value={editPkg.titleEn || ''}
+                              onChange={e => setEditPkg(p => ({...p, titleEn: e.target.value}))}
+                            />
+                          </label>
+                          <label className="bf-label">Title (Amharic)
+                            <input
+                              className="bf-input"
+                              value={editPkg.titleAm || ''}
+                              onChange={e => setEditPkg(p => ({...p, titleAm: e.target.value}))}
+                            />
+                          </label>
+                        </div>
+                        <div className="apt-split-grid" style={{gap:'.75rem'}}>
+                          <label className="bf-label">Price in ETB
+                            <input
+                              type="number"
+                              className="bf-input"
+                              value={editPkg.price || 0}
+                              onChange={e => setEditPkg(p => ({...p, price: Number(e.target.value)}))}
+                            />
+                          </label>
+                          <label className="bf-label">Badge Label (EN)
+                            <input
+                              className="bf-input"
+                              value={editPkg.badgeEn || ''}
+                              onChange={e => setEditPkg(p => ({...p, badgeEn: e.target.value}))}
+                            />
+                          </label>
+                        </div>
+
+                        {/* Edit deliverables bullets */}
+                        <div style={{marginTop:'.3rem'}}>
+                          <span style={{fontSize:'.75rem', fontWeight:700, color:'#475569'}}>Deliverables (EN):</span>
+                          <div className="apt-deliv-tags">
+                            {(editPkg.deliverablesEn || []).map((del, dIdx) => (
+                              <span key={dIdx} className="apt-deliv-tag">
+                                {del}
+                                <button type="button" onClick={() => {
+                                  const updated = (editPkg.deliverablesEn || []).filter((_, idx) => idx !== dIdx);
+                                  setEditPkg(p => ({ ...p, deliverablesEn: updated }));
+                                }}>×</button>
+                              </span>
+                            ))}
+                          </div>
+                          <div style={{display:'flex', gap:'.4rem', marginTop:'.4rem'}}>
+                            <input
+                              className="bf-input"
+                              placeholder="Add deliverable..."
+                              value={delivEnInput}
+                              onChange={e => setDelivEnInput(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter' && delivEnInput.trim()) {
+                                  e.preventDefault();
+                                  setEditPkg(p => ({ ...p, deliverablesEn: [...(p.deliverablesEn || []), delivEnInput.trim()] }));
+                                  setDelivEnInput('');
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="aoc-btn-discuss"
+                              onClick={() => {
+                                if (delivEnInput.trim()) {
+                                  setEditPkg(p => ({ ...p, deliverablesEn: [...(p.deliverablesEn || []), delivEnInput.trim()] }));
+                                  setDelivEnInput('');
+                                }
+                              }}
+                            >
+                              Add
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="aoc-card-actions" style={{marginTop:'10px'}}>
+                          <button className="aoc-btn-approve" onClick={handleSavePackageEdit}>
                             <Check size={14}/> Save Changes
                           </button>
                           <button className="aoc-btn-reject" onClick={() => setEditPkg(null)}>
@@ -2804,14 +3047,748 @@ function AdminControlPanel({ onClose, lang }) {
                         </div>
                       </div>
                     ) : (
-                      <button className="apt-edit-btn" onClick={() => setEditPkg({...pkg})}>
-                        <Edit2 size={13}/> Edit Price &amp; Badge
-                      </button>
+                      <div style={{display:'flex', gap:'.5rem', marginTop:'.5rem'}}>
+                        <button className="apt-edit-btn" style={{flex:1}} onClick={() => setEditPkg({...pkg})}>
+                          <Edit2 size={13}/> Edit Package
+                        </button>
+                        <button
+                          className="aoc-btn-reject"
+                          style={{padding:'.45rem .75rem', borderRadius:'8px', fontSize:'.75rem'}}
+                          onClick={() => setDeletePkgConfirmId(pkg.id)}
+                          title="Archive / Delete Package"
+                        >
+                          <Trash2 size={13}/>
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
+            </div>
+
+            {/* Add-on Services Catalog Manager */}
+            <div className="apt-card-box" style={{marginTop:'1.5rem'}}>
+              <div className="apt-box-header">
+                <div>
+                  <h4>✨ Add-on Extra Services Catalog</h4>
+                  <p>Manage optional creative enhancements (Drone, Extra Operator, Rush Video, Deluxe Wall Board, Makeup).</p>
+                </div>
+              </div>
+
+              <div className="apt-packages-grid">
+                {(settings?.addons || []).map(addon => (
+                  <div key={addon.id} className="apt-pkg-card" style={{border: addon.active ? '1px solid #e2e8f0' : '1px dashed #cbd5e1', opacity: addon.active ? 1 : 0.65}}>
+                    <div className="apt-pkg-top">
+                      <div>
+                        <h4 style={{fontSize:'.95rem'}}>{addon.name}</h4>
+                        <p style={{margin:'.2rem 0 0', fontSize:'.78rem', color:'#64748b'}}>{addon.desc}</p>
+                      </div>
+                      <div className="apt-pkg-price-badge" style={{fontSize:'1rem'}}>
+                        +{Number(addon.price).toLocaleString()} <span>ETB</span>
+                      </div>
+                    </div>
+                    <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'.5rem', borderTop:'1px solid #f1f5f9', paddingTop:'.6rem'}}>
+                      <label className="apt-cms-toggle">
+                        <input
+                          type="checkbox"
+                          checked={!!addon.active}
+                          onChange={() => handleToggleAddon(addon.id)}
+                        />
+                        <span>{addon.active ? 'Active on booking' : 'Disabled'}</span>
+                      </label>
+                      <button
+                        className="aoc-btn-reject"
+                        style={{padding:'.3rem .6rem', fontSize:'.72rem', borderRadius:'6px'}}
+                        onClick={async () => {
+                          const updated = (settings?.addons || []).filter(a => a.id !== addon.id);
+                          await patchSettings({ addons: updated });
+                          setSettings(s => ({ ...s, addons: updated }));
+                        }}
+                      >
+                        <Trash2 size={12}/> Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Add New Service Form */}
+              <div style={{background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:'14px', padding:'1.25rem', marginTop:'1rem'}}>
+                <h5 style={{margin:'0 0 .8rem', fontSize:'.9rem', fontWeight:800, color:'#0f172a'}}>+ Add New Add-on Service</h5>
+                <div className="apt-split-grid" style={{gridTemplateColumns:'2fr 1fr', gap:'.75rem'}}>
+                  <label className="bf-label">Service Title
+                    <input
+                      className="bf-input"
+                      placeholder="e.g. Helicopter Cinema View"
+                      value={newAddon.name}
+                      onChange={e => setNewAddon(a => ({...a, name: e.target.value}))}
+                    />
+                  </label>
+                  <label className="bf-label">Price (ETB)
+                    <input
+                      type="number"
+                      className="bf-input"
+                      value={newAddon.price}
+                      onChange={e => setNewAddon(a => ({...a, price: Number(e.target.value)}))}
+                    />
+                  </label>
+                </div>
+                <label className="bf-label" style={{marginTop:'.75rem'}}>Service Description
+                  <input
+                    className="bf-input"
+                    placeholder="Short description shown to clients during booking"
+                    value={newAddon.desc}
+                    onChange={e => setNewAddon(a => ({...a, desc: e.target.value}))}
+                  />
+                </label>
+                <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1rem'}}>
+                  <button className="admin-lock-btn" style={{width:'auto', padding:'.55rem 1.25rem'}} onClick={handleAddAddonService}>
+                    <Plus size={14}/> Add Service
+                  </button>
+                </div>
               </div>
             </div>
+
+            {/* Modal: Add New Package */}
+            {showAddPkgModal && (
+              <div className="apt-modal-backdrop" onClick={() => setShowAddPkgModal(false)}>
+                <div className="apt-modal-card" onClick={e => e.stopPropagation()}>
+                  <div className="apt-modal-header">
+                    <h3>📦 Create New Service Package</h3>
+                    <button className="apt-modal-close" onClick={() => setShowAddPkgModal(false)}><X size={20}/></button>
+                  </div>
+                  <div className="apt-modal-body">
+                    <div className="apt-split-grid" style={{gap:'1rem'}}>
+                      <label className="bf-label">Category
+                        <select
+                          className="bf-input"
+                          value={newPkg.category}
+                          onChange={e => setNewPkg(p => ({...p, category: e.target.value}))}
+                        >
+                          <option value="wedding">Wedding (የሰርግ)</option>
+                          <option value="studio">Studio (የስቱዲዮ)</option>
+                          <option value="mesk">Mesk (የመስክ)</option>
+                          <option value="commercial">Commercial (ንግድ)</option>
+                        </select>
+                      </label>
+                      <label className="bf-label">Tier
+                        <select
+                          className="bf-input"
+                          value={newPkg.tier}
+                          onChange={e => setNewPkg(p => ({...p, tier: e.target.value}))}
+                        >
+                          <option value="basic">Basic</option>
+                          <option value="standard">Standard</option>
+                          <option value="premium">Premium</option>
+                          <option value="vip">VIP / Royal</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="apt-split-grid" style={{gap:'1rem'}}>
+                      <label className="bf-label">Title (English) *
+                        <input
+                          className="bf-input"
+                          placeholder="e.g. Royal Diamond Cinema Suite"
+                          value={newPkg.titleEn}
+                          onChange={e => setNewPkg(p => ({...p, titleEn: e.target.value}))}
+                        />
+                      </label>
+                      <label className="bf-label">Title (Amharic) *
+                        <input
+                          className="bf-input"
+                          placeholder="ለምሳሌ፡ ሮያል ዳይመንድ ሲኒማ ሱዊት"
+                          value={newPkg.titleAm}
+                          onChange={e => setNewPkg(p => ({...p, titleAm: e.target.value}))}
+                        />
+                      </label>
+                    </div>
+
+                    <div className="apt-split-grid" style={{gap:'1rem'}}>
+                      <label className="bf-label">Price in ETB *
+                        <input
+                          type="number"
+                          className="bf-input"
+                          placeholder="e.g. 85000"
+                          value={newPkg.price}
+                          onChange={e => setNewPkg(p => ({...p, price: Number(e.target.value)}))}
+                        />
+                      </label>
+                      <label className="bf-label">Badge Label (EN)
+                        <input
+                          className="bf-input"
+                          placeholder="e.g. Most Popular, Grand Keepsake"
+                          value={newPkg.badgeEn}
+                          onChange={e => setNewPkg(p => ({...p, badgeEn: e.target.value}))}
+                        />
+                      </label>
+                    </div>
+
+                    {/* Deliverables Builder */}
+                    <div>
+                      <span style={{fontSize:'.82rem', fontWeight:800, color:'#0f172a'}}>Package Deliverables List:</span>
+                      <div className="apt-deliv-tags">
+                        {(newPkg.deliverablesEn || []).map((item, idx) => (
+                          <span key={idx} className="apt-deliv-tag">
+                            ✓ {item}
+                            <button type="button" onClick={() => {
+                              const updated = (newPkg.deliverablesEn || []).filter((_, i) => i !== idx);
+                              setNewPkg(p => ({...p, deliverablesEn: updated}));
+                            }}>×</button>
+                          </span>
+                        ))}
+                      </div>
+                      <div style={{display:'flex', gap:'.5rem', marginTop:'.5rem'}}>
+                        <input
+                          className="bf-input"
+                          placeholder="Type deliverable (e.g. 4K Drone Coverage) and click Add..."
+                          value={delivEnInput}
+                          onChange={e => setDelivEnInput(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && delivEnInput.trim()) {
+                              e.preventDefault();
+                              setNewPkg(p => ({...p, deliverablesEn: [...(p.deliverablesEn||[]), delivEnInput.trim()]}));
+                              setDelivEnInput('');
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="aoc-btn-discuss"
+                          onClick={() => {
+                            if (delivEnInput.trim()) {
+                              setNewPkg(p => ({...p, deliverablesEn: [...(p.deliverablesEn||[]), delivEnInput.trim()]}));
+                              setDelivEnInput('');
+                            }
+                          }}
+                        >
+                          + Add Item
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="apt-modal-footer">
+                    <button className="apt-btn-secondary" onClick={() => setShowAddPkgModal(false)}>Cancel</button>
+                    <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.5rem'}} onClick={handleCreatePackage}>
+                      <Check size={16}/> Publish Package
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Modal: Delete Package Confirmation */}
+            {deletePkgConfirmId && (
+              <div className="apt-modal-backdrop" onClick={() => setDeletePkgConfirmId(null)}>
+                <div className="apt-modal-card" style={{maxWidth:'450px'}} onClick={e => e.stopPropagation()}>
+                  <div className="apt-modal-header">
+                    <h3>Confirm Archive / Delete</h3>
+                    <button className="apt-modal-close" onClick={() => setDeletePkgConfirmId(null)}><X size={18}/></button>
+                  </div>
+                  <div className="apt-modal-body" style={{textAlign:'center', padding:'2rem 1.5rem'}}>
+                    <div style={{width:'50px', height:'50px', borderRadius:'50%', background:'#fee2e2', color:'#dc2626', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1rem'}}>
+                      <Trash2 size={24}/>
+                    </div>
+                    <h4 style={{margin:'0 0 .5rem', fontSize:'1.05rem', color:'#0f172a'}}>Remove Package from Studio Catalog?</h4>
+                    <p style={{margin:0, fontSize:'.84rem', color:'#64748b', lineHeight:1.5}}>
+                      This package will no longer be selectable on the public booking flow or contracts.
+                    </p>
+                  </div>
+                  <div className="apt-modal-footer" style={{justifyContent:'center', gap:'1rem'}}>
+                    <button className="apt-btn-secondary" onClick={() => setDeletePkgConfirmId(null)}>Cancel</button>
+                    <button className="aoc-btn-reject" style={{padding:'.6rem 1.4rem'}} onClick={() => handleDeletePackage(deletePkgConfirmId)}>
+                      Yes, Delete Package
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* ════ TAB: CONTENT MANAGEMENT (CMS) ════ */}
+        {tab === 'content' && contentDraft && (
+          <section className="apt-tab-section">
+            {/* Header / Hero */}
+            <div className="apt-section-hero">
+              <div>
+                <h3>📝 Studio Content Management System (CMS)</h3>
+                <p>Customize real-time announcement banners, studio about story, official contact details, and bilingual FAQs.</p>
+              </div>
+              <a href="/" target="_blank" rel="noopener noreferrer" className="apt-btn-secondary" style={{textDecoration:'none'}}>
+                <ExternalLink size={14}/> View Live Website
+              </a>
+            </div>
+
+            {/* Sub navigation pills */}
+            <div className="apt-filter-pills" style={{background:'#ffffff', padding:'.75rem 1rem', borderRadius:'14px', border:'1px solid #e2e8f0'}}>
+              {[
+                { id: 'announcement', label: '📢 Announcement Banner' },
+                { id: 'story', label: '📖 Studio Story & Metrics' },
+                { id: 'contact', label: '📍 Contact & Social Channels' },
+                { id: 'faqs', label: '❓ Bilingual FAQ Manager' }
+              ].map(sub => (
+                <button
+                  key={sub.id}
+                  className={`apt-filter-pill ${activeContentTab === sub.id ? 'active' : ''}`}
+                  onClick={() => setActiveContentTab(sub.id)}
+                >
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            {/* SECTION 1: ANNOUNCEMENT BANNER */}
+            {activeContentTab === 'announcement' && (
+              <div className="apt-cms-card">
+                <div className="apt-cms-head">
+                  <h4>📢 Top Announcement Bar</h4>
+                  <label className="apt-cms-toggle">
+                    <input
+                      type="checkbox"
+                      checked={!!contentDraft.announcement?.active}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        announcement: { ...(c.announcement || {}), active: e.target.checked }
+                      }))}
+                    />
+                    <span>{contentDraft.announcement?.active ? '🟢 Banner Enabled' : '⚪ Banner Hidden'}</span>
+                  </label>
+                </div>
+
+                {/* Live Visitor Preview */}
+                <div>
+                  <span style={{fontSize:'.75rem', fontWeight:800, color:'#64748b', textTransform:'uppercase'}}>Visitor Live Preview:</span>
+                  <div className="apt-live-preview" style={{marginTop:'.35rem'}}>
+                    <span className="apt-preview-badge">{contentDraft.announcement?.badgeEn || 'Limited Offer'}</span>
+                    <span className="apt-preview-text">{contentDraft.announcement?.textEn || 'Announcement text preview'}</span>
+                  </div>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Badge Label (English)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.announcement?.badgeEn || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        announcement: { ...(c.announcement || {}), badgeEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Badge Label (Amharic)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.announcement?.badgeAm || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        announcement: { ...(c.announcement || {}), badgeAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <label className="bf-label">Announcement Message (English)
+                  <textarea
+                    rows="2"
+                    className="bf-input"
+                    value={contentDraft.announcement?.textEn || ''}
+                    onChange={e => setContentDraft(c => ({
+                      ...c,
+                      announcement: { ...(c.announcement || {}), textEn: e.target.value }
+                    }))}
+                  />
+                </label>
+
+                <label className="bf-label">Announcement Message (Amharic)
+                  <textarea
+                    rows="2"
+                    className="bf-input"
+                    value={contentDraft.announcement?.textAm || ''}
+                    onChange={e => setContentDraft(c => ({
+                      ...c,
+                      announcement: { ...(c.announcement || {}), textAm: e.target.value }
+                    }))}
+                  />
+                </label>
+
+                <div style={{display:'flex', justifyContent:'flex-end'}}>
+                  <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('announcement')}>
+                    💾 Save Announcement Bar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 2: STUDIO STORY & METRICS */}
+            {activeContentTab === 'story' && (
+              <div className="apt-cms-card">
+                <div className="apt-cms-head">
+                  <h4>📖 Studio Story, Experience & Key Metrics</h4>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Story Heading (English)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.story?.titleEn || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), titleEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Story Heading (Amharic)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.story?.titleAm || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), titleAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Story Subtitle / Mission (English)
+                    <textarea
+                      rows="3"
+                      className="bf-input"
+                      value={contentDraft.story?.subtitleEn || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), subtitleEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Story Subtitle / Mission (Amharic)
+                    <textarea
+                      rows="3"
+                      className="bf-input"
+                      value={contentDraft.story?.subtitleAm || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), subtitleAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <h5 style={{margin:'.5rem 0 .2rem', fontSize:'.9rem', fontWeight:800, color:'#0f172a'}}>Studio Metric Counters</h5>
+                <div className="apt-split-grid" style={{gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))'}}>
+                  <label className="bf-label">Years of Experience
+                    <input
+                      className="bf-input"
+                      placeholder="e.g. 10+"
+                      value={contentDraft.story?.yearsExp || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), yearsExp: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Weddings & Events
+                    <input
+                      className="bf-input"
+                      placeholder="e.g. 850+"
+                      value={contentDraft.story?.weddingsCount || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), weddingsCount: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Satisfaction Rate
+                    <input
+                      className="bf-input"
+                      placeholder="e.g. 100%"
+                      value={contentDraft.story?.satisfactionRate || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), satisfactionRate: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Master Cinema Equipment
+                    <input
+                      className="bf-input"
+                      placeholder="e.g. Sony Cinema FX & Aputure"
+                      value={contentDraft.story?.gearSummary || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        story: { ...(c.story || {}), gearSummary: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1rem'}}>
+                  <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('story')}>
+                    💾 Save Story & Metrics
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 3: CONTACT & SOCIAL CHANNELS */}
+            {activeContentTab === 'contact' && (
+              <div className="apt-cms-card">
+                <div className="apt-cms-head">
+                  <h4>📍 Studio Contact Details & Social Links</h4>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Primary Studio Phone
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.phone || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), phone: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Secondary / Director Phone
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.secondaryPhone || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), secondaryPhone: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Official Email
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.email || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), email: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Telegram Bot Username
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.telegramHandle || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), telegramHandle: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Telegram Channel Link
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.channelLink || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), channelLink: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Instagram Profile Link
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.instagramLink || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), instagramLink: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Physical Studio Location (English)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.addressEn || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), addressEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Physical Studio Location (Amharic)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.addressAm || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), addressAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div className="apt-split-grid">
+                  <label className="bf-label">Working Hours (English)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.workingHoursEn || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), workingHoursEn: e.target.value }
+                      }))}
+                    />
+                  </label>
+                  <label className="bf-label">Working Hours (Amharic)
+                    <input
+                      className="bf-input"
+                      value={contentDraft.contact?.workingHoursAm || ''}
+                      onChange={e => setContentDraft(c => ({
+                        ...c,
+                        contact: { ...(c.contact || {}), workingHoursAm: e.target.value }
+                      }))}
+                    />
+                  </label>
+                </div>
+
+                <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1rem'}}>
+                  <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('contact')}>
+                    💾 Save Contact Info
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* SECTION 4: BILINGUAL FAQS */}
+            {activeContentTab === 'faqs' && (
+              <div className="apt-cms-card">
+                <div className="apt-cms-head">
+                  <h4>❓ Bilingual Studio FAQ Manager ({contentDraft.faqs?.length || 0})</h4>
+                </div>
+
+                <div className="apt-faq-list">
+                  {(contentDraft.faqs || []).map((faq, fIdx) => (
+                    <div key={faq.id || fIdx} className="apt-faq-item">
+                      <div className="apt-faq-q">
+                        <span>Q0{fIdx + 1}: {faq.qEn}</span>
+                        <button
+                          className="aoc-btn-reject"
+                          style={{padding:'.25rem .55rem', fontSize:'.72rem', borderRadius:'6px'}}
+                          onClick={() => {
+                            const updated = (contentDraft.faqs || []).filter((_, i) => i !== fIdx);
+                            setContentDraft(c => ({...c, faqs: updated}));
+                          }}
+                        >
+                          <Trash2 size={12}/>
+                        </button>
+                      </div>
+                      <div className="apt-split-grid" style={{gap:'.75rem'}}>
+                        <input
+                          className="bf-input"
+                          placeholder="Question in English"
+                          value={faq.qEn || ''}
+                          onChange={e => {
+                            const faqs = [...contentDraft.faqs];
+                            faqs[fIdx] = { ...faqs[fIdx], qEn: e.target.value };
+                            setContentDraft(c => ({...c, faqs}));
+                          }}
+                        />
+                        <input
+                          className="bf-input"
+                          placeholder="ጥያቄው በአማርኛ"
+                          value={faq.qAm || ''}
+                          onChange={e => {
+                            const faqs = [...contentDraft.faqs];
+                            faqs[fIdx] = { ...faqs[fIdx], qAm: e.target.value };
+                            setContentDraft(c => ({...c, faqs}));
+                          }}
+                        />
+                      </div>
+                      <div className="apt-split-grid" style={{gap:'.75rem'}}>
+                        <textarea
+                          rows="2"
+                          className="bf-input"
+                          placeholder="Answer in English"
+                          value={faq.aEn || ''}
+                          onChange={e => {
+                            const faqs = [...contentDraft.faqs];
+                            faqs[fIdx] = { ...faqs[fIdx], aEn: e.target.value };
+                            setContentDraft(c => ({...c, faqs}));
+                          }}
+                        />
+                        <textarea
+                          rows="2"
+                          className="bf-input"
+                          placeholder="መልሱ በአማርኛ"
+                          value={faq.aAm || ''}
+                          onChange={e => {
+                            const faqs = [...contentDraft.faqs];
+                            faqs[fIdx] = { ...faqs[fIdx], aAm: e.target.value };
+                            setContentDraft(c => ({...c, faqs}));
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Add New FAQ Card */}
+                <div style={{background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:'14px', padding:'1.25rem', marginTop:'1rem'}}>
+                  <h5 style={{margin:'0 0 .8rem', fontSize:'.9rem', fontWeight:800, color:'#0f172a'}}>+ Add New FAQ</h5>
+                  <div className="apt-split-grid" style={{gap:'.75rem'}}>
+                    <input
+                      className="bf-input"
+                      placeholder="New Question (English)"
+                      value={newFaq.qEn}
+                      onChange={e => setNewFaq(f => ({...f, qEn: e.target.value}))}
+                    />
+                    <input
+                      className="bf-input"
+                      placeholder="አዲስ ጥያቄ (አማርኛ)"
+                      value={newFaq.qAm}
+                      onChange={e => setNewFaq(f => ({...f, qAm: e.target.value}))}
+                    />
+                  </div>
+                  <div className="apt-split-grid" style={{gap:'.75rem', marginTop:'.75rem'}}>
+                    <textarea
+                      rows="2"
+                      className="bf-input"
+                      placeholder="Answer (English)"
+                      value={newFaq.aEn}
+                      onChange={e => setNewFaq(f => ({...f, aEn: e.target.value}))}
+                    />
+                    <textarea
+                      rows="2"
+                      className="bf-input"
+                      placeholder="መልስ (አማርኛ)"
+                      value={newFaq.aAm}
+                      onChange={e => setNewFaq(f => ({...f, aAm: e.target.value}))}
+                    />
+                  </div>
+                  <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1rem'}}>
+                    <button
+                      className="aoc-btn-discuss"
+                      onClick={() => {
+                        if (newFaq.qEn.trim() || newFaq.qAm.trim()) {
+                          const item = { ...newFaq, id: 'faq-' + Date.now() };
+                          setContentDraft(c => ({ ...c, faqs: [...(c.faqs || []), item] }));
+                          setNewFaq({ qEn: '', qAm: '', aEn: '', aAm: '' });
+                        }
+                      }}
+                    >
+                      + Add to FAQ List
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1.5rem'}}>
+                  <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('faqs')}>
+                    💾 Save All FAQs
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
         )}
 

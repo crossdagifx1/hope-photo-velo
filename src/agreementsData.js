@@ -323,3 +323,70 @@ export function resolveAgreementForPackage(pkg, agreementsList) {
 
   return list[0];
 }
+
+export const DEFAULT_PACKAGES = [
+  { id: 'studio-session', category: 'studio', tier: 'basic', badgeEn: 'Most Popular', badgeAm: 'ተመራጭ', badgeOm: 'Filatamaa', titleEn: 'Studio Session', titleAm: 'የስቱዲዮ ቀረጻ', titleOm: 'Waraabbii Istuudiyoo', price: 10000, deliverablesEn: ['20 Print Photos', '10 Post Photos', 'Professional Makeup', '150 Soft Copies'], deliverablesAm: ['20 ፕሪንት ፎቶዎች', '10 ፖስት ፎቶዎች', 'ሜካፕ የተካተተ', '150 ሶፍት ኮፒዎች'], deliverablesOm: ['Suuraalee maxxanfamani 20', 'Suuraalee poostii 10', 'Meek-aappii waliin', 'Soft copy 150'] },
+  { id: 'studio-event', category: 'studio', tier: 'standard', badgeEn: 'Best Value', badgeAm: 'ተመራጭ ዋጋ', badgeOm: 'Gatii Gaarii', titleEn: 'Event Coverage', titleAm: 'የክስተት ሽፋን', titleOm: 'Haguggii Qophii', price: 14500, deliverablesEn: ['200 Thank-You Cards', '40×60 Board Photo', 'Professional Makeup', '10 Post Photos', '150 Soft Copies'], deliverablesAm: ['የምስጋና ካርዶች (200 ፍሬ)', '40×60 ቦርድ ፎቶ', 'ሜካፕ የተካተተ', '10 ፖስት ፎቶዎች', '150 ሶፍት ኮፒዎች'], deliverablesOm: ['Kaardii Galataa (200)', 'Suuraa Boordii 40×60', 'Meek-aappii waliin', 'Suuraalee poostii 10', 'Soft copy 150'] },
+  { id: 'studio-production', category: 'studio', tier: 'premium', badgeEn: 'Best Choice', badgeAm: 'ምርጥ ምርጫ', badgeOm: 'Filannoo Olaanaa', titleEn: 'Full Production Suite', titleAm: 'ሙሉ ፕሮዳክሽን', titleOm: 'Oomisha Guutuu', price: 18500, deliverablesEn: ['30×45 Laminate Album (10/20 Page)', '1 Sign Board', '200 Thank-You Cards', 'Professional Makeup', '150 Soft Copies'], deliverablesAm: ['30×45 ላሚኔት አልበም (10/20 ገጽ)', '1 ሳይን ቦርድ', 'የምስጋና ካርዶች', 'ሜካፕ የተካተተ', '150 ሶፍት ኮፒዎች'], deliverablesOm: ['Albaama Laamineetii 30×45', 'Boordii Mallattoo 1', 'Kaardii Galataa', 'Meek-aappii', 'Soft copy 150'] },
+  { id: 'wedding-bronze', category: 'wedding', tier: 'basic', badgeEn: 'Essential Cinema', badgeAm: 'መሰረታዊ ሲኒማ', badgeOm: 'Sinimaa Bu\'uuraa', titleEn: 'Bronze Package', titleAm: 'የሰርግ ብሮንዝ ቪዲዮ', titleOm: 'Paakeejii Biriinzi', price: 45000, deliverablesEn: ['2 Professional Cameras', 'Ronin Gimbal Stabilization', 'Ameran Light System', 'Highlight Trailer & Cinema Edit', 'Color Grading', 'All Soft Copies Free'], deliverablesAm: ['2 ካሜራዎች', 'ሮኒን ጊምባል', 'አመራን ላይት', 'ትሬይለር / ቪዲዮ ኤዲቲንግ', 'ከለር ግሬዲንግ', 'ሙሉ ሶፍት ኮፒ በነጻ'], deliverablesOm: ['Kaameraa 2', 'Rooniin Giimbaal', 'Ibsaa Amaraan', 'Tireeyilara / fiilmii', 'Kalar gireediingii', 'Soft copy guutuu'] },
+  { id: 'wedding-silver', category: 'wedding', tier: 'standard', badgeEn: 'Most Popular', badgeAm: 'ተመራጭ', badgeOm: 'Filatamaa', titleEn: 'Silver Package', titleAm: 'የሰርግ ሲልቨር ቪዲዮ', titleOm: 'Paakeejii Siilvarii', price: 60000, deliverablesEn: ['3 Professional Cameras', 'Ronin Gimbal Stabilization', 'Ameran Lighting Setup', 'Trailer & Full Cinema Video', 'Color Grading', '40×60 Board Photo', 'All Soft Copies Free'], deliverablesAm: ['3 ካሜራዎች', 'ሮኒን ጊምባል', 'አመራን ላይት', 'ትሬይለር / ቪዲዮ ኤዲቲንግ', 'ከለር ግሬዲንግ', '40×60 ቦርድ ፎቶ', 'ሙሉ ሶፍት ኮፒ በነጻ'], deliverablesOm: ['Kaameraa 3', 'Rooniin Giimbaal', 'Ibsaa Amaraan', 'Tireeyilara & Fiilmii', 'Kalar gireediingii', 'Boordii 40×60', 'Soft copy guutuu'] },
+  { id: 'wedding-golden-plus', category: 'wedding', tier: 'premium', badgeEn: 'Ultimate Royal Suite', badgeAm: 'ልዩ የንግሥና ሱዊት', badgeOm: 'Muuxannoo Mootii', titleEn: 'Golden Plus Suite', titleAm: 'ጎልደን ፕላስ ሱዊት', titleOm: 'Paakeejii Warqee Pilaas', price: 75000, deliverablesEn: ['4 Professional Cameras', 'Ronin Gimbal System', 'Ameran Cinema Light', 'Trailer & Full Cinema Edit', 'Color Grading', '30×90 Laminate Album', '50×80 Wall Board', '40×60 Board Photo', 'All Soft Copies Free'], deliverablesAm: ['4 ካሜራዎች', 'ሮኒን ጊምባል', 'አመራን ላይት', 'ትሬይለር / ቪዲዮ ኤዲቲንግ', 'ከለር ግሬዲንግ', '30×90 ላሚኔት አልበም', '50×80 ቦርድ', '40×60 ቦርድ', 'ሙሉ ሶፍት ኮፒ በነጻ'], deliverablesOm: ['Kaameraa 4', 'Rooniin Giimbaal', 'Ibsaa Amaraan', 'Tireeyilara & Fiilmii', 'Kalar gireediingii', 'Albaama 30×90', 'Boordii 50×80', 'Boordii 40×60', 'Soft copy guutuu'] },
+  { id: 'mesk-session', category: 'mesk', tier: 'basic', badgeEn: 'Essential Mesk', badgeAm: 'የመስክ መነሻ', badgeOm: 'Dirree Bu\'uuraa', titleEn: 'Mesk Video Session', titleAm: 'የመስክ ቪዲዮ ቀረጻ', titleOm: 'Waraabbii Dirree', price: 16000, deliverablesEn: ['Cinematic Mesk Video', '1 Sign Board Photo', '150 High-Res Soft Copies', 'Color Grading & Cinematic Master'], deliverablesAm: ['የመስክ ቪዲዮ', '1 ሳይን ቦርድ', '150 ሶፍት ኮፒዎች', 'ከለር ግሬዲንግ'], deliverablesOm: ['Viidiyoo Dirree', 'Boordii Mallattoo 1', 'Soft copy 150', 'Kalar gireediingii'] },
+  { id: 'mesk-album', category: 'mesk', tier: 'standard', badgeEn: 'Best Value', badgeAm: 'ተመራጭ', badgeOm: 'Filatamaa', titleEn: 'Mesk Video & Album', titleAm: 'የመስክ ቪዲዮ እና አልበም', titleOm: 'Viidiyoo fi Albaama Dirree', price: 20000, deliverablesEn: ['Cinematic Mesk Video', '30×45 Laminate Album', '1 Sign Board', '150 Soft Copies', 'Cinematic Sound Design'], deliverablesAm: ['የመስክ ቪዲዮ', '30×45 ላሚኔት አልበም', '1 ሳይን ቦርድ', '150 ሶፍት ኮፒዎች', 'ድምፅ እና ከለር ቅንብር'], deliverablesOm: ['Viidiyoo Dirree', 'Albaama Laamineetii 30×45', 'Boordii Mallattoo 1', 'Soft copy 150', 'Qindoomina sagalee'] },
+  { id: 'mesk-grand-keepsake', category: 'mesk', tier: 'premium', badgeEn: 'Grand Keepsake', badgeAm: 'የዘላቂ ቅርስ ሱዊት', badgeOm: 'Seenaa Bara Baraan', titleEn: 'Grand Keepsake Suite', titleAm: 'ግራንድ ኪፕሴክ ሱዊት', titleOm: 'Paakeejii Giraand Kiippiseek', price: 23000, deliverablesEn: ['30×90 Laminate Album (10/20 Page)', '50×80 Wall Board', '1 Sign Board Photo', '200 Thank-You Cards', '5 Save-the-Date Photos', '150 Soft Copies Free'], deliverablesAm: ['30×90 ላሚኔት አልበም (10/20 ገጽ)', '50×80 የሳሎን ግድግዳ ቦርድ', '1 ሳይን ቦርድ', '200 የምስጋና ካርዶች', '5 ሴቭ ዘ ዴት ፎቶዎች', '150 ሶፍት ኮፒዎች'], deliverablesOm: ['Albaama Laamineetii 30×90', 'Boordii Girgiddaa 50×80', 'Boordii Mallattoo 1', 'Kaardii Galataa 200', 'Suuraalee Qophii 5', 'Soft copy 150'] },
+];
+
+export const DEFAULT_CONTENT = {
+  announcement: {
+    active: true,
+    textEn: '✨ Special Wedding Season Offer: Book 30+ days in advance & receive a Complimentary 50×80 Gallery Canvas Board!',
+    textAm: '✨ ልዩ የወቅቱ ቅናሽ፡ ከ 30 ቀናት በፊት አስቀድመው ሲመዘገቡ የ 50×80 ሳሎን ጋለሪ ካንቫስ ቦርድ በነጻ ያገኛሉ!',
+    badgeEn: 'Limited Offer',
+    badgeAm: 'ልዩ ቅናሽ'
+  },
+  story: {
+    titleEn: '10+ Years of Pure Cinema & Timeless Moments',
+    titleAm: 'ከ 10 ዓመታት በላይ የዘለቀ ሲኒማቲክ የፍቅር ታሪክ',
+    subtitleEn: "Capturing Ethiopia's finest weddings, heritage, and studio portraits with museum-grade artistic integrity.",
+    subtitleAm: 'የኢትዮጵያ ምርጥ ሰርጎችን፣ ባህላዊ ቅርሶችን እና የስቱዲዮ ፎቶግራፊዎችን በከፍተኛ ጥበባዊ ጥራት እንቀርጻለን።',
+    yearsExp: '10+',
+    weddingsCount: '850+',
+    satisfactionRate: '100%',
+    gearSummary: 'Sony Cinema FX Line & Aputure Studio Rig'
+  },
+  contact: {
+    phone: '09 10 52 69 62',
+    secondaryPhone: '09 11 00 00 00',
+    email: 'contact@hopestudio.et',
+    telegramHandle: '@HoopStudioSystemBot',
+    channelLink: 'https://t.me/hopephotovelo',
+    instagramLink: 'https://instagram.com/hope_photo_velo',
+    addressEn: 'Bole Medhanialem & Hayahulet, Addis Ababa, Ethiopia',
+    addressAm: 'ቦሌ መድሃኒዓለም እና ሃያ ሁለት፣ አዲስ አበባ፣ ኢትዮጵያ',
+    workingHoursEn: 'Mon - Sun: 8:00 AM - 8:00 PM',
+    workingHoursAm: 'ከሰኞ - እሑድ፡ ከጠዋቱ 2:00 - ከምሽቱ 2:00'
+  },
+  faqs: [
+    {
+      id: 'faq-1',
+      qEn: 'How far in advance should we reserve our wedding date?',
+      qAm: 'ለሰርጋችን ቀኑን ምን ያህል ቀደም ብለን መያዝ አለብን?',
+      aEn: 'We recommend reserving at least 1 to 3 months in advance to secure prime dates and our master cinema team.',
+      aAm: 'ተመራጭ ቀኖችን እና ዋናውን የሲኒማ ቡድን ለማስያዝ ቢያንስ ከ1 እስከ 3 ወራት አስቀድመው እንዲይዙ እንመክራለን።'
+    },
+    {
+      id: 'faq-2',
+      qEn: 'What is the deposit and payment schedule?',
+      qAm: 'የቅድሚያ ክፍያ እና የክፍያ ሁኔታው እንዴት ነው?',
+      aEn: 'A 50% deposit secures your date and triggers contract generation. The remaining 50% is settled upon final delivery of master videos and albums.',
+      aAm: '50% ቅድሚያ ክፍያ ቀኑን ያስይዛል እንዲሁም ይፋዊ ውል ያመነጫል። ቀሪው 50% የተጠናቀቁ ቪዲዮዎችና አልበሞች ሲረከቡ ይፈጸማል።'
+    },
+    {
+      id: 'faq-3',
+      qEn: 'Can we customize our package or request custom add-ons?',
+      qAm: 'ፓኬጁን ማስተካከል ወይም ተጨማሪ አገልግሎቶችን ማካተት ይቻላል?',
+      aEn: 'Yes! You can choose from our 9 physical contract packages or use our custom agreement builder in the admin portal to craft any scope.',
+      aAm: 'አዎ! ከ 9ኙ የውል ፓኬጆች መምረጥ ወይም በአስተዳዳሪ ፖርታል በኩል እንደ ፍላጎትዎ የተዘጋጀ ልዩ ውል ማዘጋጀት ይችላሉ።'
+    }
+  ]
+};
