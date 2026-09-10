@@ -1,3 +1,4 @@
+import { supabase } from './_supabase.js';
 // Shared Data Store & Telegram Utility for HOPE Studio
 import fs from 'fs';
 import path from 'path';
@@ -426,6 +427,37 @@ try {
 const CLOUD_SYNC_URL = 'https://api.restful-api.dev/objects/ff808181a067127101a0897f96e95fef';
 
 export async function syncFromCloud() {
+  // ── 1. PRIMARY: Supabase PostgreSQL Database ──
+  try {
+    const { data: rows, error } = await supabase.from('app_store').select('*');
+    if (!error && Array.isArray(rows) && rows.length > 0) {
+      if (!memoryStore.chats) memoryStore.chats = {};
+      if (!memoryStore.orders) memoryStore.orders = {};
+      for (const row of rows) {
+        if (row.key === 'chats' && row.data) {
+          for (const [cid, chat] of Object.entries(row.data)) {
+            memoryStore.chats[cid] = chat;
+          }
+        }
+        if (row.key === 'orders' && row.data) {
+          for (const [oid, ord] of Object.entries(row.data)) {
+            memoryStore.orders[oid] = ord;
+          }
+        }
+        if (row.key === 'custom_agreements' && Array.isArray(row.data)) {
+          memoryStore.customAgreements = row.data;
+        }
+        if (row.key === 'signed_agreements' && Array.isArray(row.data)) {
+          memoryStore.signedAgreements = row.data;
+        }
+      }
+      return; // Loaded successfully from Supabase!
+    }
+  } catch (e) {
+    console.warn('[SUPABASE] syncFromCloud fallback:', e.message);
+  }
+
+  // ── 2. FALLBACK: REST Sync Object ──
   try {
     const res = await fetch(CLOUD_SYNC_URL);
     if (res.ok) {
@@ -476,6 +508,20 @@ export async function syncFromCloud() {
 }
 
 export async function syncToCloud() {
+  // ── 1. PRIMARY: Write to Supabase PostgreSQL Database ──
+  try {
+    const upserts = [
+      { key: 'chats', data: memoryStore.chats || {}, updated_at: new Date().toISOString() },
+      { key: 'orders', data: memoryStore.orders || {}, updated_at: new Date().toISOString() },
+      { key: 'custom_agreements', data: memoryStore.customAgreements || [], updated_at: new Date().toISOString() },
+      { key: 'signed_agreements', data: memoryStore.signedAgreements || [], updated_at: new Date().toISOString() }
+    ];
+    await supabase.from('app_store').upsert(upserts);
+  } catch (e) {
+    console.warn('[SUPABASE] syncToCloud error:', e.message);
+  }
+
+  // ── 2. FALLBACK: REST Sync Object ──
   try {
     await fetch(CLOUD_SYNC_URL, {
       method: 'PUT',
