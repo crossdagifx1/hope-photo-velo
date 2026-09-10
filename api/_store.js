@@ -463,6 +463,12 @@ export async function syncFromCloud() {
           }
         }
       }
+      if (Array.isArray(json.data?.customAgreements)) {
+        memoryStore.customAgreements = json.data.customAgreements;
+      }
+      if (Array.isArray(json.data?.signedAgreements)) {
+        memoryStore.signedAgreements = json.data.signedAgreements;
+      }
     }
   } catch (e) {
     console.warn('[CLOUD_SYNC] read error:', e.message);
@@ -478,7 +484,9 @@ export async function syncToCloud() {
         name: 'hope_studio_master_store',
         data: {
           chats: memoryStore.chats || {},
-          orders: memoryStore.orders || {}
+          orders: memoryStore.orders || {},
+          customAgreements: memoryStore.customAgreements || [],
+          signedAgreements: memoryStore.signedAgreements || []
         }
       })
     });

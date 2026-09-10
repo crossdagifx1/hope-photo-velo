@@ -7,3 +7,4 @@ chrome-check-profile
 *.local
 
 .vercel
+.env*

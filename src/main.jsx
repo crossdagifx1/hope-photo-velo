@@ -1928,11 +1928,22 @@ function AdminControlPanel({ onClose, lang }) {
   // Real-time live sync polling for client questions from Telegram Bot
   useEffect(() => {
     if (!unlocked || tab !== 'chats') return;
-    const pollInterval = setInterval(() => {
+
+    const fetchLatest = () => {
       fetch(`${apiBase}/api/chat?list=1`)
         .then(r => r.json())
         .then(d => {
-          if (Array.isArray(d?.chats)) setChats(d.chats);
+          if (Array.isArray(d?.chats)) {
+            setChats(d.chats);
+            setActiveChat(prev => {
+              if (!prev && d.chats.length > 0) return d.chats[0];
+              if (prev) {
+                const updated = d.chats.find(c => c.chatId === prev.chatId);
+                return updated || prev;
+              }
+              return null;
+            });
+          }
         })
         .catch(() => {});
 
@@ -1946,8 +1957,10 @@ function AdminControlPanel({ onClose, lang }) {
           })
           .catch(() => {});
       }
-    }, 3500);
+    };
 
+    fetchLatest();
+    const pollInterval = setInterval(fetchLatest, 3000);
     return () => clearInterval(pollInterval);
   }, [unlocked, tab, activeChat?.chatId]);
 
@@ -2627,6 +2640,19 @@ function AdminControlPanel({ onClose, lang }) {
                         <a href={`tel:${o.phone}`} className="aoc-btn-call">
                           <Phone size={14}/> Call Client
                         </a>
+                        {(o.telegramChatId || o.telegramUserId || chats.some(c => c.orderId === o.id || c.chatId === o.telegramUserId)) && (
+                          <button
+                            className="aoc-btn-discuss"
+                            style={{borderColor: '#22c55e', color: '#22c55e'}}
+                            onClick={() => {
+                              const targetId = o.telegramChatId || o.telegramUserId || chats.find(c => c.orderId === o.id || c.chatId === o.telegramUserId)?.chatId;
+                              setTab('chats');
+                              if (targetId) loadChat(targetId);
+                            }}
+                          >
+                            <MessageCircle size={15}/> View Telegram Chat
+                          </button>
+                        )}
                       </div>
                     </article>
                   );
@@ -3598,9 +3624,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = (!loaded || bookingPkg || showAdmin) ? 'hidden' : '';
+    if (showAdmin || signId) {
+      document.body.style.overflow = '';
+      return () => { document.body.style.overflow = ''; };
+    }
+    document.body.style.overflow = (!loaded || bookingPkg) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [loaded, bookingPkg, showAdmin]);
+  }, [loaded, bookingPkg, showAdmin, signId]);
 
   const openBooking = (pkg = null) => {
     setBookingPkg(pkg || PACKAGES_BY_CATEGORY.wedding[0]);

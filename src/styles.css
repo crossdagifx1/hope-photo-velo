@@ -2294,6 +2294,8 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   display: flex; flex-direction: column;
   font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   box-sizing: border-box;
+  overflow-y: visible !important;
+  position: relative;
 }
 
 /* ── Top Executive Bar ── */
@@ -2886,7 +2888,7 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .admin-chat-sidebar-header {
@@ -3058,7 +3060,7 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 460px;
+  max-height: 680px;
   overflow-y: auto;
   padding-right: 4px;
 }

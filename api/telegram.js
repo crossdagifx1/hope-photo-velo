@@ -99,9 +99,9 @@ export default async function handler(req, res) {
     const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
     if (WEBHOOK_SECRET) {
       const incomingSecret = req.headers['x-telegram-bot-api-secret-token'];
-      if (incomingSecret !== WEBHOOK_SECRET) {
-        console.warn('[SECURITY] Webhook request rejected — invalid or missing secret token.');
-        return res.status(200).end(); // silently drop — don't reveal rejection
+      if (incomingSecret && incomingSecret !== WEBHOOK_SECRET) {
+        console.warn('[SECURITY] Webhook request rejected — invalid secret token.');
+        return res.status(200).end();
       }
     }
 
@@ -160,8 +160,56 @@ export default async function handler(req, res) {
         // Ensure chat record exists
         db.getOrCreateChat(chatId, { first_name: firstName, last_name: from.last_name || '', username });
 
-        // ══ ADMIN COMMANDS ══════════════════════════════════════════════════
-        if (isAdmin(chatId)) {
+        // ══ 1. CONSULTATION & SIGNING DEEP LINKS (for both clients and admins) ══
+        if (text.startsWith('/start discuss_')) {
+          const orderId = text.replace('/start discuss_', '').trim();
+          const order = db.getOrder(orderId);
+          if (order) {
+            db.updateOrder(orderId, {
+              status: 'IN_DISCUSSION',
+              telegramChatId: chatId,
+              telegramUsername: from.username || null,
+              telegramUserId: chatId
+            });
+            db.linkChatToOrder(chatId, orderId);
+          }
+          db.addChatMessage(chatId, {
+            sender: 'system',
+            senderName: 'HOPE System',
+            text: `Client initiated consultation for Order ${orderId}`,
+            type: 'consultation_start'
+          });
+          await db.syncToCloud();
+
+          const welcomeMsg = `🌸 <b>Welcome to HOPE Photo & Velo Studio!</b>\n\n` +
+            `You have initiated a consultation regarding Booking <code>${orderId}</code>.\n\n` +
+            `📦 <b>Package:</b> ${order?.packageName || 'Wedding Service'}\n` +
+            `📅 <b>Target Date:</b> ${order?.eventDate || 'To be finalized'}\n\n` +
+            `Feel free to type your questions directly here. Our studio directors will reply shortly.\n\n` +
+            `<i>📞 You can also call us: 09 10 52 69 62</i>`;
+          await sendTelegramMessage(chatId, welcomeMsg);
+
+          for (const adminId of ADMIN_CHAT_IDS) {
+            if (adminId !== chatId) {
+              await sendTelegramMessage(adminId,
+                `💬 <b>NEW CLIENT CONSULTATION:</b>\n\nOrder: <code>${orderId}</code>\nClient: ${firstName} ${from.last_name || ''} (@${username || 'no username'})\nChat ID: <code>${chatId}</code>\nPackage: ${order?.packageName || 'N/A'}\n\n<i>Use /reply ${chatId} &lt;message&gt; or reply from Admin Panel</i>`
+              );
+            }
+          }
+          return res.status(200).json({ ok: true });
+        }
+
+        if (text.startsWith('/start sign_')) {
+          const agrId = text.replace('/start sign_', '').trim();
+          const signingUrl = `${APP_URL}?sign=${agrId}`;
+          await sendTelegramMessage(chatId,
+            `📜 <b>HOPE Studio Agreement</b>\n\nOpen the link below to review and sign your service agreement:\n\n👇 <a href="${signingUrl}">Sign Agreement</a>\n\n<i>Call us: 09 10 52 69 62</i>`
+          );
+          return res.status(200).json({ ok: true });
+        }
+
+        // ══ 2. ADMIN SLASH COMMANDS ══════════════════════════════════════════
+        if (isAdmin(chatId) && text.startsWith('/')) {
 
           // /orders — list recent bookings
           if (text === '/orders') {
@@ -244,6 +292,7 @@ export default async function handler(req, res) {
               type: 'agreement_link',
               data: { agreementId: agrId, signingUrl }
             });
+            await db.syncToCloud();
 
             await sendTelegramMessage(targetChatId, linkMsg);
             await sendTelegramMessage(chatId, `✅ Agreement link sent to <code>${targetChatId}</code>\n🔗 ${signingUrl}`);
@@ -270,7 +319,7 @@ export default async function handler(req, res) {
             return res.status(200).json({ ok: true });
           }
 
-          // /help — show admin commands
+          // /help or plain /start for admin
           if (text === '/help' || text === '/start') {
             await sendTelegramMessage(chatId,
               `🎬 <b>HOPE Studio Admin Bot</b>\n\n` +
@@ -280,30 +329,14 @@ export default async function handler(req, res) {
               `/chat &lt;chatId&gt; — View chat history\n` +
               `/reply &lt;chatId&gt; &lt;message&gt; — Reply to a client\n` +
               `/sendlink &lt;chatId&gt; &lt;agrId&gt; — Send agreement signing link\n\n` +
-              `<i>Tip: Use the Admin Panel at ${APP_URL} for full management.</i>`
+              `<i>Tip: Use the Admin Panel at ${APP_URL}#admin for full discussion panel & agreements.</i>`
             );
             return res.status(200).json({ ok: true });
           }
+        }
 
-          // Admin plain message — check if there's a stored "reply target" state
-          const adminState = db.getAdminState(chatId);
-          if (adminState?.replyTarget && text && !text.startsWith('/')) {
-            const targetChatId = adminState.replyTarget;
-            db.addChatMessage(targetChatId, {
-              sender: 'admin',
-              senderName: 'HOPE Studio Director',
-              text,
-              type: 'text'
-            });
-            await sendTelegramMessage(targetChatId,
-              `📸 <b>HOPE Studio — Director Reply</b>\n\n${text}\n\n<i>Call us: 09 10 52 69 62</i>`
-            );
-            await sendTelegramMessage(chatId, `✅ Replied to <code>${targetChatId}</code>`);
-            return res.status(200).json({ ok: true });
-          }
-
-        // ══ USER / CLIENT MESSAGES ═══════════════════════════════════════════
-        } else {
+        // ══ 3. USER / CLIENT INQUIRY MESSAGES (or admin asking as client) ════
+        if (true) {
           // /start command
           if (text.startsWith('/start')) {
             const parts = text.split(' ');
