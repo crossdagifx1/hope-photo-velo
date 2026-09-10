@@ -4,9 +4,11 @@ import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
   ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Copy, CreditCard, Edit2, ExternalLink,
   Eye, Film, Globe, Heart, Layers, Lock, LogOut, MapPin, Menu, MessageCircle, Package, Pencil,
-  Phone, Play, Plus, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X,
+  Phone, Play, Plus, Printer, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X, FileText, Download
 } from 'lucide-react';
 import './styles.css';
+import { DEFAULT_AGREEMENTS_9, resolveAgreementForPackage } from './agreementsData.js';
+import DocumentStyleAgreement from './DocumentStyleAgreement.jsx';
 
 /* ── CONSTANTS ──────────────────────────────────────────────────────────── */
 const PHONE_DISPLAY     = '09 10 52 69 62';
@@ -995,8 +997,26 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
   const basePrice = parseInt((selectedPackage?.price || '0').toString().replace(/[^0-9]/g, ''), 10) || 0;
   const addonsTotal = addons.reduce((s, a) => s + (a.price || 0), 0);
   const totalPrice = basePrice + addonsTotal;
-  const deposit = Math.round(totalPrice * 0.3);
+  const deposit = Math.round(totalPrice * 0.5);
   const remaining = totalPrice - deposit;
+
+  // ── Agreement template state — each plan has its own agreement automatically ──
+  const [defaultAgreements9, setDefaultAgreements9] = useState(DEFAULT_AGREEMENTS_9);
+  const [selectedAgrTemplate, setSelectedAgrTemplate] = useState(() => resolveAgreementForPackage(selectedPackage, DEFAULT_AGREEMENTS_9));
+
+  useEffect(() => {
+    const matched = resolveAgreementForPackage(selectedPackage, defaultAgreements9);
+    setSelectedAgrTemplate(matched);
+    fetch(`${apiBase}/api/agreements?defaults=1`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.agreements && d.agreements.length > 0) {
+          setDefaultAgreements9(d.agreements);
+          setSelectedAgrTemplate(resolveAgreementForPackage(selectedPackage, d.agreements));
+        }
+      })
+      .catch(() => {});
+  }, [selectedPackage]);
 
   // Load settings on mount
   useEffect(() => {
@@ -1068,12 +1088,17 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     setStep(2);
   };
 
-  // Proceed to Contract (Option A)
-  const handleProceedContract = () => setStep(3);
+  // Proceed directly to Contract step with plan's own agreement — do not ask user to pick again
+  const handleProceedContract = () => {
+    const matched = resolveAgreementForPackage(selectedPackage, defaultAgreements9);
+    setSelectedAgrTemplate(matched);
+    setStep(3);
+  };
 
-  // Proceed to Discussion (Option B)
+  // Proceed to Discussion (Option B) — user requested: "when i ask must directly go to bot and i have to ask on tg bot"
   const handleDiscussion = async () => {
     setSubmitting(true);
+    let orderId = 'HOPE-' + Math.floor(1000 + Math.random() * 9000);
     try {
       const r = await fetch(`${apiBase}/api/orders`, {
         method: 'POST',
@@ -1086,9 +1111,18 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
         })
       });
       const data = await r.json();
-      setCreatedOrder(data.order);
-    } catch(err) { /* fallback order id */ setCreatedOrder({ id: 'HOPE-' + Math.floor(1000 + Math.random() * 9000) }); }
+      if (data?.order?.id) orderId = data.order.id;
+      setCreatedOrder(data?.order || { id: orderId });
+    } catch(err) {
+      setCreatedOrder({ id: orderId });
+    }
     setSubmitting(false);
+
+    // Directly open Telegram Bot for instant discussion
+    const tgUrl = `https://t.me/HoopStudioSystemBot?start=discuss_${orderId}`;
+    try {
+      window.open(tgUrl, '_blank');
+    } catch(e) {}
     setStep(5);
   };
 
@@ -1150,11 +1184,68 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
   const stepLabel = {
     1: lang === 'am' ? '1. ዝርዝርና ቀን' : '1. Details & Date',
     2: lang === 'am' ? '2. አማራጭ ምረጥ' : '2. Choose Path',
+    'agr-gallery': lang === 'am' ? '📋 ውል ዓይነት ምረጥ' : '📋 Choose Agreement',
     3: lang === 'am' ? '3. ውል' : '3. Contract',
     4: lang === 'am' ? '4. ክፍያ' : '4. Payment',
     5: lang === 'am' ? 'ውይይት' : 'Discussion',
     6: lang === 'am' ? '✅ ተረጋግጧል' : '✅ Submitted',
   };
+
+  // ── Agreement gallery renderer ──
+  const renderAgreementGallery = () => (
+    <div className="bf-step-body">
+      <div className="agr-gallery-header">
+        <h3 className="agr-gallery-title">
+          {lang === 'am' ? '📋 የ HOPE ስምምነት ዓይነቶች' : '📋 HOPE Agreement Templates'}
+        </h3>
+        <p className="agr-gallery-sub">
+          {lang === 'am'
+            ? 'ለፓኬጅዎ ተስማሚ የሆነ ስምምነት ይምረጡ። አስተዳዳሪያዊ ማሻሻያ ማድረግ ይቻላል።'
+            : 'Select the agreement template that matches your package. Admin can customize before signing.'}
+        </p>
+      </div>
+      <div className="agr-gallery-grid">
+        {defaultAgreements9.map((agr) => (
+          <button
+            key={agr.id}
+            type="button"
+            className={`agr-gallery-card ${selectedAgrTemplate?.id === agr.id ? 'agr-card-selected' : ''}`}
+            onClick={() => { setSelectedAgrTemplate(agr); }}
+          >
+            <div className="agr-card-top">
+              <span className="agr-card-cat">{agr.category?.toUpperCase()}</span>
+              <span className="agr-card-price">{(agr.price || 0).toLocaleString()} ETB</span>
+            </div>
+            <h4 className="agr-card-name">{agr.name}</h4>
+            <p className="agr-card-pkg">{agr.packageTitle}</p>
+            <ul className="agr-card-list">
+              {(agr.deliverables || []).slice(0, 5).map((d, i) => (
+                <li key={i}><Check size={10}/> {d}</li>
+              ))}
+              {(agr.deliverables || []).length > 5 && <li className="agr-more">+{(agr.deliverables || []).length - 5} more...</li>}
+            </ul>
+            {selectedAgrTemplate?.id === agr.id && (
+              <div className="agr-card-selected-badge"><Check size={14}/> Selected</div>
+            )}
+          </button>
+        ))}
+      </div>
+      <div className="agr-gallery-actions">
+        <button type="button" className="bf-back-btn" onClick={() => setStep(2)}>← Back</button>
+        <button
+          type="button"
+          className="bf-primary-btn"
+          onClick={() => setStep(3)}
+          disabled={!selectedAgrTemplate}
+        >
+          {lang === 'am' ? 'ቀጥል ወደ ፊርማ →' : 'Continue to Sign →'}
+        </button>
+      </div>
+      {!selectedAgrTemplate && (
+        <p className="agr-select-hint">{lang === 'am' ? 'ከላይ ያለውን ስምምነት ይምረጡ' : 'Please select an agreement template above'}</p>
+      )}
+    </div>
+  );
 
   const toggleAddon = (addon) => {
     setAddons(prev => prev.find(a => a.id === addon.id) ? prev.filter(a => a.id !== addon.id) : [...prev, addon]);
@@ -1268,71 +1359,48 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
 
         <button type="button" className="bf-fork-card bf-fork-discuss" onClick={handleDiscussion} disabled={submitting}>
           <div className="bf-fork-icon"><MessageCircle size={28}/></div>
-          <h4>{lang === 'am' ? 'ቀጥሎ ውይይት ማድረግ' : 'Request Discussion'}</h4>
-          <p>{lang === 'am' ? 'ፍላጎቶችዎን ለማብራራት ልምዱ ካለው ቡድናችን ጋር ምክር ያግኙ።' : 'Speak with our team to customize your package, schedule, and details.'}</p>
+          <h4>{lang === 'am' ? 'በቴሌግራም ቦት ይጠይቁ' : 'Ask on Telegram Bot'}</h4>
+          <p>{lang === 'am' ? 'ቀጥታ ወደ ይፋዊ ቴሌግራም ቦት በመሄድ ከስቱዲዮ ዳይሬክተሩ ጋር ይወያዩ ወይም ይጠይቁ።' : 'Go directly to our official Telegram bot to ask questions and discuss with the studio director.'}</p>
           <ul>
-            <li><Check size={12}/> {lang === 'am' ? 'ያለ ቅድሚ ክፍያ' : 'No upfront payment'}</li>
-            <li><Check size={12}/> {lang === 'am' ? 'ፓኬጅ ማስተካከያ' : 'Custom package options'}</li>
-            <li><Check size={12}/> {lang === 'am' ? 'ፈጣን ምላሽ' : 'Quick response'}</li>
+            <li><Check size={12}/> {lang === 'am' ? 'ቀጥታ ውይይት በቴሌግራም' : 'Direct Telegram bot chat'}</li>
+            <li><Check size={12}/> {lang === 'am' ? 'ያለ ቅድመ ክፍያ መጠየቅ' : 'No upfront deposit required'}</li>
+            <li><Check size={12}/> {lang === 'am' ? 'ፈጣን ምላሽ ከዳይሬክተር' : 'Instant response from director'}</li>
           </ul>
-          <span className="bf-fork-cta">{submitting ? '...' : (lang === 'am' ? 'ውይይት ጠይቅ →' : 'Request Discussion →')}</span>
+          <span className="bf-fork-cta">{submitting ? '...' : (lang === 'am' ? 'በቴሌግራም ቦት ይጠይቁ →' : 'Ask on Telegram Bot →')}</span>
         </button>
       </div>
       <button type="button" className="bf-back-btn" onClick={() => setStep(1)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
     </div>
   );
 
-  // ── STEP 3: Contract + Signature ──
+  // ── STEP 3: Document-Style Legal Agreement + Signature ──
+  const activeAgreement = selectedAgrTemplate || resolveAgreementForPackage(selectedPackage, defaultAgreements9);
+
   const renderStep3 = () => (
     <div className="bf-step-body">
-      <div className="bf-contract-header">
-        <Shield size={20} className="bf-contract-icon"/>
-        <div>
-          <h3 className="bf-contract-title">{contractTitle}</h3>
-          <p className="bf-contract-meta">
-            {form.name} • {form.date} • {pkgName}
-          </p>
-        </div>
-      </div>
+      <DocumentStyleAgreement
+        agreement={activeAgreement}
+        clientName={form.name}
+        phone={form.phone}
+        eventDate={form.date}
+        location={form.location || 'Addis Ababa'}
+        totalPrice={totalPrice}
+        depositAmount={deposit}
+        remainingBalance={remaining}
+        signature={signature}
+        onSign={setSignature}
+        onClearSignature={() => setSignature(null)}
+        lang={lang}
+        orderId={createdOrder?.id}
+      />
 
-      <div className="bf-price-breakdown">
-        <div className="bf-price-row">
-          <span>{lang === 'am' ? 'ጠቅላላ ዋጋ' : 'Total Investment'}</span>
-          <strong>{totalPrice.toLocaleString()} ETB</strong>
-        </div>
-        <div className="bf-price-row bf-deposit-row">
-          <span>{lang === 'am' ? '30% ቅድሚ ክፍያ (አሁን)' : '30% Advance Deposit (Now)'}</span>
-          <strong className="bf-deposit-amt">{deposit.toLocaleString()} ETB</strong>
-        </div>
-        <div className="bf-price-row">
-          <span>{lang === 'am' ? 'ቀሪ ክፍያ (ማስረከቢያ ላይ)' : 'Remaining Balance (on delivery)'}</span>
-          <strong>{remaining.toLocaleString()} ETB</strong>
-        </div>
-      </div>
-
-      <div className="bf-contract-scroll">
-        {Array.isArray(contractClauses) ? contractClauses.map((c, i) => (
-          <div key={i} className="bf-clause">
-            <h5 className="bf-clause-heading">{c.heading}</h5>
-            <p className="bf-clause-body">{c.body}</p>
-          </div>
-        )) : <p style={{color:'#999'}}>{contractClauses}</p>}
-        <p className="bf-clause-version">Version {contractTpl?.termsVersion || 'v3.2-2026'}</p>
-      </div>
-
-      <div className="bf-sig-section">
-        <p className="bf-sig-label"><Pencil size={13}/> {lang === 'am' ? 'የደምበኛ ፊርማ' : 'Client Signature'}</p>
-        <SignaturePad onSign={setSignature} onClear={() => setSignature(null)}/>
-        {signature && <p className="bf-sig-ok"><Check size={13}/> {lang === 'am' ? 'ፊርማ ተቀብሏል' : 'Signature captured'}</p>}
-      </div>
-
-      <label className="bf-terms-check">
-        <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)}/>
-        <span>{lang === 'am' ? 'ሁሉንም ውሎች እና ቅድሚ ክፍያ ሁኔታ ተቀብያለሁ' : 'I accept all terms, conditions, and the 30% advance deposit requirement'}</span>
+      <label className="bf-terms-check doc-no-print" style={{ marginTop: '16px' }}>
+        <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} />
+        <span>{lang === 'am' ? 'ሁሉንም የውል አንቀጾች እና የ 50% ቅድመ ክፍያ ሁኔታ ተቀብያለሁ' : 'I accept all agreement terms, conditions, and the 50% advance deposit schedule'}</span>
       </label>
 
-      {error && <p className="bf-error">{error}</p>}
-      <div className="bf-btn-row">
+      {error && <p className="bf-error doc-no-print">{error}</p>}
+      <div className="bf-btn-row doc-no-print">
         <button type="button" className="bf-back-btn" onClick={() => setStep(2)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
         <button type="button" className="bf-primary-btn" onClick={handleContractNext}>
           {lang === 'am' ? 'ወደ ክፍያ ቀጥሉ' : 'Proceed to Payment'} <ChevronRight size={16}/>
@@ -1439,12 +1507,16 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     </form>
   );
 
-  // ── STEP 5: Discussion Confirmation ──
+  // ── STEP 5: Discussion / Question on TG Bot ──
   const renderStep5 = () => (
     <div className="bf-step-body bf-confirm">
       <div className="bf-confirm-icon discuss"><MessageCircle size={38}/></div>
-      <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Discussion Request Received!'}</h3>
-      <p className="bf-confirm-sub">{lang === 'am' ? 'የHOPE ቡድን አባላት ወደ ቴሌፎንዎ ይደውሉልዎታል።' : 'Our team will contact you shortly to customize your package and schedule.'}</p>
+      <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Inquiry Registered!'}</h3>
+      <p className="bf-confirm-sub">
+        {lang === 'am'
+          ? 'ከታች ያለውን ቁልፍ በመጫን በቴሌግራም ቦት በቀጥታ መወያየት ይችላሉ። ዳይሬክተሮቻችን ወዲያውኑ ይመልሳሉ።'
+          : 'Please chat directly with our studio director on our official Telegram bot below.'}
+      </p>
       <div className="bf-confirm-detail-box">
         <div className="bf-confirm-row"><span>👤</span><strong>{form.name}</strong></div>
         <div className="bf-confirm-row"><span>📞</span><strong>{form.phone}</strong></div>
@@ -1452,10 +1524,23 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
         <div className="bf-confirm-row"><span>📦</span><strong>{pkgName}</strong></div>
         <div className="bf-confirm-row"><span>🔖</span><code>{createdOrder?.id}</code></div>
       </div>
-      <a className="bf-primary-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center'}}>
-        <Phone size={16}/> {lang === 'am' ? 'አሁን ደወሉ' : 'Call Us Now'}
+
+      {/* Primary Telegram CTA */}
+      <a
+        className="bf-primary-btn bf-tg-btn"
+        href={`https://t.me/HoopStudioSystemBot?start=discuss_${createdOrder?.id || 'new'}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{textDecoration:'none',justifyContent:'center',background:'linear-gradient(135deg, #0088cc, #00b4d8)',marginBottom:'10px'}}
+      >
+        <Send size={18}/> {lang === 'am' ? '💬 በቴሌግራም ቦት በቀጥታ ይጠይቁ' : '💬 Ask on Telegram Bot Directly'}
       </a>
-      <button type="button" className="bf-back-btn" style={{marginTop:'8px'}} onClick={onClose}>
+
+      <a className="bf-back-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center',marginBottom:'8px'}}>
+        <Phone size={15}/> {lang === 'am' ? '📞 በስልክ ይደውሉ: 09 10 52 69 62' : '📞 Call Us: 09 10 52 69 62'}
+      </a>
+
+      <button type="button" className="bf-back-btn" onClick={onClose}>
         {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
       </button>
     </div>
@@ -1750,10 +1835,11 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
           </div>
           <button className="bf-close-btn" aria-label="Close" onClick={onClose}><X size={20}/></button>
         </div>
-        {step <= 4 && renderStepIndicator()}
+        {(step === 1 || step === 2 || step === 3 || step === 4) && renderStepIndicator()}
         <div className="bf-panel-scroll">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
+          {step === 'agr-gallery' && renderAgreementGallery()}
           {step === 3 && renderStep3()}
           {step === 4 && renderStep4()}
           {step === 5 && renderStep5()}
@@ -1772,7 +1858,7 @@ function AdminControlPanel({ onClose, lang }) {
   const [pin, setPin]                     = useState('');
   const [unlocked, setUnlocked]           = useState(false);
   const [pinError, setPinError]           = useState(false);
-  const [tab, setTab]                     = useState('orders'); // 'orders' | 'calendar' | 'packages' | 'contract' | 'accounts'
+  const [tab, setTab]                     = useState('orders'); // 'orders'|'chats'|'agreements'|'calendar'|'packages'|'contract'|'accounts'
   const [settings, setSettings]           = useState(null);
   const [orders, setOrders]               = useState([]);
   const [loading, setLoading]             = useState(false);
@@ -1780,6 +1866,20 @@ function AdminControlPanel({ onClose, lang }) {
   const [searchQuery, setSearchQuery]     = useState('');
   const [statusFilter, setStatusFilter]   = useState('all');
   const [receiptModalImg, setReceiptModalImg] = useState(null);
+
+  // Chat state
+  const [chats, setChats]                 = useState([]);
+  const [activeChat, setActiveChat]       = useState(null);
+  const [chatMessages, setChatMessages]   = useState([]);
+  const [chatReplyText, setChatReplyText] = useState('');
+  const [chatSending, setChatSending]     = useState(false);
+
+  // Agreements state
+  const [defaultAgr9, setDefaultAgr9]     = useState([]);
+  const [customAgrs, setCustomAgrs]       = useState([]);
+  const [signedAgrs, setSignedAgrs]       = useState([]);
+  const [editingAgr, setEditingAgr]       = useState(null);
+  const [sendingAgrLink, setSendingAgrLink] = useState(false);
 
   // Edit states
   const [editPkg, setEditPkg]             = useState(null);
@@ -1803,20 +1903,128 @@ function AdminControlPanel({ onClose, lang }) {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [sRes, oRes] = await Promise.all([
+      const [sRes, oRes, chatRes, agrRes] = await Promise.all([
         fetch(`${apiBase}/api/settings`).then(r => r.json()),
-        fetch(`${apiBase}/api/orders`).then(r => r.json())
+        fetch(`${apiBase}/api/orders`).then(r => r.json()),
+        fetch(`${apiBase}/api/chat?list=1`).then(r => r.json()).catch(() => ({ chats: [] })),
+        fetch(`${apiBase}/api/agreements?list=1`).then(r => r.json()).catch(() => ({ defaultAgreements: [], customAgreements: [], signedAgreements: [] })),
       ]);
       setSettings(sRes.settings || {});
       setContractDraft(sRes.settings?.contractTemplate || {});
       setPayDraft(sRes.settings?.paymentAccounts || {});
       setOrders(oRes.orders || []);
+      setChats(chatRes.chats || []);
+      setDefaultAgr9(agrRes.defaultAgreements || sRes.settings?.defaultAgreements9 || []);
+      setCustomAgrs(agrRes.customAgreements || []);
+      setSignedAgrs(agrRes.signedAgreements || []);
       setStatus('✓ Live data synced');
       setTimeout(() => setStatus(''), 2500);
     } catch(e) {
       setStatus('Failed to load data');
     }
     setLoading(false);
+  };
+
+  // Real-time live sync polling for client questions from Telegram Bot
+  useEffect(() => {
+    if (!unlocked || tab !== 'chats') return;
+    const pollInterval = setInterval(() => {
+      fetch(`${apiBase}/api/chat?list=1`)
+        .then(r => r.json())
+        .then(d => {
+          if (Array.isArray(d?.chats)) setChats(d.chats);
+        })
+        .catch(() => {});
+
+      if (activeChat?.chatId) {
+        fetch(`${apiBase}/api/chat?chat_id=${activeChat.chatId}`)
+          .then(r => r.json())
+          .then(d => {
+            if (Array.isArray(d?.messages)) {
+              setChatMessages(d.messages);
+            }
+          })
+          .catch(() => {});
+      }
+    }, 3500);
+
+    return () => clearInterval(pollInterval);
+  }, [unlocked, tab, activeChat?.chatId]);
+
+  const loadChat = async (chatId) => {
+    try {
+      const r = await fetch(`${apiBase}/api/chat?chat_id=${chatId}&mark_read=1`);
+      const d = await r.json();
+      setActiveChat(d.chat || null);
+      setChatMessages(d.messages || d.chat?.messages || []);
+      setChats(prev => prev.map(c => c.chatId === chatId ? { ...c, unreadCount: 0 } : c));
+    } catch(e) { /* silent */ }
+  };
+
+  const sendAdminReply = async () => {
+    if (!chatReplyText.trim() || !activeChat) return;
+    setChatSending(true);
+    try {
+      const r = await fetch(`${apiBase}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'admin_reply',
+          chat_id: activeChat.chatId,
+          text: chatReplyText,
+          sender: 'admin',
+          senderName: 'HOPE Studio Director'
+        })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setChatMessages(prev => [...prev, d.message]);
+        setChatReplyText('');
+        setStatus('✓ Reply sent via Telegram');
+        setTimeout(() => setStatus(''), 2000);
+      }
+    } catch(e) { setStatus('Send failed'); }
+    setChatSending(false);
+  };
+
+  const sendAgreementLink = async (customAgreementId) => {
+    if (!activeChat?.chatId) return;
+    setSendingAgrLink(true);
+    try {
+      const r = await fetch(`${apiBase}/api/agreements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'send_link', customAgreementId, chatId: activeChat.chatId })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setStatus(`✓ Agreement link sent: ${d.signingUrl}`);
+        setTimeout(() => setStatus(''), 3000);
+      }
+    } catch(e) { setStatus('Link send failed'); }
+    setSendingAgrLink(false);
+  };
+
+  const saveCustomAgreement = async (agrData) => {
+    try {
+      const r = await fetch(`${apiBase}/api/agreements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save_custom', ...agrData })
+      });
+      const d = await r.json();
+      if (d.success) {
+        setCustomAgrs(prev => {
+          const idx = prev.findIndex(a => a.id === d.agreement.id);
+          if (idx >= 0) { const n = [...prev]; n[idx] = d.agreement; return n; }
+          return [d.agreement, ...prev];
+        });
+        setEditingAgr(null);
+        setStatus('✓ Agreement saved');
+        setTimeout(() => setStatus(''), 2000);
+        return d.agreement;
+      }
+    } catch(e) { setStatus('Save failed'); }
   };
 
   const patchSettings = async (patch) => {
@@ -1993,36 +2201,30 @@ function AdminControlPanel({ onClose, lang }) {
       {/* ── TABS NAVIGATION BAR ── */}
       <nav className="admin-portal-nav">
         <div className="admin-portal-tabs">
-          <button
-            className={`apt-tab ${tab === 'orders' ? 'apt-tab-active' : ''}`}
-            onClick={() => setTab('orders')}
-          >
-            <Package size={16}/> <span>Orders &amp; Receipts</span>
+          <button className={`apt-tab ${tab === 'orders' ? 'apt-tab-active' : ''}`} onClick={() => setTab('orders')}>
+            <Package size={16}/> <span>Orders</span>
             {pendingCount > 0 && <span className="apt-tab-pill-amber">{pendingCount}</span>}
           </button>
-          <button
-            className={`apt-tab ${tab === 'calendar' ? 'apt-tab-active' : ''}`}
-            onClick={() => setTab('calendar')}
-          >
-            <CalendarDays size={16}/> <span>Calendar &amp; Blackouts</span>
+          <button className={`apt-tab ${tab === 'chats' ? 'apt-tab-active' : ''}`} onClick={() => setTab('chats')}>
+            <MessageCircle size={16}/> <span>💬 Chats</span>
+            {chats.reduce((s,c) => s + (c.unreadCount||0), 0) > 0 && (
+              <span className="apt-tab-pill-amber">{chats.reduce((s,c) => s + (c.unreadCount||0), 0)}</span>
+            )}
           </button>
-          <button
-            className={`apt-tab ${tab === 'packages' ? 'apt-tab-active' : ''}`}
-            onClick={() => setTab('packages')}
-          >
-            <Star size={16}/> <span>Packages &amp; Pricing</span>
+          <button className={`apt-tab ${tab === 'agreements' ? 'apt-tab-active' : ''}`} onClick={() => setTab('agreements')}>
+            <Layers size={16}/> <span>📜 Agreements</span>
           </button>
-          <button
-            className={`apt-tab ${tab === 'contract' ? 'apt-tab-active' : ''}`}
-            onClick={() => setTab('contract')}
-          >
-            <Shield size={16}/> <span>Contract Clauses</span>
+          <button className={`apt-tab ${tab === 'calendar' ? 'apt-tab-active' : ''}`} onClick={() => setTab('calendar')}>
+            <CalendarDays size={16}/> <span>Calendar</span>
           </button>
-          <button
-            className={`apt-tab ${tab === 'accounts' ? 'apt-tab-active' : ''}`}
-            onClick={() => setTab('accounts')}
-          >
-            <CreditCard size={16}/> <span>Bank Accounts</span>
+          <button className={`apt-tab ${tab === 'packages' ? 'apt-tab-active' : ''}`} onClick={() => setTab('packages')}>
+            <Star size={16}/> <span>Packages</span>
+          </button>
+          <button className={`apt-tab ${tab === 'contract' ? 'apt-tab-active' : ''}`} onClick={() => setTab('contract')}>
+            <Shield size={16}/> <span>Contract</span>
+          </button>
+          <button className={`apt-tab ${tab === 'accounts' ? 'apt-tab-active' : ''}`} onClick={() => setTab('accounts')}>
+            <CreditCard size={16}/> <span>Accounts</span>
           </button>
         </div>
       </nav>
@@ -2030,6 +2232,247 @@ function AdminControlPanel({ onClose, lang }) {
       {/* ── MAIN CONTENT CONTAINER ── */}
       <main className="admin-portal-main">
         {loading && <div className="admin-portal-loader"><div className="brc-spinner"/> Loading latest data...</div>}
+
+        {/* ════ TAB: CHATS ════ */}
+        {tab === 'chats' && (
+          <section className="apt-tab-section">
+            <div className="admin-chat-layout">
+              {/* LEFT: Chat list */}
+              <div className="admin-chat-sidebar">
+                <div className="admin-chat-sidebar-header">
+                  <h4>💬 Conversations</h4>
+                  <button className="apt-btn-secondary" onClick={loadData}><RefreshCw size={13}/></button>
+                </div>
+                {chats.length === 0 ? (
+                  <div className="admin-empty">No conversations yet. Users who message the bot will appear here.</div>
+                ) : (
+                  chats.map(c => (
+                    <button
+                      key={c.chatId}
+                      className={`admin-chat-list-item ${activeChat?.chatId === c.chatId ? 'admin-chat-item-active' : ''}`}
+                      onClick={() => loadChat(c.chatId)}
+                    >
+                      <div className="acli-avatar">{(c.firstName || '?')[0].toUpperCase()}</div>
+                      <div className="acli-info">
+                        <div className="acli-name">{c.firstName} {c.lastName || ''}{c.username ? <span className="acli-handle"> @{c.username}</span> : ''}</div>
+                        <div className="acli-last">{c.lastMessage?.substring(0, 45) || 'No messages'}</div>
+                      </div>
+                      {c.unreadCount > 0 && <span className="acli-badge">{c.unreadCount}</span>}
+                    </button>
+                  ))
+                )}
+              </div>
+
+              {/* RIGHT: Chat thread */}
+              <div className="admin-chat-thread">
+                {!activeChat ? (
+                  <div className="admin-chat-empty">
+                    <MessageCircle size={48} color="#55556a"/>
+                    <h4>Select a conversation</h4>
+                    <p>Click on a chat in the list to view the conversation and reply.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="admin-chat-thread-header">
+                      <div>
+                        <h4>{activeChat.firstName} {activeChat.lastName || ''}</h4>
+                        <span>Chat ID: <code>{activeChat.chatId}</code>{activeChat.orderId ? ` · Order: ${activeChat.orderId}` : ''}</span>
+                      </div>
+                      <div className="admin-chat-thread-actions">
+                        <button className="aoc-btn-discuss" onClick={() => setTab('agreements')} title="Create custom agreement for this client">
+                          <Layers size={14}/> Customize Agreement
+                        </button>
+                        {activeChat.orderId && (
+                          <a href={`tel:${orders.find(o=>o.id===activeChat.orderId)?.phone}`} className="aoc-btn-call">
+                            <Phone size={14}/> Call
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="admin-chat-messages">
+                      {chatMessages.length === 0 ? (
+                        <div className="admin-empty">No messages in this conversation yet.</div>
+                      ) : (
+                        chatMessages.map(m => (
+                          <div key={m.id} className={`admin-chat-msg ${m.sender === 'admin' ? 'msg-admin' : 'msg-client'}`}>
+                            <div className="admin-chat-msg-bubble">
+                              <div className="admin-chat-msg-sender">{m.sender === 'admin' ? '🟦 Admin' : '🟩 Client'}</div>
+                              <div className="admin-chat-msg-text">{m.text}</div>
+                              <div className="admin-chat-msg-time">{new Date(m.timestamp).toLocaleTimeString()}</div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+
+                    <div className="admin-chat-reply-bar">
+                      <textarea
+                        className="admin-chat-reply-input"
+                        placeholder="Type your reply... (will be sent via Telegram to client)"
+                        value={chatReplyText}
+                        onChange={e => setChatReplyText(e.target.value)}
+                        rows={2}
+                        onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminReply(); } }}
+                      />
+                      <button
+                        className="aoc-btn-approve"
+                        onClick={sendAdminReply}
+                        disabled={chatSending || !chatReplyText.trim()}
+                      >
+                        {chatSending ? <span className="brc-spinner"/> : <Send size={15}/>}
+                        {chatSending ? 'Sending...' : 'Send Reply'}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ════ TAB: AGREEMENTS ════ */}
+        {tab === 'agreements' && (
+          <section className="apt-tab-section">
+            <div className="apt-split-grid">
+              {/* LEFT: 9 Default Templates */}
+              <div className="apt-card-box">
+                <div className="apt-box-header">
+                  <div>
+                    <h4>📋 9 Default Agreement Templates (ወ•ል)</h4>
+                    <p>The 9 ready-made physical contract templates, now digital. Click to edit &amp; customize per client.</p>
+                  </div>
+                </div>
+                <div className="admin-agr-list">
+                  {defaultAgr9.map(agr => (
+                    <div key={agr.id} className="admin-agr-row">
+                      <div className="admin-agr-info">
+                        <span className="aoc-category-tag">{agr.category}</span>
+                        <strong>{agr.name}</strong>
+                        <span className="admin-agr-price">{(agr.price||0).toLocaleString()} ETB</span>
+                      </div>
+                      <button
+                        className="aoc-btn-discuss"
+                        onClick={() => setEditingAgr({
+                          ...agr,
+                          id: null, // new custom agr based on this template
+                          baseTemplateId: agr.id,
+                          clientName: activeChat ? `${activeChat.firstName} ${activeChat.lastName||''}`.trim() : '',
+                          clientChatId: activeChat?.chatId || '',
+                          orderId: activeChat?.orderId || '',
+                        })}
+                      >
+                        <Edit2 size={13}/> Customize for Client
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* RIGHT: Custom Agreements or Editor */}
+              <div className="apt-card-box">
+                {editingAgr ? (
+                  <>
+                    <div className="apt-box-header">
+                      <h4>✏️ Customize Agreement for Client</h4>
+                    </div>
+                    <div className="admin-agr-editor">
+                      <label>Client Name
+                        <input value={editingAgr.clientName||''} onChange={e => setEditingAgr(a=>({...a,clientName:e.target.value}))} placeholder="Client Full Name"/>
+                      </label>
+                      <label>Client Chat ID (Telegram)
+                        <input value={editingAgr.clientChatId||''} onChange={e => setEditingAgr(a=>({...a,clientChatId:e.target.value}))} placeholder="Telegram Chat ID"/>
+                      </label>
+                      <label>Package Title
+                        <input value={editingAgr.packageTitle||''} onChange={e => setEditingAgr(a=>({...a,packageTitle:e.target.value}))}/>
+                      </label>
+                      <label>Agreed Price (ETB)
+                        <input type="number" value={editingAgr.price||''} onChange={e => setEditingAgr(a=>({...a,price:Number(e.target.value)}))}/>
+                      </label>
+                      <label>Deliverables (one per line)
+                        <textarea
+                          rows={6}
+                          value={(editingAgr.deliverables||[]).join('\n')}
+                          onChange={e => setEditingAgr(a=>({...a,deliverables:e.target.value.split('\n').filter(Boolean)}))}
+                        />
+                      </label>
+                      <label>Payment Terms
+                        <textarea rows={3} value={editingAgr.paymentTerms||''} onChange={e => setEditingAgr(a=>({...a,paymentTerms:e.target.value}))}/>
+                      </label>
+                      <div className="admin-agr-editor-actions">
+                        <button className="aoc-btn-reject" onClick={() => setEditingAgr(null)}>Cancel</button>
+                        <button className="aoc-btn-approve" onClick={() => saveCustomAgreement(editingAgr)}>
+                          <Check size={14}/> Save Custom Agreement
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="apt-box-header">
+                      <div>
+                        <h4>📨 Custom Client Agreements</h4>
+                        <p>Agreements customized for specific clients. Send signing link via Telegram.</p>
+                      </div>
+                    </div>
+                    {customAgrs.length === 0 ? (
+                      <div className="admin-empty">No custom agreements yet. Select a template on the left and customize it for a client.</div>
+                    ) : (
+                      customAgrs.map(agr => (
+                        <div key={agr.id} className="admin-agr-row admin-agr-custom">
+                          <div className="admin-agr-info">
+                            <strong>{agr.name}</strong>
+                            {agr.clientName && <span className="aoc-lbl"> → {agr.clientName}</span>}
+                            <span className="admin-agr-price">{(agr.price||0).toLocaleString()} ETB</span>
+                            <span className={`aoc-status-pill ${agr.status === 'sent' ? '' : ''}`} style={{fontSize:'11px', padding:'2px 7px'}}>{agr.status || 'draft'}</span>
+                          </div>
+                          <div style={{display:'flex', gap:'6px', flexWrap:'wrap'}}>
+                            <button className="aoc-btn-discuss" onClick={() => setEditingAgr(agr)}>
+                              <Edit2 size={13}/> Edit
+                            </button>
+                            {agr.signingUrl && (
+                              <a href={agr.signingUrl} target="_blank" rel="noopener noreferrer" className="aoc-btn-discuss">
+                                <ExternalLink size={13}/> Preview
+                              </a>
+                            )}
+                            {agr.clientChatId && (
+                              <button
+                                className="aoc-btn-approve"
+                                disabled={sendingAgrLink}
+                                onClick={() => sendAgreementLink(agr.id)}
+                              >
+                                {sendingAgrLink ? <span className="brc-spinner"/> : <Send size={13}/>}
+                                Send Link
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Signed Agreements Archive */}
+            {signedAgrs.length > 0 && (
+              <div className="apt-card-box" style={{marginTop:'20px'}}>
+                <div className="apt-box-header"><h4>✍️ Signed Agreements Archive ({signedAgrs.length})</h4></div>
+                {signedAgrs.map(agr => (
+                  <div key={agr.id} className="admin-agr-row">
+                    <div className="admin-agr-info">
+                      <strong>{agr.clientName}</strong>
+                      <span className="aoc-lbl">· {agr.packageName} ·</span>
+                      <span className="admin-agr-price">{(agr.agreedPrice||0).toLocaleString()} ETB</span>
+                      <span style={{color:'#22c55e', fontSize:'12px'}}> ✅ Signed {new Date(agr.signedAt).toLocaleDateString()}</span>
+                    </div>
+                    <code style={{fontSize:'11px', color:'#9090a8'}}>{agr.id}</code>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* ════ TAB 1: ORDERS & RECEIPTS ════ */}
         {tab === 'orders' && (
@@ -2947,6 +3390,17 @@ function PackagesSection({ lang, openBooking }) {
                   <span>{t.pkgCta}</span>
                   <ArrowRight size={16} />
                 </button>
+                <a
+                  href={`https://t.me/HoopStudioSystemBot?start=inquire_${pkg.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="card-v2-tg-inquire"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Ask directly on Telegram Bot"
+                >
+                  <Send size={13} />
+                  <span>{lang === 'am' ? 'በቴሌግራም ቦት ይጠይቁ' : 'Ask on Telegram Bot'}</span>
+                </a>
               </div>
             </article>
           );
@@ -2980,6 +3434,139 @@ function Reveal({ children, className = '', delay = 0 }) {
   return <div ref={ref} className={`reveal-section ${className}`} style={{ transitionDelay: `${delay}ms` }}>{children}</div>;
 }
 
+/* ── AGREEMENT SIGNING PAGE (URL: ?sign=CAGR-xxx) ───────────────────────── */
+function AgreementSigningPage({ signId, lang }) {
+  const [agreement, setAgreement] = useState(null);
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [signature, setSignature] = useState(null);
+  const [termsAccepted, setTerms] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
+
+  useEffect(() => {
+    fetch(`${apiBase}/api/agreements?custom_id=${signId}`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.agreement) { setAgreement(d.agreement); setOrder(d.order || null); }
+        else setError('Agreement not found or link expired.');
+        setLoading(false);
+      })
+      .catch(() => { setError('Failed to load agreement. Please check your link.'); setLoading(false); });
+  }, [signId]);
+
+  const handleSign = async () => {
+    if (!signature) { setError('Please provide your digital signature above.'); return; }
+    if (!termsAccepted) { setError('Please accept the terms to proceed.'); return; }
+    setSubmitting(true);
+    try {
+      const price = agreement.price || 0;
+      const deposit = Math.round(price * 0.5);
+      const r = await fetch(`${apiBase}/api/agreements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sign',
+          orderId: order?.id || agreement.orderId || 'CUSTOM',
+          clientName: agreement.clientName || 'Client',
+          signatureDataUrl: signature,
+          termsAccepted: true,
+          agreedPrice: price,
+          depositAmount: deposit,
+          customAgreementId: agreement.id,
+          eventDate: order?.eventDate || new Date().toISOString().slice(0, 10),
+        })
+      });
+      const d = await r.json();
+      if (d.success) { setSubmitted(true); }
+      else setError(d.error || 'Signing failed. Please try again.');
+    } catch(e) { setError('Network error. Please try again.'); }
+    setSubmitting(false);
+  };
+
+  if (loading) return (
+    <div style={{minHeight:'100vh',background:'#0a0a0f',display:'flex',alignItems:'center',justifyContent:'center',color:'#f5f5f5'}}>
+      <div className="brc-spinner" style={{width:40,height:40,borderWidth:3}}/> &nbsp; Loading agreement...
+    </div>
+  );
+  if (error && !agreement) return (
+    <div style={{minHeight:'100vh',background:'#0a0a0f',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#ef4444',gap:16}}>
+      <Shield size={48}/><h2>{error}</h2>
+      <a href="/" style={{color:'#d4af37'}}>← Return to HOPE Studio</a>
+    </div>
+  );
+  if (submitted) return (
+    <div style={{minHeight:'100vh',background:'#0a0a0f',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#f5f5f5',gap:20,padding:24}}>
+      <div style={{width:72,height:72,borderRadius:'50%',background:'linear-gradient(135deg,#22c55e,#16a34a)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+        <Check size={36} color="#fff"/>
+      </div>
+      <h2 style={{color:'#22c55e',fontSize:28,fontWeight:800}}>Agreement Signed!</h2>
+      <p style={{color:'#9090a8',maxWidth:400,textAlign:'center'}}>Your HOPE Studio service agreement has been digitally signed and recorded. Our team will contact you shortly.</p>
+      <div style={{background:'#111118',border:'1px solid #2a2a40',borderRadius:12,padding:20,maxWidth:360,width:'100%'}}>
+        <p><strong>Package:</strong> {agreement?.packageTitle}</p>
+        <p><strong>Total:</strong> {(agreement?.price||0).toLocaleString()} ETB</p>
+        <p><strong>50% Deposit:</strong> {Math.round((agreement?.price||0)*0.5).toLocaleString()} ETB</p>
+      </div>
+      <a href={`tel:+251910526962`} style={{color:'#d4af37',textDecoration:'none',fontSize:18,fontWeight:700}}>📞 09 10 52 69 62</a>
+      <a href="/" style={{color:'#9090a8',fontSize:14}}>← Return to HOPE Studio</a>
+    </div>
+  );
+
+  const price = agreement?.price || order?.totalPrice || 0;
+  const deposit = agreement?.depositAmount || Math.round(price * 0.5);
+  const remaining = price - deposit;
+
+  return (
+    <div style={{minHeight:'100vh',background:'#0a0a0f',color:'#f5f5f5',fontFamily:'Inter,sans-serif',padding:'24px 16px 80px'}}>
+      <div style={{maxWidth:840,margin:'0 auto'}}>
+        <DocumentStyleAgreement
+          agreement={agreement}
+          clientName={agreement?.clientName || order?.clientName || 'Client'}
+          phone={agreement?.phone || order?.phone || ''}
+          eventDate={order?.eventDate || agreement?.eventDate || ''}
+          location={order?.location || 'Addis Ababa'}
+          totalPrice={price}
+          depositAmount={deposit}
+          remainingBalance={remaining}
+          signature={signature}
+          onSign={setSignature}
+          onClearSignature={() => setSignature(null)}
+          lang={lang}
+          orderId={order?.id || agreement?.id}
+        />
+
+        <div className="doc-no-print" style={{marginTop: 20, background:'#111118', border:'1px solid #2a2a40', borderRadius: 12, padding: 20}}>
+          <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer'}}>
+            <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} style={{marginTop:3}}/>
+            <span style={{color:'#cbd5e1',fontSize:13,lineHeight:1.5}}>
+              {lang === 'am'
+                ? 'ከላይ በሰነዱ የተዘረዘሩትን ሁሉ አንብቤ ተቀብያለሁ። የ 50% ቅድሚያ ክፍያ ሁኔታን አረጋግጣለሁ።'
+                : 'I have reviewed and agree to all terms in this document. I accept the 50% advance deposit requirement.'}
+            </span>
+          </label>
+
+          {error && <p style={{color:'#ef4444',fontSize:13,marginTop:12}}>{error}</p>}
+
+          <button
+            onClick={handleSign}
+            disabled={submitting || !signature || !termsAccepted}
+            style={{
+              width:'100%',marginTop:16,padding:'14px 24px',background:'linear-gradient(135deg,#d4af37,#b8860b)',
+              color:'#0a0a0f',fontWeight:800,fontSize:15,border:'none',borderRadius:8,cursor:'pointer',
+              opacity: (submitting||!signature||!termsAccepted) ? 0.5 : 1,
+              boxShadow: '0 4px 15px rgba(212,175,55,0.3)'
+            }}
+          >
+            {submitting ? 'Submitting...' : lang === 'am' ? '📝 ስምምነቱን በዲጂታል ፊርማ አጽድቅ (Accept & Sign)' : '📝 Accept & Sign Agreement'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── APP ────────────────────────────────────────────────────────────────── */
 function App() {
   const [loaded, setLoaded]   = useState(false);
@@ -2992,6 +3579,11 @@ function App() {
   const [activeImg, setActiveImg] = useState(0);
   const [openFaq, setOpenFaq] = useState(null);
   const [activeLocTab, setActiveLocTab] = useState(0);
+
+  // URL-based custom agreement signing (?sign=CAGR-xxx)
+  const signId = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location.search).get('sign')
+    : null;
 
   const t = T[lang];
 
@@ -3018,6 +3610,10 @@ function App() {
   const toggleLang = () => setLang(l => l === 'am' ? 'en' : l === 'en' ? 'om' : 'am');
 
   const locImgs = [galleryImages[1].src, galleryImages[3].src, galleryImages[5].src];
+
+  if (signId) {
+    return <AgreementSigningPage signId={signId} lang={lang} />;
+  }
 
   if (showAdmin) {
     return (
