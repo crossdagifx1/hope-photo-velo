@@ -1,6 +1,6 @@
 // src/DocumentStyleAgreement.jsx — Official Document-Style Legal Agreement with Download PDF
 import React from 'react';
-import { FileText, Download, Printer, Check, Shield } from 'lucide-react';
+import { FileText, Download, Printer, Check, Shield, Star } from 'lucide-react';
 import SignaturePad from './SignaturePad.jsx';
 
 const ASSET = '/assets';
@@ -58,7 +58,7 @@ export default function DocumentStyleAgreement({
         <div className="doc-toolbar-actions">
           <button type="button" className="doc-btn-pdf" onClick={handlePrint} title="Save as PDF or Print">
             <Download size={14} />
-            <span>{lang === 'am' ? '📄 PDF አውርድ / Download' : '📄 Download PDF'}</span>
+            <span>{lang === 'am' ? 'PDF አውርድ / Download' : 'Download PDF'}</span>
           </button>
           <button type="button" className="doc-btn-secondary" onClick={() => window.print()} title="Print Document">
             <Printer size={14} />
@@ -79,12 +79,12 @@ export default function DocumentStyleAgreement({
             <h2 className="doc-brand-en">HOPE PHOTO &amp; VELO STUDIO</h2>
             <p className="doc-subhead">የሰርግ እና ዝግጅቶች ፎቶግራፊ፣ ሲኒማቲክ ቪዲዮ እና ላሚኔት አልበም ማዕከል</p>
             <p className="doc-address-line">
-              📍 ትጋት የንግድ ማዕከል 2ኛ ፎቅ ፣ 22 ሃያሁለት ፣ አዲስ አበባ | 📞 09 10 52 69 62 / 09 95 27 08 94
+              ትጋት የንግድ ማዕከል 2ኛ ፎቅ ፣ 22 ሃያሁለት ፣ አዲስ አበባ | ስልክ: 09 10 52 69 62 / 09 95 27 08 94
             </p>
           </div>
           <div className="doc-emblem-col">
             <div className="doc-gold-seal">
-              <span className="seal-star">★ ★ ★</span>
+              <span className="seal-star"><Star size={10} fill="currentColor" /> <Star size={12} fill="currentColor" /> <Star size={10} fill="currentColor" /></span>
               <span className="seal-txt">OFFICIAL</span>
               <span className="seal-txt-sub">HOPE CONTRACT</span>
             </div>
@@ -255,7 +255,7 @@ export default function DocumentStyleAgreement({
                   <div className="doc-sig-hrule" />
                   <p className="doc-signer-name">ስም: {clientName || '_________________________'}</p>
                   <small className="doc-signer-date">ቀን: {today}</small>
-                  {!readOnly && <p className="doc-sign-hint doc-no-print">✍️ እባክዎ ከላይ ባለው ሳጥን ውስጥ ይፈርሙ</p>}
+                  {!readOnly && <p className="doc-sign-hint doc-no-print">እባክዎ ከላይ ባለው ሳጥን ውስጥ ይፈርሙ</p>}
                 </div>
               )}
             </div>
@@ -268,9 +268,9 @@ export default function DocumentStyleAgreement({
                 {/* Official Circular Red Rubber Stamp */}
                 <div className="doc-red-stamp">
                   <div className="stamp-inner-border">
-                    <span className="stamp-arc-top">★ HOPE PHOTO &amp; VELO ★</span>
+                    <span className="stamp-arc-top">HOPE PHOTO &amp; VELO</span>
                     <span className="stamp-center-title">OFFICIAL<br/>SEAL</span>
-                    <span className="stamp-arc-bottom">★ ADDIS ABABA ★</span>
+                    <span className="stamp-arc-bottom">ADDIS ABABA</span>
                   </div>
                 </div>
 
@@ -284,7 +284,7 @@ export default function DocumentStyleAgreement({
               <div className="doc-sig-hrule" />
               <p className="doc-signer-name"><strong>ቢንያም አ. (Binyam A.)</strong></p>
               <small className="doc-signer-date">ይፋዊ ማህተም እና ፊርማ • HOPE STUDIO</small>
-              <span className="doc-verified-badge doc-badge-gold">✓ በስቱዲዮው የተረጋገጠ</span>
+              <span className="doc-verified-badge doc-badge-gold"><Check size={11}/> በስቱዲዮው የተረጋገጠ</span>
             </div>
           </div>
         </div>

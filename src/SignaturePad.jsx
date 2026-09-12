@@ -68,7 +68,7 @@ export default function SignaturePad({ onSign, onClear }) {
         onTouchStart={start} onTouchMove={draw} onTouchEnd={stop}
       />
       <div className="sig-pad-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-        <span className="sig-line-label" style={{ fontSize: '11px', color: '#64748b' }}>✍️ Sign above</span>
+        <span className="sig-line-label" style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>Sign Above (Digital Signature)</span>
         <button type="button" className="sig-clear-btn" onClick={clear} style={{ fontSize: '11px', background: 'none', border: 'none', color: '#991b1b', cursor: 'pointer', fontWeight: 600 }}>Clear</button>
       </div>
     </div>

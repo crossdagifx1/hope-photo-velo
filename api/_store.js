@@ -386,18 +386,18 @@ const DEFAULT_CONTRACT_TEMPLATE = {
 const DEFAULT_CONTENT = {
   announcement: {
     active: true,
-    textEn: '✨ Special Wedding Season Offer: Book 30+ days in advance & receive a Complimentary 50×80 Gallery Canvas Board!',
-    textAm: '✨ ልዩ የወቅቱ ቅናሽ፡ ከ 30 ቀናት በፊት አስቀድመው ሲመዘገቡ የ 50×80 ሳሎን ጋለሪ ካንቫስ ቦርድ በነጻ ያገኛሉ!',
+    textEn: 'Special Wedding Season Offer: Book 30+ days in advance & receive a Complimentary 50×80 Gallery Canvas Board!',
+    textAm: 'ልዩ የወቅቱ ቅናሽ፡ ከ 30 ቀናት በፊት አስቀድመው ሲመዘገቡ የ 50×80 ሳሎን ጋለሪ ካንቫስ ቦርድ በነጻ ያገኛሉ!',
     badgeEn: 'Limited Offer',
     badgeAm: 'ልዩ ቅናሽ'
   },
   story: {
-    titleEn: '10+ Years of Pure Cinema & Timeless Moments',
-    titleAm: 'ከ 10 ዓመታት በላይ የዘለቀ ሲኒማቲክ የፍቅር ታሪክ',
+    titleEn: '1+ Years of Dedicated Cinema & Timeless Moments',
+    titleAm: 'የ 1+ ዓመት የሲኒማ ጥበብ እና የማይረሱ አፍታዎች',
     subtitleEn: "Capturing Ethiopia's finest weddings, heritage, and studio portraits with museum-grade artistic integrity.",
     subtitleAm: 'የኢትዮጵያ ምርጥ ሰርጎችን፣ ባህላዊ ቅርሶችን እና የስቱዲዮ ፎቶግራፊዎችን በከፍተኛ ጥበባዊ ጥራት እንቀርጻለን።',
-    yearsExp: '10+',
-    weddingsCount: '850+',
+    yearsExp: '1+',
+    weddingsCount: '150+',
     satisfactionRate: '100%',
     gearSummary: 'Sony Cinema FX Line & Aputure Studio Rig'
   },

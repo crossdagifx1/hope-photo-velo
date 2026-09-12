@@ -4,7 +4,8 @@ import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
   ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Copy, CreditCard, Edit2, ExternalLink,
   Eye, Film, Globe, Heart, Layers, Lock, LogOut, MapPin, Menu, MessageCircle, Package, Pencil,
-  Phone, Play, Plus, Printer, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X, FileText, Download
+  Phone, Play, Plus, Printer, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X, FileText, Download,
+  User, Building2, Hash, Clock, CheckCircle2, ShieldCheck, AlertCircle, HelpCircle, Award, Volume2
 } from 'lucide-react';
 import './styles.css';
 import { DEFAULT_AGREEMENTS_9, resolveAgreementForPackage, DEFAULT_PACKAGES, DEFAULT_CONTENT } from './agreementsData.js';
@@ -34,7 +35,7 @@ const T = {
     },
     bookNow: 'ቀንዎን አሁኑኑ ያስይዙ',
     call: 'ደውሉ',
-    heroProof: ['የ 9 ዓመታት', 'የውብ ትዝታዎች', 'ማህደር እና ታማኝነት።'],
+    heroProof: ['የ 1+ ዓመት', 'የውብ ትዝታዎች', 'ማህደር እና ታማኝነት።'],
     heroImages: ['የፀሐይ ፍቅር', 'የጋርደን ፎቶ', 'የምሽት ውበት', 'የሙሽራዋ ውበት'],
     heroScrollCta: 'ሥራዎቻችን',
     storyEyebrow: 'የ HOPE መንገድ',
@@ -61,20 +62,20 @@ const T = {
     craftEyebrow: 'የሙያችን እና የቴክኖሎጂ ጥራት',
     craftH2a: 'በከፍተኛ የቴክኖሎጂ ደረጃ',
     craftH2b: 'የተሰሩ ጥራቶች።',
-    craftStats: [['9+', 'ዓመታት ልምድ'], ['500+', 'የተቀረፁ የሰርግ በዓላት'], ['4K/8K', 'የሲኒማ ጥራት ቪዲዮ'], ['100%', 'የደንበኞች እርካታ']],
+    craftStats: [['1+', 'ዓመት ልምድ'], ['150+', 'የተቀረፁ የሰርግ በዓላት'], ['4K/8K', 'የሲኒማ ጥራት ቪዲዮ'], ['100%', 'የደንበኞች እርካታ']],
     craftItems: [
       { title: '4K & 8K Cinema Cameras', desc: 'በቅርብ የቴክኖሎጂ ደረጃ የተሰሩ ፕሮፌሽናል የሲኒማ ካሜራዎችና የሌንስ ስብስቦች።' },
       { title: 'Drone & Aerial Lighting', desc: 'የሰርግዎን ግርማ ሞገስ በከፍታ የሚያሳዩ ድሮኖች እና ለቪዲዮው ውበት የሚሆኑ የአየር ላይ መብራቶች።' },
       { title: 'Color Grading Master', desc: 'ለእያንዳንዱ ምስል እና ቪዲዮ ሞቅ ያለ፣ ተፈጥሯዊ እና የፊልም እይታ የሚሰጥ የከለር ኤዲቲንግ።' },
       { title: 'Fine-Art Laminated Albums', desc: 'ከውጭ ሀገር የሚመጡ ዘላቂ፣ በውሃና አቧራ የማይበላሹ በእጅ የተሰሩ ላሚኔት አልበሞች።' },
     ],
-    locationsEyebrow: 'የፎቶግራፍ ቦታዎችና ስታዲዮዎች',
-    locationsH2a: 'የእርስዎ ምርጥ',
-    locationsH2b: 'የቀረጻ ዳራዎች።',
-    locationsTabs: ['የጋርደን እና ተፈጥሮ ቀረጻ', 'የቤት ውስጥ ስታዲዮ', 'የምሽት እና የኤዲቶሪያል ፎቶ'],
-    locationsTitles: ['የተፈጥሮ ውበትና የጋርደን ፎቶዎች', 'የላቀ የስታዲዮ የብርሃንና የባህል አልበሞች', 'የምሽት የብርሃን ውበት እና የፊልም እይታ'],
-    locationsDescs: ['የተረጋጉ፣ በተፈጥሮ ብርሃን የተዋቡ እና የፍቅር አፍታዎችን በሰፊ አረንጓዴ ጋርደኖች ውስጥ የምናስቀራቸው።', 'ለየት ባሉ የስታዲዮ መብራቶች፣ ዳራዎች እና የመካፕ ማዘጋጃዎች የተሟላ የቤት ውስጥ ፎቶግራፍ።', 'በምሽት ብርሃን እና የከለር ኤዲቲንግ የሚሰሩ በውበት የተቀነባበሩ የሰርግ አፍታዎች።'],
-    locationsCta: 'ይህንን ቦታ ይምረጡ',
+    locationsEyebrow: 'የፎቶ ቦታዎች እና ስቱዲዮዎች',
+    locationsH2a: 'ለቀረጻዎ',
+    locationsH2b: 'የሚስማማ ውብ ስፍራ።',
+    locationsTabs: ['ጋርደን እና ሜዳ', 'የውስጥ ስቱዲዮ', 'የምሽት እና ልዩ ቀረጻ'],
+    locationsTitles: ['የተፈጥሮ ብርሃን ጋርደን እና የውጪ ፎቶዎች', 'ዘመናዊ የስቱዲዮ መብራቶች እና የባህል አልበሞች', 'የምሽት ውበት እና ሲኒማቲክ ኤዲቶሪያል'],
+    locationsDescs: ['ጸጥታና አረንጓዴ በተሞላ የተፈጥሮ ስፍራ የሚነሱ የፍቅር አፍታዎች።', 'ሙሉ የቤት ውስጥ ፎቶግራፊ፣ ልዩ መብራቶች፣ ዳራዎች እና የሜካፕ ማስተካከያ ያካተተ።', 'በምሽት መብራቶች እና በፊልም ከለር ግሬዲንግ የተሰሩ ልዩ የሰርግ አፍታዎች።'],
+    locationsCta: 'ይህንን ስፍራ ይምረጡ',
     processEyebrow: 'የአሠራር ሂደታችን',
     processH2a: 'ከመጀመሪያው ውይይት',
     processH2b: 'እስከ መጨረሻው ማስረከቢያ።',
@@ -102,7 +103,7 @@ const T = {
     testimonialH2b: 'ስለ እኛ የሚሉት።',
     testimonials: [
       { quote: 'ሆፕ በሰርጋችን ቀን ያደረገልን እንክብካቤ እና ያስረከበን አልበም ከጠበቅነው በላይ ውብ ነው! በቪዲዮው ኤዲቲንግ በጣም ተደስተናል።', name: 'ዮሴፍ እና ሄለን', event: 'የሰርግ በዓል' },
-      { quote: 'የቪዲዮው ኤዲቲንግ እና የከለር ምርጫው እውነተኛ የፊልም ጥራት አለው። በየጊዜው ደግመን ስናየው ያንኑ የሰርጋችንን ቀን ደስታ ይሰጠናል።', name: 'ዳዊት እና ሰለሞን', event: 'የሰርግ እና ጋርደን ቀረጻ' },
+      { quote: 'የቪዲዮው ኤዲቲንግ እና የከለር ምርጫው እውነተኛ የፊልም ጥራት አለው። በየጊዜው ደግመን ስናየው ያንኑ የሰርጋችንን ቀን ደስታ ይሰጠናል።', name: 'ዳዊት እና ሩት', event: 'የሰርግ እና ጋርደን ቀረጻ' },
       { quote: 'በቀረጻ ጊዜ ዘና እንድንል ያደረጉበት መንገድ እና የታማኝነታቸው ደረጃ በጣም ያስደስታል። ለሁሉም ወዳጆቻችን ሆፕን እንመክራለን!', name: 'አቤል እና ትዕግስት', event: 'የሰርግ እና ስታዲዮ ቀረጻ' },
     ],
     faqEyebrow: 'ተደጋግመው የሚጠየቁ ጥያቄዎች',
@@ -151,7 +152,7 @@ const T = {
     },
     bookNow: 'Book Your Date Now',
     call: 'Call',
-    heroProof: ['9+ Years', 'of Beautiful Memories', 'Preserved with Care.'],
+    heroProof: ['1+ Years', 'of Beautiful Memories', 'Preserved with Care.'],
     heroImages: ['Golden Hour Love', 'Garden Portrait', 'Evening Glamour', 'Bridal Beauty'],
     heroScrollCta: 'Our Work',
     storyEyebrow: 'The HOPE Journey',
@@ -178,7 +179,7 @@ const T = {
     craftEyebrow: 'Our Craft & Technology',
     craftH2a: 'Built with the highest',
     craftH2b: 'level of technology.',
-    craftStats: [['9+', 'Years Experience'], ['500+', 'Weddings Captured'], ['4K/8K', 'Cinema Quality Video'], ['100%', 'Client Satisfaction']],
+    craftStats: [['1+', 'Years Experience'], ['150+', 'Weddings Captured'], ['4K/8K', 'Cinema Quality Video'], ['100%', 'Client Satisfaction']],
     craftItems: [
       { title: '4K & 8K Cinema Cameras', desc: 'Professional cinema cameras and lens collections built to the highest technology standards.' },
       { title: 'Drone & Aerial Lighting', desc: 'Drones to showcase the grandeur of your wedding from above, with aerial lights for stunning video quality.' },
@@ -219,7 +220,7 @@ const T = {
     testimonialH2b: 'say about us.',
     testimonials: [
       { quote: 'The care HOPE gave us on our wedding day and the album they delivered exceeded our expectations! We absolutely loved the video editing.', name: 'Yosef & Helen', event: 'Wedding Celebration' },
-      { quote: 'The video editing and color grading has true cinematic quality. Every time we rewatch it, it brings back the joy of our wedding day.', name: 'Dawit & Solomon', event: 'Wedding & Garden Shoot' },
+      { quote: 'The video editing and color grading has true cinematic quality. Every time we rewatch it, it brings back the joy of our wedding day.', name: 'Dawit & Ruth', event: 'Wedding & Garden Shoot' },
       { quote: 'The way they made us feel relaxed during the shoot and their level of trustworthiness is truly impressive. We recommend HOPE to all our friends!', name: 'Abel & Tigist', event: 'Wedding & Studio Shoot' },
     ],
     faqEyebrow: 'Frequently Asked Questions',
@@ -268,7 +269,7 @@ const T = {
     },
     bookNow: 'Amma Guyyaa Keessan Qabadhaa',
     call: 'Bilbilaa',
-    heroProof: ['Waggaa 9+', 'Yaadannoo Bareedaa', 'Kunuunsaan Qabame.'],
+    heroProof: ['Waggaa 1+', 'Yaadannoo Bareedaa', 'Kunuunsaan Qabame.'],
     heroImages: ['Jaalala Yeroo Aduu', 'Suuraa Maasaa/Gadaa', 'Bareedina Galgalaa', 'Bareedina Misirroo'],
     heroScrollCta: 'Hojiiwwan Keenya',
     storyEyebrow: 'Imala HOPE',
@@ -295,7 +296,7 @@ const T = {
     craftEyebrow: 'Ogummaa fi Teknoolojii Keenya',
     craftH2a: 'Sadarkaa teknoolojii',
     craftH2b: 'isa ol\'aanaan kan uumame.',
-    craftStats: [['9+', 'Waggaa Muuxannoo'], ['500+', 'Cidha Waraabame'], ['4K/8K', 'Qulqullina Viidiyoo Sinimaa'], ['100%', 'Gammachuu Maamilaa']],
+    craftStats: [['1+', 'Waggaa Muuxannoo'], ['150+', 'Cidha Waraabame'], ['4K/8K', 'Qulqullina Viidiyoo Sinimaa'], ['100%', 'Gammachuu Maamilaa']],
     craftItems: [
       { title: 'Kaameraa Sinimaa 4K & 8K', desc: 'Kaameraawwan sinimaa fi lensoota sadarkaa teknoolojii ol\'aanaatiin ijaaraman.' },
       { title: 'Diroonii fi Iboo Gubbaa', desc: 'Dirooniiwwan ulfina cidha keessan gubbaadhaan agarsiisan, ibsaa gubbaa viidiyoof gargaaru waliin.' },
@@ -336,7 +337,7 @@ const T = {
     testimonialH2b: 'waa\'ee keenya waan jedhan.',
     testimonials: [
       { quote: 'Kunuunsi HOPE guyyaa cidha keenya nuuf godhe fi albaamni nuuf kenne waan nuti eeggannu caalaa bareedaadha! Gulaala viidiyoo baay\'ee jaallanneera.', name: 'Yooseef & Heelen', event: 'Ayyaana Cidhaa' },
-      { quote: 'Gulaalli viidiyoo fi filannoon halluu qulqullina fiilmii dhugaa qaba. Yeroo hunda irra deebinee yoo ilaallu gammachuu guyyaa cidha keenyaa nuuf kenne.', name: 'Daawit & Solomoon', event: 'Cidha & Suuraa Maasaa' },
+      { quote: 'Gulaalli viidiyoo fi filannoon halluu qulqullina fiilmii dhugaa qaba. Yeroo hunda irra deebinee yoo ilaallu gammachuu guyyaa cidha keenyaa nuuf kenne.', name: 'Daawit & Ruut', event: 'Cidha & Suuraa Maasaa' },
       { quote: 'Adeemsi isaan suuraa irratti akka nuti boqonnu godhan fi sadarkaa amanamummaa isaanii baay\'ee nu gammachiiseera. Hiriyoota keenya hundumaaf HOPE ni gorsina!', name: 'Abeel & Ti\'gisiti', event: 'Cidha & Suuraa Istuudiyoo' },
     ],
     faqEyebrow: 'Gaaffiiwwan Yeroo Baay\'ee Gaafataman',
@@ -1080,22 +1081,19 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     : 'Service Agreement';
   const contractClauses = fillContractTemplate(contractTpl);
 
-  // Step 1 → validate and move to Step 2
+  // Step 1 → validate and move directly to Step 2 (Agreement & Signature)
   const handleStep1Submit = (e) => {
     e.preventDefault();
+    if (!form.name?.trim()) { setError(lang === 'am' ? 'እባክዎ ሙሉ ስምዎን ያስገቡ' : 'Please enter your full name'); return; }
+    if (!form.phone?.trim()) { setError(lang === 'am' ? 'እባክዎ ስልክ ቁጥር ያስገቡ' : 'Please enter your phone number'); return; }
     if (!form.date) { setError(lang === 'am' ? 'እባክዎ ቀን ይምረጡ' : 'Please select a date'); return; }
     setError('');
+    const matched = resolveAgreementForPackage(selectedPackage, defaultAgreements9);
+    setSelectedAgrTemplate(matched);
     setStep(2);
   };
 
-  // Proceed directly to Contract step with plan's own agreement — do not ask user to pick again
-  const handleProceedContract = () => {
-    const matched = resolveAgreementForPackage(selectedPackage, defaultAgreements9);
-    setSelectedAgrTemplate(matched);
-    setStep(3);
-  };
-
-  // Proceed to Discussion (Option B) — user requested: "when i ask must directly go to bot and i have to ask on tg bot"
+  // Direct Discussion on Telegram Bot (Inquiry option)
   const handleDiscussion = async () => {
     setSubmitting(true);
     let orderId = 'HOPE-' + Math.floor(1000 + Math.random() * 9000);
@@ -1104,7 +1102,7 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          clientName: form.name, phone: form.phone, eventDate: form.date,
+          clientName: form.name || 'Website Client', phone: form.phone || '', eventDate: form.date || '',
           location: form.location, notes: form.note, packageName: pkgName,
           basePrice, totalPrice, category: selectedPackage?.category || 'custom',
           status: 'IN_DISCUSSION'
@@ -1118,7 +1116,6 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     }
     setSubmitting(false);
 
-    // Directly open Telegram Bot for instant discussion
     const tgUrl = `https://t.me/HoopStudioSystemBot?start=discuss_${orderId}`;
     try {
       window.open(tgUrl, '_blank');
@@ -1126,19 +1123,19 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     setStep(5);
   };
 
-  // Contract signed → checkout
+  // Step 2 → validate signature & terms, then proceed to Step 3 (Payment)
   const handleContractNext = () => {
-    if (!signature) { setError(lang === 'am' ? 'እባክዎ ፊርማ ያኑሩ' : 'Please sign the contract'); return; }
-    if (!termsAccepted) { setError(lang === 'am' ? 'ውሎቹን ይቀበሉ' : 'Please accept the terms'); return; }
+    if (!signature) { setError(lang === 'am' ? 'እባክዎ ዲጂታል ፊርማዎን ያኑሩ' : 'Please provide your digital signature above'); return; }
+    if (!termsAccepted) { setError(lang === 'am' ? 'እባክዎ የውል ደንቦችን ይቀበሉ' : 'Please accept the agreement terms'); return; }
     setError('');
-    setStep(4);
+    setStep(3);
   };
 
-  // Final submit with receipt
+  // Step 3 → Submit advance deposit & payment receipt
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
     if (!payMethod) { setError(lang === 'am' ? 'እባክዎ የክፍያ ዘዴ ይምረጡ' : 'Please select a payment method'); return; }
-    if (!receiptPreview) { setError(lang === 'am' ? 'የደረሰኝ ምስል ይጫኑ' : 'Please upload payment receipt'); return; }
+    if (!receiptPreview) { setError(lang === 'am' ? 'የደረሰኝ ምስል ይጫኑ' : 'Please upload payment receipt screenshot'); return; }
     setSubmitting(true);
     setError('');
     let orderObj = null;
@@ -1177,103 +1174,56 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
       };
     }
     setCreatedOrder(orderObj);
-    setStep(6);
+    setStep(4);
     setSubmitting(false);
   };
-
-  const stepLabel = {
-    1: lang === 'am' ? '1. ዝርዝርና ቀን' : '1. Details & Date',
-    2: lang === 'am' ? '2. አማራጭ ምረጥ' : '2. Choose Path',
-    'agr-gallery': lang === 'am' ? '📋 ውል ዓይነት ምረጥ' : '📋 Choose Agreement',
-    3: lang === 'am' ? '3. ውል' : '3. Contract',
-    4: lang === 'am' ? '4. ክፍያ' : '4. Payment',
-    5: lang === 'am' ? 'ውይይት' : 'Discussion',
-    6: lang === 'am' ? '✅ ተረጋግጧል' : '✅ Submitted',
-  };
-
-  // ── Agreement gallery renderer ──
-  const renderAgreementGallery = () => (
-    <div className="bf-step-body">
-      <div className="agr-gallery-header">
-        <h3 className="agr-gallery-title">
-          {lang === 'am' ? '📋 የ HOPE ስምምነት ዓይነቶች' : '📋 HOPE Agreement Templates'}
-        </h3>
-        <p className="agr-gallery-sub">
-          {lang === 'am'
-            ? 'ለፓኬጅዎ ተስማሚ የሆነ ስምምነት ይምረጡ። አስተዳዳሪያዊ ማሻሻያ ማድረግ ይቻላል።'
-            : 'Select the agreement template that matches your package. Admin can customize before signing.'}
-        </p>
-      </div>
-      <div className="agr-gallery-grid">
-        {defaultAgreements9.map((agr) => (
-          <button
-            key={agr.id}
-            type="button"
-            className={`agr-gallery-card ${selectedAgrTemplate?.id === agr.id ? 'agr-card-selected' : ''}`}
-            onClick={() => { setSelectedAgrTemplate(agr); }}
-          >
-            <div className="agr-card-top">
-              <span className="agr-card-cat">{agr.category?.toUpperCase()}</span>
-              <span className="agr-card-price">{(agr.price || 0).toLocaleString()} ETB</span>
-            </div>
-            <h4 className="agr-card-name">{agr.name}</h4>
-            <p className="agr-card-pkg">{agr.packageTitle}</p>
-            <ul className="agr-card-list">
-              {(agr.deliverables || []).slice(0, 5).map((d, i) => (
-                <li key={i}><Check size={10}/> {d}</li>
-              ))}
-              {(agr.deliverables || []).length > 5 && <li className="agr-more">+{(agr.deliverables || []).length - 5} more...</li>}
-            </ul>
-            {selectedAgrTemplate?.id === agr.id && (
-              <div className="agr-card-selected-badge"><Check size={14}/> Selected</div>
-            )}
-          </button>
-        ))}
-      </div>
-      <div className="agr-gallery-actions">
-        <button type="button" className="bf-back-btn" onClick={() => setStep(2)}>← Back</button>
-        <button
-          type="button"
-          className="bf-primary-btn"
-          onClick={() => setStep(3)}
-          disabled={!selectedAgrTemplate}
-        >
-          {lang === 'am' ? 'ቀጥል ወደ ፊርማ →' : 'Continue to Sign →'}
-        </button>
-      </div>
-      {!selectedAgrTemplate && (
-        <p className="agr-select-hint">{lang === 'am' ? 'ከላይ ያለውን ስምምነት ይምረጡ' : 'Please select an agreement template above'}</p>
-      )}
-    </div>
-  );
 
   const toggleAddon = (addon) => {
     setAddons(prev => prev.find(a => a.id === addon.id) ? prev.filter(a => a.id !== addon.id) : [...prev, addon]);
   };
 
-  // ── RENDER ──
-  const renderStepIndicator = () => (
-    <div className="bf-steps">
-      {[1,2,3,4].map(s => (
-        <div key={s} className={`bf-step ${step >= s ? 'bf-step-done' : ''} ${step === s ? 'bf-step-active' : ''}`}>
-          <span className="bf-step-num">{step > s ? <Check size={11}/> : s}</span>
+  // ── Sleek Top Progress Bar matching user reference screenshots ──
+  const renderStepIndicator = () => {
+    if (step === 4 || step === 5) return null;
+    const progressPercent = step === 1 ? 33 : step === 2 ? 66 : 100;
+    return (
+      <div className="bf-stepper-wrap">
+        <div className="bf-progress-track">
+          <div className="bf-progress-bar" style={{ width: `${progressPercent}%` }} />
         </div>
-      ))}
-    </div>
-  );
+        <div className="bf-steps-header">
+          <span className="bf-step-count">
+            {lang === 'am' ? `ደረጃ ${step} ከ 3` : `Step ${step} of 3`}
+          </span>
+          <span className="bf-category-badge">
+            {selectedPackage?.category?.toUpperCase() || 'OFFICIAL PACKAGE'}
+          </span>
+        </div>
+      </div>
+    );
+  };
 
-  // ── STEP 1: Package + Calendar + Client Info ──
+  // ── STEP 1: Details & Date & Add-on Pills ──
   const renderStep1 = () => (
     <form onSubmit={handleStep1Submit} className="bf-step-body">
       <div className="bf-pkg-header">
-        <div className="bf-pkg-badge">{selectedPackage?.badgeEn || 'Package'}</div>
+        <div className="bf-pkg-badge">{selectedPackage?.badgeEn || 'Official Package'}</div>
         <h3 className="bf-pkg-name">{pkgName}</h3>
         <div className="bf-pkg-price">{totalPrice.toLocaleString()} <span>ETB</span></div>
       </div>
 
+      {/* Ask on Telegram direct pill */}
+      <div className="bf-tg-ask-pill-wrap">
+        <button type="button" className="bf-tg-ask-pill" onClick={handleDiscussion} disabled={submitting}>
+          <MessageCircle size={15} />
+          <span>{lang === 'am' ? 'ጥያቄ አለዎት? በቴሌግራም ቦት በቀጥታ ይጠይቁ' : 'Have a question? Chat with Studio Director on Telegram'}</span>
+          <ArrowRight size={13} />
+        </button>
+      </div>
+
       {deliverables.length > 0 && (
         <div className="bf-deliverables">
-          <p className="bf-deliv-label">{lang === 'am' ? 'የተካተቱ አገልግሎቶች:' : 'Included deliverables:'}</p>
+          <p className="bf-deliv-label">{lang === 'am' ? 'የተካተቱ አገልግሎቶች:' : 'Included Deliverables:'}</p>
           <ul className="bf-deliv-list">
             {deliverables.map((d, i) => <li key={i}><Check size={11}/> {d}</li>)}
           </ul>
@@ -1332,52 +1282,22 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
 
       {error && <p className="bf-error">{error}</p>}
       <button type="submit" className="bf-primary-btn">
-        {lang === 'am' ? 'ቀጣይ — አማራጭ ምረጥ' : 'Next — Choose Your Path'} <ChevronRight size={16}/>
+        <span>{lang === 'am' ? 'ቀጣይ — ወደ ውል እና ፊርማ' : 'Continue to Agreement & Sign'}</span>
+        <ArrowRight size={16}/>
       </button>
     </form>
   );
 
-  // ── STEP 2: Fork — Contract or Discussion ──
-  const renderStep2 = () => (
-    <div className="bf-step-body bf-fork">
-      <div className="bf-fork-header">
-        <p className="eyebrow">{lang === 'am' ? 'የቀጠሮ መንገድ ምረጥ' : 'Choose Your Booking Path'}</p>
-        <p className="bf-fork-sub">{lang === 'am' ? `ቀን: ${form.date} | ${pkgName}` : `Date: ${form.date} | ${pkgName}`}</p>
-      </div>
-      <div className="bf-fork-cards">
-        <button type="button" className="bf-fork-card bf-fork-contract" onClick={handleProceedContract}>
-          <div className="bf-fork-icon"><Shield size={28}/></div>
-          <h4>{lang === 'am' ? 'ወደ ውል ቀጥሉ' : 'Proceed to Contract'}</h4>
-          <p>{lang === 'am' ? 'ውሉን ይፈርሙ፣ ቅድመ ክፍያ ያስገቡ፣ ቀንዎን አሁኑኑ ያስያዙ።' : 'Sign the agreement, pay 30% deposit, and lock your date now.'}</p>
-          <ul>
-            <li><Check size={12}/> {lang === 'am' ? 'ቀን ወዲያውኑ ይጠበቃል' : 'Date reserved immediately'}</li>
-            <li><Check size={12}/> {lang === 'am' ? '30% ቅድሚ ክፍያ' : '30% advance deposit'}</li>
-            <li><Check size={12}/> {lang === 'am' ? 'ዲጂታል ፊርማ' : 'Digital signature'}</li>
-          </ul>
-          <span className="bf-fork-cta">{lang === 'am' ? 'ወደ ውል →' : 'Go to Contract →'}</span>
-        </button>
-
-        <button type="button" className="bf-fork-card bf-fork-discuss" onClick={handleDiscussion} disabled={submitting}>
-          <div className="bf-fork-icon"><MessageCircle size={28}/></div>
-          <h4>{lang === 'am' ? 'በቴሌግራም ቦት ይጠይቁ' : 'Ask on Telegram Bot'}</h4>
-          <p>{lang === 'am' ? 'ቀጥታ ወደ ይፋዊ ቴሌግራም ቦት በመሄድ ከስቱዲዮ ዳይሬክተሩ ጋር ይወያዩ ወይም ይጠይቁ።' : 'Go directly to our official Telegram bot to ask questions and discuss with the studio director.'}</p>
-          <ul>
-            <li><Check size={12}/> {lang === 'am' ? 'ቀጥታ ውይይት በቴሌግራም' : 'Direct Telegram bot chat'}</li>
-            <li><Check size={12}/> {lang === 'am' ? 'ያለ ቅድመ ክፍያ መጠየቅ' : 'No upfront deposit required'}</li>
-            <li><Check size={12}/> {lang === 'am' ? 'ፈጣን ምላሽ ከዳይሬክተር' : 'Instant response from director'}</li>
-          </ul>
-          <span className="bf-fork-cta">{submitting ? '...' : (lang === 'am' ? 'በቴሌግራም ቦት ይጠይቁ →' : 'Ask on Telegram Bot →')}</span>
-        </button>
-      </div>
-      <button type="button" className="bf-back-btn" onClick={() => setStep(1)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
-    </div>
-  );
-
-  // ── STEP 3: Document-Style Legal Agreement + Signature ──
+  // ── STEP 2: Document-Style Legal Agreement + Digital Signature ──
   const activeAgreement = selectedAgrTemplate || resolveAgreementForPackage(selectedPackage, defaultAgreements9);
 
-  const renderStep3 = () => (
+  const renderStep2 = () => (
     <div className="bf-step-body">
+      <div className="bf-section-label">
+        <FileText size={15}/>
+        <span>{lang === 'am' ? 'ይፋዊ የስምምነት ሰነድ እና ዲጂታል ፊርማ' : 'Review Official Agreement & Digital Signature'}</span>
+      </div>
+
       <DocumentStyleAgreement
         agreement={activeAgreement}
         clientName={form.name}
@@ -1394,32 +1314,49 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
         orderId={createdOrder?.id}
       />
 
-      <label className="bf-terms-check doc-no-print" style={{ marginTop: '16px' }}>
+      {/* Compensation / Payment Terms Box matching Screenshot 5 */}
+      <div className="bf-comp-box doc-no-print">
+        <p className="bf-comp-title">{lang === 'am' ? 'የክፍያ ሁኔታ (Payment Terms)' : 'How is compensation to be paid'}</p>
+        <div className="bf-comp-options">
+          <div className="bf-comp-option active">
+            <div className="bf-comp-radio"><Check size={12}/></div>
+            <div>
+              <strong>{lang === 'am' ? '50% ቅድመ ክፍያ + 50% በርክክብ ወቅት' : '50% upfront + 50% after delivery'}</strong>
+              <small>{lang === 'am' ? 'ይፋዊ የስቱዲዮ ደንብ — ቀንዎን ወዲያውኑ ያስይዛል' : 'Official Studio Standard — Locks your shooting date'}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <label className="bf-terms-check doc-no-print" style={{ marginTop: '8px' }}>
         <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} />
         <span>{lang === 'am' ? 'ሁሉንም የውል አንቀጾች እና የ 50% ቅድመ ክፍያ ሁኔታ ተቀብያለሁ' : 'I accept all agreement terms, conditions, and the 50% advance deposit schedule'}</span>
       </label>
 
       {error && <p className="bf-error doc-no-print">{error}</p>}
       <div className="bf-btn-row doc-no-print">
-        <button type="button" className="bf-back-btn" onClick={() => setStep(2)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
+        <button type="button" className="bf-back-btn" onClick={() => setStep(1)}>
+          <ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}
+        </button>
         <button type="button" className="bf-primary-btn" onClick={handleContractNext}>
-          {lang === 'am' ? 'ወደ ክፍያ ቀጥሉ' : 'Proceed to Payment'} <ChevronRight size={16}/>
+          <span>{lang === 'am' ? 'ወደ ክፍያ ቀጥሉ' : 'Proceed to Payment'}</span>
+          <ChevronRight size={16}/>
         </button>
       </div>
     </div>
   );
 
-  // ── STEP 4: Checkout ──
+  // ── STEP 3: Advance Deposit & Receipt Screenshot Upload ──
   const telebirr = payAccounts?.telebirr;
   const cbe = payAccounts?.cbe;
 
-  const renderStep4 = () => (
+  const renderStep3 = () => (
     <form onSubmit={handlePaymentSubmit} className="bf-step-body">
       <div className="bf-pay-header">
         <CreditCard size={22}/>
         <div>
-          <h3>{lang === 'am' ? 'ቅድሚ ክፍያ ይፈጽሙ' : 'Complete Advance Deposit'}</h3>
-          <p>{lang === 'am' ? `30% ቅድሚ ክፍያ: ${deposit.toLocaleString()} ETB` : `30% Deposit: ${deposit.toLocaleString()} ETB`}</p>
+          <h3>{lang === 'am' ? 'ቅድመ ክፍያ ይፈጽሙ' : 'Complete Advance Deposit'}</h3>
+          <p>{lang === 'am' ? `50% ቅድመ ክፍያ: ${deposit.toLocaleString()} ETB` : `50% Deposit: ${deposit.toLocaleString()} ETB`}</p>
         </div>
       </div>
 
@@ -1479,7 +1416,7 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
       )}
 
       <div className="bf-receipt-upload">
-        <p className="bf-deliv-label"><Upload size={13}/> {lang === 'am' ? 'የደረሰኝ ምስል ይጫኑ (screenshot)' : 'Upload Payment Receipt Screenshot'}</p>
+        <p className="bf-deliv-label"><Upload size={13}/> {lang === 'am' ? 'የደረሰኝ ምስል ይጫኑ (Screenshot)' : 'Upload Payment Receipt Screenshot'}</p>
         <label className={`bf-dropzone ${receiptPreview ? 'bf-dropzone-filled':''}`}>
           <input type="file" accept="image/*" onChange={handleReceiptChange} hidden/>
           {receiptPreview
@@ -1499,58 +1436,30 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
 
       {error && <p className="bf-error">{error}</p>}
       <div className="bf-btn-row">
-        <button type="button" className="bf-back-btn" onClick={() => setStep(3)}><ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}</button>
+        <button type="button" className="bf-back-btn" onClick={() => setStep(2)}>
+          <ChevronLeft size={15}/> {lang === 'am' ? 'ተመለስ' : 'Back'}
+        </button>
         <button type="submit" className="bf-primary-btn" disabled={submitting}>
-          {submitting ? (lang === 'am' ? 'በማስገባት ላይ...' : 'Submitting...') : (lang === 'am' ? 'ክፍያ ያስገቡ' : 'Submit Payment Proof')} <Check size={16}/>
+          {submitting
+            ? (lang === 'am' ? 'በማስገባት ላይ...' : 'Submitting...')
+            : (lang === 'am' ? 'ክፍያ ያስገቡ' : 'Submit Payment Proof')}
+          <Check size={16}/>
         </button>
       </div>
     </form>
   );
 
-  // ── STEP 5: Discussion / Question on TG Bot ──
-  const renderStep5 = () => (
-    <div className="bf-step-body bf-confirm">
-      <div className="bf-confirm-icon discuss"><MessageCircle size={38}/></div>
-      <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Inquiry Registered!'}</h3>
-      <p className="bf-confirm-sub">
-        {lang === 'am'
-          ? 'ከታች ያለውን ቁልፍ በመጫን በቴሌግራም ቦት በቀጥታ መወያየት ይችላሉ። ዳይሬክተሮቻችን ወዲያውኑ ይመልሳሉ።'
-          : 'Please chat directly with our studio director on our official Telegram bot below.'}
-      </p>
-      <div className="bf-confirm-detail-box">
-        <div className="bf-confirm-row"><span>👤</span><strong>{form.name}</strong></div>
-        <div className="bf-confirm-row"><span>📞</span><strong>{form.phone}</strong></div>
-        <div className="bf-confirm-row"><span>📅</span><strong>{form.date}</strong></div>
-        <div className="bf-confirm-row"><span>📦</span><strong>{pkgName}</strong></div>
-        <div className="bf-confirm-row"><span>🔖</span><code>{createdOrder?.id}</code></div>
-      </div>
+  // ── Canvas Helper ──
+  function cRR(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x+r, y); c.lineTo(x+w-r, y); c.quadraticCurveTo(x+w,y,x+w,y+r);
+    c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+    c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
+    c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y);
+    c.closePath();
+  }
 
-      {/* Primary Telegram CTA */}
-      <a
-        className="bf-primary-btn bf-tg-btn"
-        href={`https://t.me/HoopStudioSystemBot?start=discuss_${createdOrder?.id || 'new'}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{textDecoration:'none',justifyContent:'center',background:'linear-gradient(135deg, #0088cc, #00b4d8)',marginBottom:'10px'}}
-      >
-        <Send size={18}/> {lang === 'am' ? '💬 በቴሌግራም ቦት በቀጥታ ይጠይቁ' : '💬 Ask on Telegram Bot Directly'}
-      </a>
-
-      <a className="bf-back-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center',marginBottom:'8px'}}>
-        <Phone size={15}/> {lang === 'am' ? '📞 በስልክ ይደውሉ: 09 10 52 69 62' : '📞 Call Us: 09 10 52 69 62'}
-      </a>
-
-      <button type="button" className="bf-back-btn" onClick={onClose}>
-        {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
-      </button>
-    </div>
-  );
-
-  // ── STEP 6: QR RECEIPT CARD (beautiful + downloadable) ──
-  const receiptCardRef = useRef(null);
-  const [receiptDownloading, setReceiptDownloading] = useState(false);
-
-  // Load cross-origin image as promise
+  // Load image helper
   const loadImg = (url) => new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -1559,139 +1468,120 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     img.src = url;
   });
 
+  // ── High-Resolution Pure White Receipt Voucher Download ──
+  const [receiptDownloading, setReceiptDownloading] = useState(false);
+
   const downloadReceipt = async () => {
     setReceiptDownloading(true);
     try {
-      const W = 720, H = 980;
+      const W = 720, H = 960;
       const cv = document.createElement('canvas');
       cv.width = W; cv.height = H;
       const c = cv.getContext('2d');
 
-      // Background
-      const bg = c.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, '#0a0a0f');
-      bg.addColorStop(0.5, '#111118');
-      bg.addColorStop(1, '#0d0508');
-      c.fillStyle = bg; c.fillRect(0, 0, W, H);
+      // Pure White Background
+      c.fillStyle = '#ffffff';
+      c.fillRect(0, 0, W, H);
 
-      // Crimson glow top-left
-      const g1 = c.createRadialGradient(130, 160, 0, 130, 160, 340);
-      g1.addColorStop(0, 'rgba(189,38,55,0.25)'); g1.addColorStop(1, 'rgba(0,0,0,0)');
-      c.fillStyle = g1; c.fillRect(0, 0, W, H);
+      // Outer light border
+      c.strokeStyle = '#e2e8f0'; c.lineWidth = 2;
+      cRR(c, 16, 16, W-32, H-32, 24); c.stroke();
 
-      // Gold glow bottom-right
-      const g2 = c.createRadialGradient(580, 820, 0, 580, 820, 260);
-      g2.addColorStop(0, 'rgba(212,175,55,0.18)'); g2.addColorStop(1, 'rgba(0,0,0,0)');
-      c.fillStyle = g2; c.fillRect(0, 0, W, H);
+      // Header Band in Luxury Brand Burgundy (#bd2637)
+      c.fillStyle = '#bd2637';
+      c.fillRect(16, 16, W-32, 120);
 
-      // Outer border
-      c.strokeStyle = 'rgba(255,255,255,0.06)'; c.lineWidth = 1.5;
-      c.strokeRect(1, 1, W-2, H-2);
+      // Brand Name
+      c.fillStyle = '#ffffff'; c.font = 'bold 36px Arial,sans-serif';
+      c.fillText('HOPE', 48, 68);
+      c.fillStyle = '#fecdd3'; c.font = 'bold 13px Arial,sans-serif';
+      c.fillText('PHOTO & VELO STUDIO', 48, 92);
+      c.fillStyle = 'rgba(255,255,255,0.85)'; c.font = '500 11px Arial,sans-serif';
+      c.fillText('ADDIS ABABA  \u00B7  EST. 2009', 48, 114);
 
-      // Header band fill
-      c.fillStyle = 'rgba(189,38,55,0.12)'; c.fillRect(0, 0, W, 118);
-      c.strokeStyle = 'rgba(189,38,55,0.3)'; c.lineWidth = 1;
-      c.beginPath(); c.moveTo(0, 118); c.lineTo(W, 118); c.stroke();
-
-      // Brand name
-      c.fillStyle = '#f5f5f5'; c.font = 'bold 40px Arial,sans-serif';
-      c.fillText('HOPE', 44, 60);
-      c.fillStyle = '#9090a8'; c.font = '500 14px Arial,sans-serif';
-      c.fillText('PHOTO & VELO STUDIO', 44, 84);
-      c.fillStyle = 'rgba(189,38,55,0.75)'; c.font = '500 11px Arial,sans-serif';
-      c.fillText('ADDIS ABABA  \u00B7  EST. 2009', 44, 108);
-
-      // Status pill (right)
-      c.fillStyle = 'rgba(245,158,11,0.15)';
-      cRR(c, W-230, 38, 186, 30, 8); c.fill();
-      c.strokeStyle = 'rgba(245,158,11,0.3)'; c.lineWidth = 1;
-      cRR(c, W-230, 38, 186, 30, 8); c.stroke();
-      c.fillStyle = '#f59e0b'; c.font = 'bold 11px Arial,sans-serif';
+      // Status Pill on top-right
+      c.fillStyle = '#ffffff';
+      cRR(c, W-240, 48, 192, 34, 17); c.fill();
+      c.fillStyle = '#16a34a'; c.font = 'bold 11px Arial,sans-serif';
       c.textAlign = 'center';
-      c.fillText('PENDING VERIFICATION', W-137, 59);
+      c.fillText('DATE RESERVED', W-144, 70);
       c.textAlign = 'left';
 
       // Eyebrow
-      c.fillStyle = 'rgba(189,38,55,0.65)'; c.font = 'bold 11px Arial,sans-serif';
-      c.fillText('\u25CF  BOOKING RECEIPT', 44, 152);
+      c.fillStyle = '#bd2637'; c.font = 'bold 12px Arial,sans-serif';
+      c.fillText('OFFICIAL BOOKING RECEIPT VOUCHER', 48, 175);
 
-      // Thin divider
-      c.strokeStyle = 'rgba(255,255,255,0.05)'; c.lineWidth = 1;
-      c.beginPath(); c.moveTo(44, 163); c.lineTo(W-44, 163); c.stroke();
+      // Divider line
+      c.strokeStyle = '#e2e8f0'; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(48, 188); c.lineTo(W-48, 188); c.stroke();
 
-      // Detail rows
+      // Detail Rows (Zero Emojis, Clean Professional Alignment)
       const rows = [
-        ['\u{1F464}', 'Client', form.name || '\u2014', false],
-        ['\u{1F4DE}', 'Phone', form.phone || '\u2014', false],
-        ['\u{1F4C5}', 'Event Date', form.date || '\u2014', false],
-        ['\u{1F4E6}', 'Package', (createdOrder?.packageName || pkgName || '\u2014'), false],
-        ['\u{1F4B3}', 'Deposit Paid', `${deposit.toLocaleString()} ETB`, 'green'],
-        ['\u{1F4CA}', 'Balance Due', `${remaining.toLocaleString()} ETB`, false],
-        ['\u{1F3E6}', 'Paid Via', payMethod === 'telebirr' ? 'Telebirr' : 'CBE Birr', false],
-        ['\u{1F516}', 'Reference #', createdOrder?.id || '\u2014', 'gold'],
-        ['\u{1F4C6}', 'Issued', new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}), false],
+        ['Client Name', form.name || '—', false],
+        ['Phone Number', form.phone || '—', false],
+        ['Event Date', form.date || '—', false],
+        ['Service Package', (createdOrder?.packageName || pkgName || '—'), false],
+        ['Deposit Paid', `${deposit.toLocaleString()} ETB`, 'green'],
+        ['Balance Due', `${remaining.toLocaleString()} ETB`, false],
+        ['Payment Method', payMethod === 'telebirr' ? 'Telebirr' : 'CBE (Commercial Bank)', false],
+        ['Reference Number', createdOrder?.id || '—', 'burgundy'],
+        ['Issued Date', new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}), false],
       ];
-      let ry = 188;
-      rows.forEach(([icon, label, val, accent], i) => {
+      let ry = 216;
+      rows.forEach(([label, val, accent], i) => {
         if (i % 2 === 0) {
-          c.fillStyle = 'rgba(255,255,255,0.025)'; c.fillRect(44, ry-13, W-88, 27);
+          c.fillStyle = '#f8fafc'; c.fillRect(48, ry-14, W-96, 28);
         }
-        c.fillStyle = '#55556a'; c.font = '500 11px Arial,sans-serif';
-        c.fillText(label.toUpperCase(), 58, ry+4);
-        c.font = accent === 'gold' ? 'bold 13px Arial,sans-serif' : 'bold 14px Arial,sans-serif';
-        c.fillStyle = accent === 'green' ? '#22c55e' : accent === 'gold' ? '#d4af37' : '#f0f0f0';
+        c.fillStyle = '#64748b'; c.font = 'bold 11px Arial,sans-serif';
+        c.fillText(label.toUpperCase(), 62, ry+5);
+        c.font = accent === 'burgundy' ? 'bold 14px Arial,sans-serif' : 'bold 13px Arial,sans-serif';
+        c.fillStyle = accent === 'green' ? '#16a34a' : accent === 'burgundy' ? '#bd2637' : '#0f172a';
         c.textAlign = 'right';
-        c.fillText(val, W-58, ry+4);
+        c.fillText(val, W-62, ry+5);
         c.textAlign = 'left';
-        ry += 30;
+        ry += 32;
       });
 
-      // QR Code fetch & draw
-      const qrY = ry + 28;
-      const QS = 170;
+      // QR Code Box
+      const qrY = ry + 20;
+      const QS = 150;
       const qrX = (W - QS) / 2;
       const qrData = encodeURIComponent(`HOPE|${createdOrder?.id||'REF'}|${form.name}|${form.date}`);
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=170x170&color=f5f5f5&bgcolor=1a1a25&ecc=M&data=${qrData}`;
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=0f172a&bgcolor=ffffff&ecc=M&data=${qrData}`;
 
-      // QR background card
-      c.fillStyle = '#1a1a25';
-      cRR(c, qrX-20, qrY-14, QS+40, QS+54, 14); c.fill();
-      c.strokeStyle = 'rgba(255,255,255,0.07)'; c.lineWidth = 1;
-      cRR(c, qrX-20, qrY-14, QS+40, QS+54, 14); c.stroke();
+      c.fillStyle = '#f8fafc';
+      cRR(c, qrX-16, qrY-12, QS+32, QS+48, 16); c.fill();
+      c.strokeStyle = '#e2e8f0'; c.lineWidth = 1;
+      cRR(c, qrX-16, qrY-12, QS+32, QS+48, 16); c.stroke();
 
       try {
         const qrImg = await loadImg(qrUrl);
         c.drawImage(qrImg, qrX, qrY, QS, QS);
       } catch {
-        c.fillStyle = '#252535'; c.fillRect(qrX, qrY, QS, QS);
-        c.fillStyle = '#55556a'; c.font = '500 12px Arial,sans-serif';
-        c.textAlign = 'center'; c.fillText('QR CODE', W/2, qrY+QS/2+4); c.textAlign = 'left';
+        c.fillStyle = '#ffffff'; c.fillRect(qrX, qrY, QS, QS);
+        c.fillStyle = '#64748b'; c.font = 'bold 12px Arial,sans-serif';
+        c.textAlign = 'center'; c.fillText('OFFICIAL QR', W/2, qrY+QS/2); c.textAlign = 'left';
       }
 
-      c.fillStyle = '#55556a'; c.font = '500 11px Arial,sans-serif';
+      c.fillStyle = '#64748b'; c.font = 'bold 11px Arial,sans-serif';
       c.textAlign = 'center'; c.fillText('Scan to verify booking', W/2, qrY+QS+22); c.textAlign = 'left';
 
       // Tear line
-      const tearY = qrY + QS + 55;
-      c.setLineDash([5,6]); c.strokeStyle = 'rgba(255,255,255,0.07)'; c.lineWidth = 1.5;
-      c.beginPath(); c.moveTo(44, tearY); c.lineTo(W-44, tearY); c.stroke(); c.setLineDash([]);
-      [[28, tearY],[W-28, tearY]].forEach(([cx,cy]) => {
-        c.fillStyle = '#0a0a0f'; c.beginPath(); c.arc(cx,cy,11,0,Math.PI*2); c.fill();
+      const tearY = qrY + QS + 52;
+      c.setLineDash([5, 6]); c.strokeStyle = '#cbd5e1'; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(48, tearY); c.lineTo(W-48, tearY); c.stroke(); c.setLineDash([]);
+      [[16, tearY],[W-16, tearY]].forEach(([cx,cy]) => {
+        c.fillStyle = '#ffffff'; c.beginPath(); c.arc(cx,cy,12,0,Math.PI*2); c.fill();
+        c.strokeStyle = '#e2e8f0'; c.lineWidth = 1.5; c.beginPath(); c.arc(cx,cy,12,0,Math.PI*2); c.stroke();
       });
 
-      // Footer text
-      const fy = tearY + 32;
-      c.fillStyle = '#3a3a4a'; c.font = '500 10px Arial,sans-serif'; c.textAlign = 'center';
+      // Footer
+      const fy = tearY + 34;
+      c.fillStyle = '#64748b'; c.font = '500 11px Arial,sans-serif'; c.textAlign = 'center';
       c.fillText('Date held 24 hrs pending verification  \u00B7  +251 910 52 69 62', W/2, fy);
-      c.fillStyle = 'rgba(189,38,55,0.5)';
+      c.fillStyle = '#bd2637'; c.font = 'bold 11px Arial,sans-serif';
       c.fillText('hope-photo-velo.vercel.app', W/2, fy+20);
       c.textAlign = 'left';
-
-      // Gold accent bottom line
-      const goldG = c.createLinearGradient(80, 0, W-80, 0);
-      goldG.addColorStop(0,'rgba(212,175,55,0)'); goldG.addColorStop(0.5,'rgba(212,175,55,0.55)'); goldG.addColorStop(1,'rgba(212,175,55,0)');
-      c.strokeStyle = goldG; c.lineWidth = 1.5;
-      c.beginPath(); c.moveTo(80, H-26); c.lineTo(W-80, H-26); c.stroke();
 
       // Download
       const a = document.createElement('a');
@@ -1702,148 +1592,161 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
     setReceiptDownloading(false);
   };
 
-  // Canvas rounded-rect helper (no fill/stroke — caller does that)
-  function cRR(c, x, y, w, h, r) {
-    c.beginPath();
-    c.moveTo(x+r, y); c.lineTo(x+w-r, y); c.quadraticCurveTo(x+w,y,x+w,y+r);
-    c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-    c.lineTo(x+r,y+h); c.quadraticCurveTo(x,y+h,x,y+h-r);
-    c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y);
-    c.closePath();
-  }
-
-  const renderStep6 = () => {
-    const qrVal = encodeURIComponent(`HOPE|${createdOrder?.id||'REF'}|${form.name}|${form.date}`);
-    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&color=f5f5f5&bgcolor=111118&ecc=M&data=${qrVal}`;
+  // ── STEP 4: Success & Confirmation View matching Screenshots 2 & 3 ──
+  const renderStep4 = () => {
     return (
-      <div className="bf-step-body bf-receipt-card-wrap" ref={receiptCardRef}>
-
-        {/* ── Animated check header ── */}
-        <div className="brc-header">
-          <div className="brc-check-ring">
-            <Check size={22} color="#f5f5f5" strokeWidth={2.5}/>
+      <div className="bf-step-body" style={{ alignItems: 'center', textAlign: 'center' }}>
+        {/* Scalloped Success checkmark badge (Screenshot 2) */}
+        <div className="bf-success-scallop-wrap">
+          <div className="bf-success-scallop">
+            <Check size={36} strokeWidth={3} />
           </div>
-          <div>
-            <p className="brc-header-title">{lang==='am'?'ቀጠሮዎ ቀርቧል!':'Booking Submitted!'}</p>
-            <p className="brc-header-sub">{lang==='am'?'ደረሰኝዎን ያስቀምጡ':'Save your receipt below'}</p>
+          <h3 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#0f172a', margin: '0.2rem 0' }}>
+            {lang === 'am' ? 'ቀጠሮዎ በተሳካ ሁኔታ ተመዝግቧል!' : 'Booking Confirmed!'}
+          </h3>
+          <p className="bf-confirm-sub">
+            {lang === 'am'
+              ? 'የመረጡት ቀን በጊዜያዊነት ተይዟል። የስቱዲዮው ቡድን በአጭር ጊዜ ውስጥ ያረጋግጥልዎታል።'
+              : 'Your booking has been received and your date is reserved pending verification.'}
+          </p>
+        </div>
+
+        {/* Order Details Card (Screenshot 3 style) */}
+        <div className="bf-order-summary-card">
+          <div className="bf-order-summary-header">
+            <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#0f172a' }}>
+              {lang === 'am' ? 'የትእዛዝ ዝርዝር' : 'Order Details'}
+            </span>
+            <span className="bf-summary-badge">
+              <Check size={11} style={{ display: 'inline', marginRight: 3 }} />
+              {lang === 'am' ? 'ተመዝግቧል' : 'Registered'}
+            </span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><Package size={13} /> {lang === 'am' ? 'ፓኬጅ' : 'Package'}</span>
+            <span className="bf-summary-val">{createdOrder?.packageName || pkgName}</span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><User size={13} /> {lang === 'am' ? 'ደንበኛ' : 'Client'}</span>
+            <span className="bf-summary-val">{form.name}</span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><Phone size={13} /> {lang === 'am' ? 'ስልክ' : 'Phone'}</span>
+            <span className="bf-summary-val">{form.phone}</span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><CalendarDays size={13} /> {lang === 'am' ? 'የቀን ምርጫ' : 'Event Date'}</span>
+            <span className="bf-summary-val">{form.date}</span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><CreditCard size={13} /> {lang === 'am' ? 'ቅድመ ክፍያ' : 'Deposit Paid'}</span>
+            <span className="bf-summary-val highlight">{deposit.toLocaleString()} ETB</span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><Clock size={13} /> {lang === 'am' ? 'ቀሪ ክፍያ' : 'Balance Due'}</span>
+            <span className="bf-summary-val">{remaining.toLocaleString()} ETB</span>
+          </div>
+
+          <div className="bf-summary-item">
+            <span className="bf-summary-lbl"><Hash size={13} /> {lang === 'am' ? 'ማጣቀሻ' : 'Reference'}</span>
+            <code className="bf-summary-val ref-code">{createdOrder?.id}</code>
           </div>
         </div>
 
-        {/* ── The visual receipt card ── */}
-        <div className="brc-card">
-          <div className="brc-glow-top"/>
-          <div className="brc-glow-bottom"/>
+        {/* Action Buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', maxWidth: '440px', marginTop: '10px' }}>
+          <button
+            type="button"
+            className="bf-primary-btn"
+            onClick={downloadReceipt}
+            disabled={receiptDownloading}
+          >
+            <Download size={16} />
+            <span>{receiptDownloading ? (lang === 'am' ? 'በማዘጋጀት ላይ...' : 'Preparing receipt...') : (lang === 'am' ? 'ደረሰኝ አውርድ (PNG Voucher)' : 'Download Receipt Voucher (PNG)')}</span>
+          </button>
 
-          {/* Top band */}
-          <div className="brc-top-band">
-            <div className="brc-brand">
-              <span className="brc-brand-name">HOPE</span>
-              <span className="brc-brand-sub">Photo &amp; Velo Studio · Addis Ababa</span>
-            </div>
-            <div className="brc-pending-pill">PENDING</div>
-          </div>
+          <a
+            className="bf-secondary-btn"
+            href={`https://t.me/HoopStudioSystemBot?start=order_${createdOrder?.id || 'new'}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ textDecoration: 'none' }}
+          >
+            <Send size={15} />
+            <span>{lang === 'am' ? 'በቴሌግራም ቦት ዝርዝሩን ይመልከቱ' : 'View in Telegram Bot'}</span>
+          </a>
 
-          <p className="brc-eyebrow"><span className="brc-dot"/>BOOKING RECEIPT</p>
-
-          {/* Detail rows */}
-          <div className="brc-details">
-            {[
-              {icon:'👤', label: lang==='am'?'ስም':'Client',      val: form.name,                   mono: false, green: false},
-              {icon:'📞', label: lang==='am'?'ስልክ':'Phone',      val: form.phone,                  mono: false, green: false},
-              {icon:'📅', label: lang==='am'?'ቀን':'Event Date',  val: form.date,                   mono: false, green: false},
-              {icon:'📦', label: lang==='am'?'ፓኬጅ':'Package',   val: createdOrder?.packageName || pkgName, mono: false, green: false},
-              {icon:'💳', label: lang==='am'?'ቅድሚ ክፍያ':'Deposit Paid', val: `${deposit.toLocaleString()} ETB`, mono: false, green: true},
-              {icon:'📊', label: lang==='am'?'ቀሪ ክፍያ':'Balance Due', val: `${remaining.toLocaleString()} ETB`, mono: false, green: false},
-              {icon:'🏦', label: lang==='am'?'ሳ/ዘዴ':'Paid Via',  val: payMethod==='telebirr'?'Telebirr':'CBE Birr', mono: false, green: false},
-              {icon:'🔖', label: lang==='am'?'ማጣቀሻ':'Reference',val: null,  mono: createdOrder?.id, green: false},
-              {icon:'📆', label: lang==='am'?'የቀረበ':'Issued',    val: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}), mono: false, green: false},
-            ].map(({icon, label, val, mono, green}) => (
-              <div key={label} className="brc-row">
-                <span className="brc-row-icon">{icon}</span>
-                <span className="brc-row-label">{label}</span>
-                {mono
-                  ? <code className="brc-row-mono">{mono}</code>
-                  : <span className="brc-row-value" style={green?{color:'#22c55e'}:{}}>{val}</span>
-                }
-              </div>
-            ))}
-          </div>
-
-          {/* Tear line */}
-          <div className="brc-tear">
-            <div className="brc-tear-notch brc-notch-l"/>
-            <div className="brc-tear-dashes"/>
-            <div className="brc-tear-notch brc-notch-r"/>
-          </div>
-
-          {/* QR Section */}
-          <div className="brc-qr-section">
-            <div className="brc-qr-frame">
-              <div className="brc-qr-corner brc-corner-tl"/><div className="brc-qr-corner brc-corner-tr"/>
-              <img src={qrSrc} alt="Booking QR Code" className="brc-qr-img" crossOrigin="anonymous"/>
-              <div className="brc-qr-corner brc-corner-bl"/><div className="brc-qr-corner brc-corner-br"/>
-            </div>
-            <p className="brc-qr-label">{lang==='am'?'ቀጠሮ ለማረጋገጥ ስካን ያድርጉ':'Scan to verify booking'}</p>
-          </div>
-
-          {/* Card footer */}
-          <div className="brc-card-footer">
-            <p>{lang==='am'?'ቀኑ ለ 24 ሰዓት ይጠበቃል':'Date held 24 hrs · +251 910 52 69 62'}</p>
-            <p className="brc-footer-url">hope-photo-velo.vercel.app</p>
-          </div>
-          <div className="brc-gold-line"/>
+          <button type="button" className="bf-secondary-btn" onClick={onClose} style={{ background: '#0f172a', color: '#ffffff', borderColor: '#0f172a' }}>
+            <span>{lang === 'am' ? 'ተጠናቋል (Nice one!)' : 'Nice one!'}</span>
+          </button>
         </div>
-
-        {/* ── Download button ── */}
-        <button
-          type="button"
-          className="bf-primary-btn brc-download-btn"
-          onClick={downloadReceipt}
-          disabled={receiptDownloading}
-          style={{marginTop:'8px'}}
-        >
-          {receiptDownloading ? (
-            <><span className="brc-spinner"/>  {lang==='am'?'በማዘጋጀት ላይ...':'Preparing receipt...'}</>
-          ) : (
-            <>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              {lang==='am'?'ደረሰኝ አውርድ (PNG)':'Download Receipt PNG'}
-            </>
-          )}
-        </button>
-
-        <button type="button" className="bf-back-btn" style={{alignSelf:'center'}} onClick={onClose}>
-          {lang==='am'?'ወደ ዋናው ገጽ':'Return to Website'}
-        </button>
       </div>
     );
   };
 
+  // ── STEP 5: Telegram Bot Inquiry Screen ──
+  const renderStep5 = () => (
+    <div className="bf-step-body bf-confirm">
+      <div className="bf-confirm-icon discuss"><MessageCircle size={38}/></div>
+      <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Inquiry Registered!'}</h3>
+      <p className="bf-confirm-sub">
+        {lang === 'am'
+          ? 'ከታች ያለውን ቁልፍ በመጫን በቴሌግራም ቦት በቀጥታ መወያየት ይችላሉ። ዳይሬክተሮቻችን ወዲያውኑ ይመልሳሉ።'
+          : 'Please chat directly with our studio director on our official Telegram bot below.'}
+      </p>
+      <div className="bf-confirm-detail-box">
+        <div className="bf-confirm-row"><span className="icon"><User size={14}/></span><strong>{form.name}</strong></div>
+        <div className="bf-confirm-row"><span className="icon"><Phone size={14}/></span><strong>{form.phone}</strong></div>
+        <div className="bf-confirm-row"><span className="icon"><CalendarDays size={14}/></span><strong>{form.date}</strong></div>
+        <div className="bf-confirm-row"><span className="icon"><Package size={14}/></span><strong>{pkgName}</strong></div>
+        <div className="bf-confirm-row"><span className="icon"><Hash size={14}/></span><code>{createdOrder?.id}</code></div>
+      </div>
+
+      <a
+        className="bf-primary-btn bf-tg-btn"
+        href={`https://t.me/HoopStudioSystemBot?start=discuss_${createdOrder?.id || 'new'}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{textDecoration:'none',justifyContent:'center',marginBottom:'10px'}}
+      >
+        <Send size={18}/> <span>{lang === 'am' ? 'በቴሌግራም ቦት በቀጥታ ይጠይቁ' : 'Ask on Telegram Bot Directly'}</span>
+      </a>
+
+      <a className="bf-back-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center',marginBottom:'8px'}}>
+        <Phone size={15}/> <span>{lang === 'am' ? 'በስልክ ይደውሉ: 09 10 52 69 62' : 'Call Us: 09 10 52 69 62'}</span>
+      </a>
+
+      <button type="button" className="bf-back-btn" onClick={onClose}>
+        {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
+      </button>
+    </div>
+  );
 
   return (
     <div className="bf-overlay" role="dialog" aria-modal="true" aria-labelledby="bf-title">
       <button className="bf-backdrop" aria-label="Close" onClick={onClose}/>
       <section className="bf-panel">
         <div className="bf-panel-header">
-          <div>
-            <p className="bf-eyebrow">{lang === 'am' ? 'ቀን ምዝገባ' : 'Book Your Date'}</p>
+          <div style={{ width: '100%' }}>
+            <div className="bf-grab-bar" />
+            <p className="bf-eyebrow">{lang === 'am' ? 'ይፋዊ የቀን ማስያዣ' : 'Book Your Date'}</p>
             <h2 id="bf-title" className="bf-title">{pkgName}</h2>
           </div>
           <button className="bf-close-btn" aria-label="Close" onClick={onClose}><X size={20}/></button>
         </div>
-        {(step === 1 || step === 2 || step === 3 || step === 4) && renderStepIndicator()}
+        {renderStepIndicator()}
         <div className="bf-panel-scroll">
           {step === 1 && renderStep1()}
           {step === 2 && renderStep2()}
-          {step === 'agr-gallery' && renderAgreementGallery()}
           {step === 3 && renderStep3()}
           {step === 4 && renderStep4()}
           {step === 5 && renderStep5()}
-          {step === 6 && renderStep6()}
         </div>
       </section>
     </div>
@@ -1939,7 +1842,7 @@ function AdminControlPanel({ onClose, lang }) {
       setDefaultAgr9(agrRes.defaultAgreements || sRes.settings?.defaultAgreements9 || []);
       setCustomAgrs(agrRes.customAgreements || []);
       setSignedAgrs(agrRes.signedAgreements || []);
-      setStatus('✓ Live data synced');
+      setStatus('Live data synced');
       setTimeout(() => setStatus(''), 2500);
     } catch(e) {
       setStatus('Failed to load data');
@@ -2015,7 +1918,7 @@ function AdminControlPanel({ onClose, lang }) {
       if (d.success) {
         setChatMessages(prev => [...prev, d.message]);
         setChatReplyText('');
-        setStatus('✓ Reply sent via Telegram');
+        setStatus('Reply sent via Telegram');
         setTimeout(() => setStatus(''), 2000);
       }
     } catch(e) { setStatus('Send failed'); }
@@ -2033,7 +1936,7 @@ function AdminControlPanel({ onClose, lang }) {
       });
       const d = await r.json();
       if (d.success) {
-        setStatus(`✓ Agreement link sent: ${d.signingUrl}`);
+        setStatus(`Agreement link sent: ${d.signingUrl}`);
         setTimeout(() => setStatus(''), 3000);
       }
     } catch(e) { setStatus('Link send failed'); }
@@ -2055,7 +1958,7 @@ function AdminControlPanel({ onClose, lang }) {
           return [d.agreement, ...prev];
         });
         setEditingAgr(null);
-        setStatus('✓ Agreement saved');
+        setStatus('Agreement saved');
         setTimeout(() => setStatus(''), 2000);
         return d.agreement;
       }
@@ -2072,7 +1975,7 @@ function AdminControlPanel({ onClose, lang }) {
       });
       const data = await r.json();
       setSettings(data.settings || settings);
-      setStatus('✓ Settings saved');
+      setStatus('Settings saved');
       setTimeout(() => setStatus(''), 2500);
     } catch(e) { setStatus('Save failed'); }
     setLoading(false);
@@ -2086,7 +1989,7 @@ function AdminControlPanel({ onClose, lang }) {
         body: JSON.stringify({ id, status: newStatus })
       });
       setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
-      setStatus(`✓ Order #${id} set to ${newStatus}`);
+      setStatus(`Order #${id} set to ${newStatus}`);
       setTimeout(() => setStatus(''), 2500);
     } catch(e) { setStatus('Update failed'); }
   };
@@ -2125,7 +2028,7 @@ function AdminControlPanel({ onClose, lang }) {
       });
       const d = await r.json();
       if (d.success) {
-        setStatus(`✓ ${sectionKey ? sectionKey.toUpperCase() : 'Content'} saved successfully`);
+        setStatus(`${sectionKey ? sectionKey.toUpperCase() : 'Content'} saved successfully`);
         setTimeout(() => setStatus(''), 2500);
       }
     } catch(e) { setStatus('Save content failed'); }
@@ -2158,7 +2061,7 @@ function AdminControlPanel({ onClose, lang }) {
           deliverablesAm: ['3 ካሜራዎች', 'ትሬይለር እና ሙሉ ቪዲዮ', 'ሙሉ ሶፍት ኮፒ በነጻ'],
           deliverablesOm: ['Kaameraa 3', 'Tireeyilara & Fiilmii', 'Soft copy guutuu']
         });
-        setStatus('✓ New package added to catalog');
+        setStatus('New package added to catalog');
         setTimeout(() => setStatus(''), 2500);
       }
     } catch(e) { setStatus('Failed to add package'); }
@@ -2177,7 +2080,7 @@ function AdminControlPanel({ onClose, lang }) {
       if (d.success) {
         setSettings(s => ({ ...s, packages: d.packages }));
         setDeletePkgConfirmId(null);
-        setStatus('✓ Package removed from catalog');
+        setStatus('Package removed from catalog');
         setTimeout(() => setStatus(''), 2500);
       }
     } catch(e) { setStatus('Failed to delete package'); }
@@ -2197,7 +2100,7 @@ function AdminControlPanel({ onClose, lang }) {
       if (d.success) {
         setSettings(s => ({ ...s, packages: d.packages }));
         setEditPkg(null);
-        setStatus('✓ Package updated');
+        setStatus('Package updated');
         setTimeout(() => setStatus(''), 2500);
       }
     } catch(e) { setStatus('Update package failed'); }
@@ -2218,7 +2121,7 @@ function AdminControlPanel({ onClose, lang }) {
       if (d.success) {
         setSettings(s => ({ ...s, addons: d.addons }));
         setNewAddon({ name: '', price: 4000, desc: '', active: true });
-        setStatus('✓ Add-on service added');
+        setStatus('Add-on service added');
         setTimeout(() => setStatus(''), 2500);
       }
     } catch(e) { setStatus('Failed to add service'); }
@@ -2287,7 +2190,7 @@ function AdminControlPanel({ onClose, lang }) {
                 autoFocus
               />
             </div>
-            {pinError && <p className="admin-lock-err">⚠️ Incorrect Security PIN. Please try again.</p>}
+            {pinError && <p className="admin-lock-err"><AlertCircle size={14} style={{display:"inline",marginRight:6}}/> Incorrect Security PIN. Please try again.</p>}
             <button type="submit" className="admin-lock-btn">
               <Lock size={16}/> Unlock Studio Portal
             </button>
@@ -2358,19 +2261,19 @@ function AdminControlPanel({ onClose, lang }) {
             {pendingCount > 0 && <span className="apt-tab-pill-amber">{pendingCount}</span>}
           </button>
           <button className={`apt-tab ${tab === 'chats' ? 'apt-tab-active' : ''}`} onClick={() => setTab('chats')}>
-            <MessageCircle size={16}/> <span>💬 Chats</span>
+            <MessageCircle size={16}/> <span>Chats</span>
             {chats.reduce((s,c) => s + (c.unreadCount||0), 0) > 0 && (
               <span className="apt-tab-pill-amber">{chats.reduce((s,c) => s + (c.unreadCount||0), 0)}</span>
             )}
           </button>
           <button className={`apt-tab ${tab === 'packages' ? 'apt-tab-active' : ''}`} onClick={() => setTab('packages')}>
-            <Star size={16}/> <span>📦 Packages</span>
+            <Star size={16}/> <span>Packages</span>
           </button>
           <button className={`apt-tab ${tab === 'content' ? 'apt-tab-active' : ''}`} onClick={() => setTab('content')}>
-            <FileText size={16}/> <span>📝 Content</span>
+            <FileText size={16}/> <span>Content</span>
           </button>
           <button className={`apt-tab ${tab === 'agreements' ? 'apt-tab-active' : ''}`} onClick={() => setTab('agreements')}>
-            <Layers size={16}/> <span>📜 Agreements</span>
+            <Layers size={16}/> <span>Agreements</span>
           </button>
           <button className={`apt-tab ${tab === 'calendar' ? 'apt-tab-active' : ''}`} onClick={() => setTab('calendar')}>
             <CalendarDays size={16}/> <span>Calendar</span>
@@ -2395,7 +2298,7 @@ function AdminControlPanel({ onClose, lang }) {
               {/* LEFT: Chat list */}
               <div className="admin-chat-sidebar">
                 <div className="admin-chat-sidebar-header">
-                  <h4>💬 Conversations</h4>
+                  <h4>Conversations</h4>
                   <button className="apt-btn-secondary" onClick={loadData}><RefreshCw size={13}/></button>
                 </div>
                 {chats.length === 0 ? (
@@ -2452,7 +2355,7 @@ function AdminControlPanel({ onClose, lang }) {
                         chatMessages.map(m => (
                           <div key={m.id} className={`admin-chat-msg ${m.sender === 'admin' ? 'msg-admin' : 'msg-client'}`}>
                             <div className="admin-chat-msg-bubble">
-                              <div className="admin-chat-msg-sender">{m.sender === 'admin' ? '🟦 Admin' : '🟩 Client'}</div>
+                              <div className="admin-chat-msg-sender">{m.sender === 'admin' ? 'Admin' : 'Client'}</div>
                               <div className="admin-chat-msg-text">{m.text}</div>
                               <div className="admin-chat-msg-time">{new Date(m.timestamp).toLocaleTimeString()}</div>
                             </div>
@@ -2494,7 +2397,7 @@ function AdminControlPanel({ onClose, lang }) {
               <div className="apt-card-box">
                 <div className="apt-box-header">
                   <div>
-                    <h4>📋 9 Default Agreement Templates (ወ•ል)</h4>
+                    <h4>9 Default Agreement Templates (ወ•ል)</h4>
                     <p>The 9 ready-made physical contract templates, now digital. Click to edit &amp; customize per client.</p>
                   </div>
                 </div>
@@ -2529,7 +2432,7 @@ function AdminControlPanel({ onClose, lang }) {
                 {editingAgr ? (
                   <>
                     <div className="apt-box-header">
-                      <h4>✏️ Customize Agreement for Client</h4>
+                      <h4>Customize Agreement for Client</h4>
                     </div>
                     <div className="admin-agr-editor">
                       <label>Client Name
@@ -2566,7 +2469,7 @@ function AdminControlPanel({ onClose, lang }) {
                   <>
                     <div className="apt-box-header">
                       <div>
-                        <h4>📨 Custom Client Agreements</h4>
+                        <h4>Custom Client Agreements</h4>
                         <p>Agreements customized for specific clients. Send signing link via Telegram.</p>
                       </div>
                     </div>
@@ -2612,14 +2515,14 @@ function AdminControlPanel({ onClose, lang }) {
             {/* Signed Agreements Archive */}
             {signedAgrs.length > 0 && (
               <div className="apt-card-box" style={{marginTop:'20px'}}>
-                <div className="apt-box-header"><h4>✍️ Signed Agreements Archive ({signedAgrs.length})</h4></div>
+                <div className="apt-box-header"><h4>Signed Agreements Archive ({signedAgrs.length})</h4></div>
                 {signedAgrs.map(agr => (
                   <div key={agr.id} className="admin-agr-row">
                     <div className="admin-agr-info">
                       <strong>{agr.clientName}</strong>
                       <span className="aoc-lbl">· {agr.packageName} ·</span>
                       <span className="admin-agr-price">{(agr.agreedPrice||0).toLocaleString()} ETB</span>
-                      <span style={{color:'#22c55e', fontSize:'12px'}}> ✅ Signed {new Date(agr.signedAt).toLocaleDateString()}</span>
+                      <span style={{color:'#22c55e', fontSize:'12px'}}> Signed {new Date(agr.signedAt).toLocaleDateString()}</span>
                     </div>
                     <code style={{fontSize:'11px', color:'#9090a8'}}>{agr.id}</code>
                   </div>
@@ -2702,15 +2605,15 @@ function AdminControlPanel({ onClose, lang }) {
                         <div className="aoc-info-col">
                           <div className="aoc-info-row">
                             <span className="aoc-lbl">Event Date:</span>
-                            <strong className="aoc-val">📅 {o.eventDate || 'To be decided'}</strong>
+                            <strong className="aoc-val">{o.eventDate || 'To be decided'}</strong>
                           </div>
                           <div className="aoc-info-row">
                             <span className="aoc-lbl">Phone:</span>
-                            <a href={`tel:${o.phone}`} className="aoc-phone-link">📞 {o.phone || '—'}</a>
+                            <a href={`tel:${o.phone}`} className="aoc-phone-link">{o.phone || '—'}</a>
                           </div>
                           <div className="aoc-info-row">
                             <span className="aoc-lbl">Location:</span>
-                            <span className="aoc-val">📍 {o.location || 'Addis Ababa'}</span>
+                            <span className="aoc-val">{o.location || 'Addis Ababa'}</span>
                           </div>
                           <div className="aoc-info-row">
                             <span className="aoc-lbl">Payment Method:</span>
@@ -2837,7 +2740,7 @@ function AdminControlPanel({ onClose, lang }) {
                     <div className="apt-chips-list">
                       {(settings?.blackoutDates || []).map(d => (
                         <div key={d} className="apt-blackout-chip">
-                          <span>🚫 {d}</span>
+                          <span>{d}</span>
                           <button onClick={() => removeBlackout(d)} title="Remove block"><Trash2 size={13}/></button>
                         </div>
                       ))}
@@ -2864,7 +2767,7 @@ function AdminControlPanel({ onClose, lang }) {
                       .map(o => (
                         <div key={o.id} className="apt-booked-row">
                           <div className="apt-booked-date">
-                            📅 <strong>{o.eventDate}</strong>
+                            <CalendarDays size={13} style={{display:"inline",marginRight:4}}/> <strong>{o.eventDate}</strong>
                           </div>
                           <div className="apt-booked-info">
                             <strong>{o.clientName}</strong>
@@ -2888,7 +2791,7 @@ function AdminControlPanel({ onClose, lang }) {
             {/* Header / Hero */}
             <div className="apt-section-hero">
               <div>
-                <h3>📦 Studio Packages & Catalog Management</h3>
+                <h3>Studio Packages & Catalog Management</h3>
                 <p>Add new service packages, update pricing in ETB, customize deliverables, and manage add-on extras.</p>
               </div>
               <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.4rem'}} onClick={() => setShowAddPkgModal(true)}>
@@ -3069,7 +2972,7 @@ function AdminControlPanel({ onClose, lang }) {
             <div className="apt-card-box" style={{marginTop:'1.5rem'}}>
               <div className="apt-box-header">
                 <div>
-                  <h4>✨ Add-on Extra Services Catalog</h4>
+                  <h4>Add-on Extra Services Catalog</h4>
                   <p>Manage optional creative enhancements (Drone, Extra Operator, Rush Video, Deluxe Wall Board, Makeup).</p>
                 </div>
               </div>
@@ -3153,7 +3056,7 @@ function AdminControlPanel({ onClose, lang }) {
               <div className="apt-modal-backdrop" onClick={() => setShowAddPkgModal(false)}>
                 <div className="apt-modal-card" onClick={e => e.stopPropagation()}>
                   <div className="apt-modal-header">
-                    <h3>📦 Create New Service Package</h3>
+                    <h3>Create New Service Package</h3>
                     <button className="apt-modal-close" onClick={() => setShowAddPkgModal(false)}><X size={20}/></button>
                   </div>
                   <div className="apt-modal-body">
@@ -3229,7 +3132,7 @@ function AdminControlPanel({ onClose, lang }) {
                       <div className="apt-deliv-tags">
                         {(newPkg.deliverablesEn || []).map((item, idx) => (
                           <span key={idx} className="apt-deliv-tag">
-                            ✓ {item}
+                            {item}
                             <button type="button" onClick={() => {
                               const updated = (newPkg.deliverablesEn || []).filter((_, i) => i !== idx);
                               setNewPkg(p => ({...p, deliverablesEn: updated}));
@@ -3311,7 +3214,7 @@ function AdminControlPanel({ onClose, lang }) {
             {/* Header / Hero */}
             <div className="apt-section-hero">
               <div>
-                <h3>📝 Studio Content Management System (CMS)</h3>
+                <h3>Studio Content Management System (CMS)</h3>
                 <p>Customize real-time announcement banners, studio about story, official contact details, and bilingual FAQs.</p>
               </div>
               <a href="/" target="_blank" rel="noopener noreferrer" className="apt-btn-secondary" style={{textDecoration:'none'}}>
@@ -3322,10 +3225,10 @@ function AdminControlPanel({ onClose, lang }) {
             {/* Sub navigation pills */}
             <div className="apt-filter-pills" style={{background:'#ffffff', padding:'.75rem 1rem', borderRadius:'14px', border:'1px solid #e2e8f0'}}>
               {[
-                { id: 'announcement', label: '📢 Announcement Banner' },
-                { id: 'story', label: '📖 Studio Story & Metrics' },
-                { id: 'contact', label: '📍 Contact & Social Channels' },
-                { id: 'faqs', label: '❓ Bilingual FAQ Manager' }
+                { id: 'announcement', label: 'Announcement Banner' },
+                { id: 'story', label: 'Studio Story & Metrics' },
+                { id: 'contact', label: 'Contact & Social Channels' },
+                { id: 'faqs', label: 'Bilingual FAQ Manager' }
               ].map(sub => (
                 <button
                   key={sub.id}
@@ -3341,7 +3244,7 @@ function AdminControlPanel({ onClose, lang }) {
             {activeContentTab === 'announcement' && (
               <div className="apt-cms-card">
                 <div className="apt-cms-head">
-                  <h4>📢 Top Announcement Bar</h4>
+                  <h4>Top Announcement Bar</h4>
                   <label className="apt-cms-toggle">
                     <input
                       type="checkbox"
@@ -3351,7 +3254,7 @@ function AdminControlPanel({ onClose, lang }) {
                         announcement: { ...(c.announcement || {}), active: e.target.checked }
                       }))}
                     />
-                    <span>{contentDraft.announcement?.active ? '🟢 Banner Enabled' : '⚪ Banner Hidden'}</span>
+                    <span>{contentDraft.announcement?.active ? 'Banner Enabled' : 'Banner Hidden'}</span>
                   </label>
                 </div>
 
@@ -3413,7 +3316,7 @@ function AdminControlPanel({ onClose, lang }) {
 
                 <div style={{display:'flex', justifyContent:'flex-end'}}>
                   <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('announcement')}>
-                    💾 Save Announcement Bar
+                    Save Announcement Bar
                   </button>
                 </div>
               </div>
@@ -3423,7 +3326,7 @@ function AdminControlPanel({ onClose, lang }) {
             {activeContentTab === 'story' && (
               <div className="apt-cms-card">
                 <div className="apt-cms-head">
-                  <h4>📖 Studio Story, Experience & Key Metrics</h4>
+                  <h4>Studio Story, Experience & Key Metrics</h4>
                 </div>
 
                 <div className="apt-split-grid">
@@ -3524,7 +3427,7 @@ function AdminControlPanel({ onClose, lang }) {
 
                 <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1rem'}}>
                   <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('story')}>
-                    💾 Save Story & Metrics
+                    Save Story & Metrics
                   </button>
                 </div>
               </div>
@@ -3534,7 +3437,7 @@ function AdminControlPanel({ onClose, lang }) {
             {activeContentTab === 'contact' && (
               <div className="apt-cms-card">
                 <div className="apt-cms-head">
-                  <h4>📍 Studio Contact Details & Social Links</h4>
+                  <h4>Studio Contact Details & Social Links</h4>
                 </div>
 
                 <div className="apt-split-grid">
@@ -3654,7 +3557,7 @@ function AdminControlPanel({ onClose, lang }) {
 
                 <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1rem'}}>
                   <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('contact')}>
-                    💾 Save Contact Info
+                    Save Contact Info
                   </button>
                 </div>
               </div>
@@ -3664,7 +3567,7 @@ function AdminControlPanel({ onClose, lang }) {
             {activeContentTab === 'faqs' && (
               <div className="apt-cms-card">
                 <div className="apt-cms-head">
-                  <h4>❓ Bilingual Studio FAQ Manager ({contentDraft.faqs?.length || 0})</h4>
+                  <h4>Bilingual Studio FAQ Manager ({contentDraft.faqs?.length || 0})</h4>
                 </div>
 
                 <div className="apt-faq-list">
@@ -3784,7 +3687,7 @@ function AdminControlPanel({ onClose, lang }) {
 
                 <div style={{display:'flex', justifyContent:'flex-end', marginTop:'1.5rem'}}>
                   <button className="admin-lock-btn" style={{width:'auto', padding:'.65rem 1.75rem'}} onClick={() => saveContent('faqs')}>
-                    💾 Save All FAQs
+                    Save All FAQs
                   </button>
                 </div>
               </div>
@@ -3802,7 +3705,7 @@ function AdminControlPanel({ onClose, lang }) {
                   <p>Bilingual legal contract clauses automatically populated with client tokens during booking.</p>
                 </div>
                 <button className="aoc-btn-approve" onClick={saveContract}>
-                  💾 Save Contract Template
+                  Save Contract Template
                 </button>
               </div>
 
@@ -3896,7 +3799,7 @@ function AdminControlPanel({ onClose, lang }) {
                 </div>
 
                 <button className="aoc-btn-approve" style={{marginTop:'1.25rem', alignSelf:'flex-start'}} onClick={saveContract}>
-                  💾 Save Contract Template
+                  Save Contract Template
                 </button>
               </div>
             </div>
@@ -3913,7 +3816,7 @@ function AdminControlPanel({ onClose, lang }) {
                   <p>Manage Telebirr and Commercial Bank of Ethiopia (CBE) accounts displayed on the checkout screen.</p>
                 </div>
                 <button className="aoc-btn-approve" onClick={savePaymentAccounts}>
-                  💾 Save Bank Accounts
+                  Save Bank Accounts
                 </button>
               </div>
 
@@ -4036,7 +3939,7 @@ function AdminControlPanel({ onClose, lang }) {
               </div>
 
               <button className="aoc-btn-approve" style={{marginTop:'1.5rem'}} onClick={savePaymentAccounts}>
-                💾 Save Bank Accounts
+                Save Bank Accounts
               </button>
             </div>
           </section>
@@ -4093,19 +3996,19 @@ function _OldBookingPanel({ selectedPackage, onClose, lang }) {
     setSubmitting(true);
 
     const deliverablesText = deliverables.length
-      ? `\n\n📋 Included Deliverables (${deliverables.length}):\n` + deliverables.map(d => `• ${d}`).join('\n')
+      ? `\n\nIncluded Deliverables (${deliverables.length}):\n` + deliverables.map(d => `• ${d}`).join('\n')
       : selectedPackage?.servicesList?.length
-      ? `\n\n📋 Included Services:\n` + selectedPackage.servicesList.join('\n')
+      ? `\n\nIncluded Services:\n` + selectedPackage.servicesList.join('\n')
       : '';
 
-    const formattedMessage = `📸 NEW BOOKING REQUEST — HOPE PHOTO & VELO\n\n` +
-      `📦 Package: ${pkgName}\n` +
-      `💰 Official Price: ${selectedPackage?.price ? selectedPackage.price + ' ETB' : 'Standard Rate'}` +
+    const formattedMessage = `NEW BOOKING REQUEST — HOPE PHOTO & VELO\n\n` +
+      `Package: ${pkgName}\n` +
+      `Official Price: ${selectedPackage?.price ? selectedPackage.price + ' ETB' : 'Standard Rate'}` +
       deliverablesText + `\n\n` +
-      `👤 Client Name: ${form.name}\n` +
-      `📅 Target Date: ${form.date}\n` +
-      `📞 Phone: ${form.phone}\n` +
-      `📝 Note / Details: ${form.note || 'N/A'}`;
+      `Client Name: ${form.name}\n` +
+      `Target Date: ${form.date}\n` +
+      `Phone: ${form.phone}\n` +
+      `Note / Details: ${form.note || 'N/A'}`;
 
     let orderId = 'HOPE-' + Math.floor(1000 + Math.random() * 9000);
     const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
@@ -4161,33 +4064,33 @@ function _OldBookingPanel({ selectedPackage, onClose, lang }) {
 
             <div className="booking-success-summary-box">
               <div className="bss-row">
-                <span className="bss-label">👤 {lang === 'am' ? 'ሙሉ ስም:' : 'Full Name:'}</span>
+                <span className="bss-label"><User size={13}/> {lang === 'am' ? 'ሙሉ ስም:' : 'Full Name:'}</span>
                 <strong className="bss-val">{createdOrder?.name || form.name}</strong>
               </div>
               <div className="bss-row">
-                <span className="bss-label">📞 {lang === 'am' ? 'ስልክ ቁጥር:' : 'Phone:'}</span>
+                <span className="bss-label"><Phone size={13}/> {lang === 'am' ? 'ስልክ ቁጥር:' : 'Phone:'}</span>
                 <strong className="bss-val">{createdOrder?.phone || form.phone}</strong>
               </div>
               <div className="bss-row">
-                <span className="bss-label">📅 {lang === 'am' ? 'የቀጠሮ ቀን:' : 'Event Date:'}</span>
+                <span className="bss-label"><CalendarDays size={13}/> {lang === 'am' ? 'የቀጠሮ ቀን:' : 'Event Date:'}</span>
                 <strong className="bss-val">{createdOrder?.date || form.date}</strong>
               </div>
               {form.note && (
                 <div className="bss-row">
-                  <span className="bss-label">📝 {lang === 'am' ? 'ማስታወሻ:' : 'Note:'}</span>
+                  <span className="bss-label"><FileText size={13}/> {lang === 'am' ? 'ማስታወሻ:' : 'Note:'}</span>
                   <span className="bss-val">{form.note}</span>
                 </div>
               )}
               <div className="bss-row">
-                <span className="bss-label">📦 {lang === 'am' ? 'የመረጡት ፓኬጅ:' : 'Package:'}</span>
+                <span className="bss-label"><Package size={13}/> {lang === 'am' ? 'የመረጡት ፓኬጅ:' : 'Package:'}</span>
                 <strong className="bss-val">{pkgName}</strong>
               </div>
               <div className="bss-row">
-                <span className="bss-label">💰 {lang === 'am' ? 'ይፋዊ ዋጋ:' : 'Price:'}</span>
+                <span className="bss-label"><CreditCard size={13}/> {lang === 'am' ? 'ይፋዊ ዋጋ:' : 'Price:'}</span>
                 <strong className="bss-val bss-price">{selectedPackage?.price} ETB</strong>
               </div>
               <div className="bss-row">
-                <span className="bss-label">🔖 {lang === 'am' ? 'የትእዛዝ መለያ:' : 'Order ID:'}</span>
+                <span className="bss-label"><Hash size={13}/> {lang === 'am' ? 'የትእዛዝ መለያ:' : 'Order ID:'}</span>
                 <code className="bss-id">{createdOrder?.id}</code>
               </div>
             </div>
@@ -4308,7 +4211,7 @@ function PackagesSection({ lang, openBooking }) {
       {/* ── Direct Booking Banner ── */}
       <div className="pricing-telegram-bot-banner">
         <div className="ptb-left">
-          <span className="ptb-badge">✨ {lang === 'am' ? 'ይፋዊ የቀን ማስያዣ' : lang === 'om' ? 'Galmee Guyyaa' : 'Official Booking'}</span>
+          <span className="ptb-badge">{lang === 'am' ? 'ይፋዊ የቀን ማስያዣ' : lang === 'om' ? 'Galmee Guyyaa' : 'Official Booking'}</span>
           <h3>{lang === 'am' ? 'የመረጡትን ፓኬጅ በቀላሉ ያስይዙ፤ ቡድናችን ወዲያውኑ ያረጋግጥልዎታል!' : lang === 'om' ? 'Paakeejii filadhaa guyyaa keessan amma qabadhaa!' : 'Select your package & book your date directly online!'}</h3>
           <p>{lang === 'am' ? 'የትኛውንም ፓኬጅ በመጫን የቀጠሮዎን መረጃ ያስገቡ፤ የሆፕ ባለሙያዎች ወዲያውኑ ደውለው ቀጠሮዎን ያረጋግጣሉ።' : lang === 'om' ? 'Paakeejii barbaaddan cuqaasuun beellama keessan guutaa; saffisaan isiniif bilbilla.' : 'Click on any package to customize deliverables and request your booking schedule directly.'}</p>
         </div>
@@ -4490,30 +4393,32 @@ function AgreementSigningPage({ signId, lang }) {
   };
 
   if (loading) return (
-    <div style={{minHeight:'100vh',background:'#0a0a0f',display:'flex',alignItems:'center',justifyContent:'center',color:'#f5f5f5'}}>
+    <div style={{minHeight:'100vh',background:'#ffffff',display:'flex',alignItems:'center',justifyContent:'center',color:'#0f172a'}}>
       <div className="brc-spinner" style={{width:40,height:40,borderWidth:3}}/> &nbsp; Loading agreement...
     </div>
   );
   if (error && !agreement) return (
-    <div style={{minHeight:'100vh',background:'#0a0a0f',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#ef4444',gap:16}}>
+    <div style={{minHeight:'100vh',background:'#ffffff',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#dc2626',gap:16}}>
       <Shield size={48}/><h2>{error}</h2>
-      <a href="/" style={{color:'#d4af37'}}>← Return to HOPE Studio</a>
+      <a href="/" style={{color:'#bd2637',fontWeight:700}}>← Return to HOPE Studio</a>
     </div>
   );
   if (submitted) return (
-    <div style={{minHeight:'100vh',background:'#0a0a0f',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#f5f5f5',gap:20,padding:24}}>
-      <div style={{width:72,height:72,borderRadius:'50%',background:'linear-gradient(135deg,#22c55e,#16a34a)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{minHeight:'100vh',background:'#ffffff',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#0f172a',gap:20,padding:24}}>
+      <div style={{width:72,height:72,borderRadius:'50%',background:'linear-gradient(135deg,#16a34a,#15803d)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 10px 25px rgba(22,163,74,0.3)'}}>
         <Check size={36} color="#fff"/>
       </div>
-      <h2 style={{color:'#22c55e',fontSize:28,fontWeight:800}}>Agreement Signed!</h2>
-      <p style={{color:'#9090a8',maxWidth:400,textAlign:'center'}}>Your HOPE Studio service agreement has been digitally signed and recorded. Our team will contact you shortly.</p>
-      <div style={{background:'#111118',border:'1px solid #2a2a40',borderRadius:12,padding:20,maxWidth:360,width:'100%'}}>
-        <p><strong>Package:</strong> {agreement?.packageTitle}</p>
-        <p><strong>Total:</strong> {(agreement?.price||0).toLocaleString()} ETB</p>
-        <p><strong>50% Deposit:</strong> {Math.round((agreement?.price||0)*0.5).toLocaleString()} ETB</p>
+      <h2 style={{color:'#16a34a',fontSize:28,fontWeight:800}}>Agreement Signed!</h2>
+      <p style={{color:'#64748b',maxWidth:400,textAlign:'center'}}>Your HOPE Studio service agreement has been digitally signed and recorded. Our team will contact you shortly.</p>
+      <div style={{background:'#f8fafc',border:'1.5px solid #e2e8f0',borderRadius:16,padding:20,maxWidth:380,width:'100%'}}>
+        <p style={{margin:'0 0 8px'}}><strong>Package:</strong> {agreement?.packageTitle}</p>
+        <p style={{margin:'0 0 8px'}}><strong>Total:</strong> {(agreement?.price||0).toLocaleString()} ETB</p>
+        <p style={{margin:0}}><strong>50% Deposit:</strong> {Math.round((agreement?.price||0)*0.5).toLocaleString()} ETB</p>
       </div>
-      <a href={`tel:+251910526962`} style={{color:'#d4af37',textDecoration:'none',fontSize:18,fontWeight:700}}>📞 09 10 52 69 62</a>
-      <a href="/" style={{color:'#9090a8',fontSize:14}}>← Return to HOPE Studio</a>
+      <a href={`tel:+251910526962`} style={{display:'inline-flex',alignItems:'center',gap:6,color:'#bd2637',textDecoration:'none',fontSize:18,fontWeight:800}}>
+        <Phone size={18}/> 09 10 52 69 62
+      </a>
+      <a href="/" style={{color:'#64748b',fontSize:14,fontWeight:600}}>← Return to HOPE Studio</a>
     </div>
   );
 
@@ -4522,7 +4427,7 @@ function AgreementSigningPage({ signId, lang }) {
   const remaining = price - deposit;
 
   return (
-    <div style={{minHeight:'100vh',background:'#0a0a0f',color:'#f5f5f5',fontFamily:'Inter,sans-serif',padding:'24px 16px 80px'}}>
+    <div style={{minHeight:'100vh',background:'#ffffff',color:'#0f172a',fontFamily:'Inter,sans-serif',padding:'24px 16px 80px'}}>
       <div style={{maxWidth:840,margin:'0 auto'}}>
         <DocumentStyleAgreement
           agreement={agreement}
@@ -4540,29 +4445,29 @@ function AgreementSigningPage({ signId, lang }) {
           orderId={order?.id || agreement?.id}
         />
 
-        <div className="doc-no-print" style={{marginTop: 20, background:'#111118', border:'1px solid #2a2a40', borderRadius: 12, padding: 20}}>
+        <div className="doc-no-print" style={{marginTop: 20, background:'#f8fafc', border:'1.5px solid #e2e8f0', borderRadius: 16, padding: 20}}>
           <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer'}}>
-            <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} style={{marginTop:3}}/>
-            <span style={{color:'#cbd5e1',fontSize:13,lineHeight:1.5}}>
+            <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} style={{marginTop:3,accentColor:'#bd2637'}}/>
+            <span style={{color:'#334155',fontSize:13,lineHeight:1.5,fontWeight:600}}>
               {lang === 'am'
                 ? 'ከላይ በሰነዱ የተዘረዘሩትን ሁሉ አንብቤ ተቀብያለሁ። የ 50% ቅድሚያ ክፍያ ሁኔታን አረጋግጣለሁ።'
                 : 'I have reviewed and agree to all terms in this document. I accept the 50% advance deposit requirement.'}
             </span>
           </label>
 
-          {error && <p style={{color:'#ef4444',fontSize:13,marginTop:12}}>{error}</p>}
+          {error && <p style={{color:'#dc2626',fontSize:13,marginTop:12,fontWeight:600}}>{error}</p>}
 
           <button
             onClick={handleSign}
             disabled={submitting || !signature || !termsAccepted}
             style={{
-              width:'100%',marginTop:16,padding:'14px 24px',background:'linear-gradient(135deg,#d4af37,#b8860b)',
-              color:'#0a0a0f',fontWeight:800,fontSize:15,border:'none',borderRadius:8,cursor:'pointer',
+              width:'100%',marginTop:16,padding:'14px 24px',background:'linear-gradient(135deg,#bd2637,#9b1c2b)',
+              color:'#ffffff',fontWeight:800,fontSize:15,border:'none',borderRadius:999,cursor:'pointer',
               opacity: (submitting||!signature||!termsAccepted) ? 0.5 : 1,
-              boxShadow: '0 4px 15px rgba(212,175,55,0.3)'
+              boxShadow: '0 8px 20px rgba(189,38,55,0.25)'
             }}
           >
-            {submitting ? 'Submitting...' : lang === 'am' ? '📝 ስምምነቱን በዲጂታል ፊርማ አጽድቅ (Accept & Sign)' : '📝 Accept & Sign Agreement'}
+            {submitting ? 'Submitting...' : lang === 'am' ? 'ስምምነቱን በዲጂታል ፊርማ አጽድቅ (Accept & Sign)' : 'Accept & Sign Agreement'}
           </button>
         </div>
       </div>
@@ -5008,7 +4913,7 @@ function App() {
 
         {/* ── CLOSING CTA ── */}
         <section className="closing-cta">
-          <div className="closing-art"><img src={galleryImages[2].src} alt="Wedding photo" /><div className="closing-star">✦</div></div>
+          <div className="closing-art"><img src={galleryImages[2].src} alt="Wedding photo" /><div className="closing-star"><Sparkles size={16}/></div></div>
           <div className="closing-copy">
             <p className="eyebrow">{t.closingEyebrow}</p>
             <h2>{t.closingH2a}<br />{t.closingH2b} <em>{lang === 'am' ? '' : ''}</em></h2>
