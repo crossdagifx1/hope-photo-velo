@@ -1814,6 +1814,39 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 .bf-close-btn:hover { color: #0f172a; background: #e2e8f0; transform: scale(1.05); }
 
+/* ── Capsule Segmented Mode Switch (Matches Screenshot 4: Talk with Bot or Agreement) ── */
+.bf-segmented-mode-switch {
+  display: flex; align-items: center; justify-content: space-between;
+  background: #f1f5f9; border: 1.5px solid #e2e8f0;
+  border-radius: 999px; padding: 4px;
+  margin: 0.85rem 1.5rem 0.35rem;
+  gap: 6px;
+}
+.bf-seg-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.65rem 0.9rem; border-radius: 999px; border: none;
+  font-size: 0.8rem; font-weight: 700; color: #64748b;
+  background: transparent; cursor: pointer; transition: all 0.25s;
+}
+.bf-seg-btn.bf-seg-active {
+  background: #ffffff; color: #bd2637;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  font-weight: 800;
+}
+.bf-seg-btn:hover:not(.bf-seg-active) {
+  color: #0f172a;
+}
+
+@media (max-width: 480px) {
+  .bf-segmented-mode-switch {
+    margin: 0.6rem 1rem 0.25rem;
+  }
+  .bf-seg-btn {
+    padding: 0.55rem 0.65rem;
+    font-size: 0.76rem;
+  }
+}
+
 /* ── Modern Step Progress Bar (Matches mobile references) ── */
 .bf-progress-track {
   width: 100%; height: 3px; background: #f1f5f9;
@@ -4084,12 +4117,12 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   width: 100%;
   margin-top: 8px;
   padding: 8px 12px;
-  background: rgba(0, 136, 204, 0.12);
-  border: 1px solid rgba(0, 136, 204, 0.3);
+  background: #f0f9ff;
+  border: 1.5px solid #bae6fd;
   border-radius: 8px;
-  color: #38bdf8;
-  font-size: 12px;
-  font-weight: 600;
+  color: #0284c7;
+  font-size: 12.5px;
+  font-weight: 700;
   text-decoration: none;
   transition: all .2s ease;
   cursor: pointer;
@@ -4100,7 +4133,19 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   color: #ffffff;
   border-color: #0088cc;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.25);
+}
+
+.card-premium-dark .card-v2-tg-inquire {
+  background: rgba(0, 136, 204, 0.18);
+  border-color: rgba(0, 136, 204, 0.4);
+  color: #38bdf8;
+}
+
+.card-premium-dark .card-v2-tg-inquire:hover {
+  background: #0088cc;
+  color: #ffffff;
+  border-color: #0088cc;
 }
 
 /* ════════════════════════════════════════════════════════════════════════════

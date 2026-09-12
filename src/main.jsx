@@ -962,8 +962,11 @@ function SignaturePad({ onSign, onClear }) {
 }
 
 /* ── BOOKING FLOW MODAL ─────────────────────────────────────────────────── */
-function BookingFlowModal({ selectedPackage, onClose, lang }) {
-  const [step, setStep]               = useState(1); // 1=details 2=fork 3a=contract 3b=checkout 4=confirm 5=discussion
+function BookingFlowModal({ selectedPackage, onClose, lang, initialStep = 1 }) {
+  const [step, setStep]               = useState(initialStep); // 1=details 2=agreement 3=payment 4=confirm 5=discussion
+  useEffect(() => {
+    if (initialStep) setStep(initialStep);
+  }, [initialStep]);
   const [blackoutDates, setBlackout]  = useState([]);
   const [bookedDates, setBooked]      = useState([]);
   const [payAccounts, setPayAccounts] = useState(null);
@@ -1214,9 +1217,9 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
 
       {/* Ask on Telegram direct pill */}
       <div className="bf-tg-ask-pill-wrap">
-        <button type="button" className="bf-tg-ask-pill" onClick={handleDiscussion} disabled={submitting}>
+        <button type="button" className="bf-tg-ask-pill" onClick={() => setStep(5)}>
           <MessageCircle size={15} />
-          <span>{lang === 'am' ? 'ጥያቄ አለዎት? በቴሌግራም ቦት በቀጥታ ይጠይቁ' : 'Have a question? Chat with Studio Director on Telegram'}</span>
+          <span>{lang === 'am' ? 'ጥያቄ አለዎት? ከቦት ጋር ይወያዩ (Talk with Bot)' : lang === 'om' ? 'Gaaffii qabduu? Bootii waliin haasawaa' : 'Have a question? Talk with Telegram Bot'}</span>
           <ArrowRight size={13} />
         </button>
       </div>
@@ -1281,10 +1284,22 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
       </div>
 
       {error && <p className="bf-error">{error}</p>}
-      <button type="submit" className="bf-primary-btn">
-        <span>{lang === 'am' ? 'ቀጣይ — ወደ ውል እና ፊርማ' : 'Continue to Agreement & Sign'}</span>
-        <ArrowRight size={16}/>
-      </button>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+        <button type="submit" className="bf-primary-btn">
+          <FileText size={16}/>
+          <span>{lang === 'am' ? 'ቀጣይ — ወደ ውል እና ፊርማ (Sign Agreement)' : lang === 'om' ? 'Itti Fufaa — Gara Waliigalaa' : 'Continue to Agreement & Sign'}</span>
+          <ArrowRight size={16}/>
+        </button>
+        <button
+          type="button"
+          className="bf-secondary-btn"
+          onClick={() => setStep(5)}
+          style={{ justifyContent: 'center', borderColor: '#bae6fd', color: '#0284c7', background: '#f0f9ff' }}
+        >
+          <MessageCircle size={15}/>
+          <span>{lang === 'am' ? 'ወይም ከቦት ጋር ይወያዩ (Talk with Bot)' : lang === 'om' ? 'Yookiin Bootii Waliin Haasawaa' : 'Or Talk with Bot on Telegram'}</span>
+        </button>
+      </div>
     </form>
   );
 
@@ -1691,42 +1706,143 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
   };
 
   // ── STEP 5: Telegram Bot Inquiry Screen ──
-  const renderStep5 = () => (
-    <div className="bf-step-body bf-confirm">
-      <div className="bf-confirm-icon discuss"><MessageCircle size={38}/></div>
-      <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Inquiry Registered!'}</h3>
-      <p className="bf-confirm-sub">
-        {lang === 'am'
-          ? 'ከታች ያለውን ቁልፍ በመጫን በቴሌግራም ቦት በቀጥታ መወያየት ይችላሉ። ዳይሬክተሮቻችን ወዲያውኑ ይመልሳሉ።'
-          : 'Please chat directly with our studio director on our official Telegram bot below.'}
-      </p>
-      <div className="bf-confirm-detail-box">
-        <div className="bf-confirm-row"><span className="icon"><User size={14}/></span><strong>{form.name}</strong></div>
-        <div className="bf-confirm-row"><span className="icon"><Phone size={14}/></span><strong>{form.phone}</strong></div>
-        <div className="bf-confirm-row"><span className="icon"><CalendarDays size={14}/></span><strong>{form.date}</strong></div>
-        <div className="bf-confirm-row"><span className="icon"><Package size={14}/></span><strong>{pkgName}</strong></div>
-        <div className="bf-confirm-row"><span className="icon"><Hash size={14}/></span><code>{createdOrder?.id}</code></div>
+  const renderStep5 = () => {
+    if (createdOrder) {
+      return (
+        <div className="bf-step-body bf-confirm">
+          <div className="bf-confirm-icon discuss"><MessageCircle size={38}/></div>
+          <h3>{lang === 'am' ? 'ጥያቄዎ ተመዝግቧል!' : 'Inquiry Registered!'}</h3>
+          <p className="bf-confirm-sub">
+            {lang === 'am'
+              ? 'ጥያቄዎ ለስቱዲዮ አስተዳዳሪ ደርሷል። ከታች ያለውን ቁልፍ በመጫን በቴሌግራም ቦት በቀጥታ መወያየት ይችላሉ።'
+              : 'Your inquiry has been logged with the studio director. Chat directly on Telegram below.'}
+          </p>
+          <div className="bf-confirm-detail-box">
+            {form.name && <div className="bf-confirm-row"><span className="icon"><User size={14}/></span><strong>{form.name}</strong></div>}
+            {form.phone && <div className="bf-confirm-row"><span className="icon"><Phone size={14}/></span><strong>{form.phone}</strong></div>}
+            {form.date && <div className="bf-confirm-row"><span className="icon"><CalendarDays size={14}/></span><strong>{form.date}</strong></div>}
+            <div className="bf-confirm-row"><span className="icon"><Package size={14}/></span><strong>{pkgName}</strong></div>
+            <div className="bf-confirm-row"><span className="icon"><Hash size={14}/></span><code>{createdOrder?.id}</code></div>
+          </div>
+
+          <a
+            className="bf-primary-btn bf-tg-btn"
+            href={`https://t.me/HoopStudioSystemBot?start=discuss_${createdOrder?.id || 'new'}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{textDecoration:'none',justifyContent:'center',marginBottom:'10px'}}
+          >
+            <Send size={18}/> <span>{lang === 'am' ? 'በቴሌግራም ቦት በቀጥታ ይክፈቱ' : 'Open in Telegram Bot Directly'}</span>
+          </a>
+
+          <button
+            type="button"
+            className="bf-secondary-btn"
+            onClick={() => setStep(1)}
+            style={{ justifyContent: 'center', marginBottom: '8px', borderColor: '#bd2637', color: '#bd2637' }}
+          >
+            <FileText size={15}/> <span>{lang === 'am' ? 'ወደ ይፋዊ የውል ፊርማ ይቀይሩ (Book with Agreement)' : 'Switch to Book with Agreement'}</span>
+          </button>
+
+          <a className="bf-back-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center',marginBottom:'8px'}}>
+            <Phone size={15}/> <span>{lang === 'am' ? 'በስልክ ይደውሉ: 09 10 52 69 62' : 'Call Us: 09 10 52 69 62'}</span>
+          </a>
+
+          <button type="button" className="bf-back-btn" onClick={onClose}>
+            {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="bf-step-body bf-confirm">
+        <div className="bf-confirm-icon discuss" style={{ background: '#f0f9ff', color: '#0088cc' }}>
+          <MessageCircle size={38}/>
+        </div>
+        <h3>{lang === 'am' ? 'ከስቱዲዮ ዳይሬክተር እና ቦት ጋር ይወያዩ' : lang === 'om' ? 'Bootii Waliin Haasawaa' : 'Talk with Studio Director & Bot'}</h3>
+        <p className="bf-confirm-sub">
+          {lang === 'am'
+            ? `ስለ ${pkgName} ማንኛውንም ጥያቄ በቴሌግራም ቦት በቀጥታ መጠየቅ ይችላሉ። ወዲያውኑ ምላሽ እንሰጣለን።`
+            : `Ask any questions regarding ${pkgName} directly on our official Telegram bot. We reply promptly.`}
+        </p>
+
+        {/* 1-Tap Open Telegram Bot */}
+        <a
+          className="bf-primary-btn bf-tg-btn"
+          href={`https://t.me/HoopStudioSystemBot?start=inquire_${selectedPackage?.id || 'general'}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none', justifyContent: 'center', marginBottom: '12px' }}
+        >
+          <Send size={18}/> <span>{lang === 'am' ? 'ቴሌግራም ቦት ይክፈቱ (@HoopStudioSystemBot)' : 'Open Telegram Bot (@HoopStudioSystemBot)'}</span>
+        </a>
+
+        {/* Quick callback question form */}
+        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '14px', width: '100%', marginBottom: '12px', textAlign: 'left' }}>
+          <p style={{ fontSize: '12px', fontWeight: 700, color: '#334155', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <User size={13} /> {lang === 'am' ? 'ወይም ጥያቄዎን እዚህ ይመዝግቡ:' : 'Or leave details for direct callback:'}
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <input
+              className="bf-input"
+              name="name"
+              value={form.name}
+              onChange={update}
+              placeholder={lang === 'am' ? 'ስምዎ (አማራጭ)' : 'Your Name (optional)'}
+              style={{ fontSize: '13px', padding: '8px 10px' }}
+            />
+            <input
+              className="bf-input"
+              name="phone"
+              type="tel"
+              value={form.phone}
+              onChange={update}
+              placeholder={lang === 'am' ? 'ስልክ ቁጥርዎ' : 'Phone Number'}
+              style={{ fontSize: '13px', padding: '8px 10px' }}
+            />
+            <textarea
+              className="bf-input"
+              name="note"
+              value={form.note}
+              onChange={update}
+              rows="2"
+              placeholder={lang === 'am' ? 'ምን ማወቅ ይፈልጋሉ?' : 'What would you like to ask?'}
+              style={{ fontSize: '13px', padding: '8px 10px' }}
+            />
+            <button
+              type="button"
+              className="bf-secondary-btn"
+              onClick={handleDiscussion}
+              disabled={submitting}
+              style={{ justifyContent: 'center', borderColor: '#0088cc', color: '#0088cc', background: '#ffffff', fontWeight: 700 }}
+            >
+              <Send size={14}/>
+              <span>{submitting ? (lang === 'am' ? 'በመላክ ላይ...' : 'Sending...') : (lang === 'am' ? 'ጥያቄውን መዝግብና ቴሌግራም ክፈት' : 'Register Question & Launch Bot')}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Switch to Official Agreement */}
+        <button
+          type="button"
+          className="bf-secondary-btn"
+          onClick={() => setStep(1)}
+          style={{ justifyContent: 'center', marginBottom: '8px', borderColor: '#bd2637', color: '#bd2637' }}
+        >
+          <FileText size={15}/> <span>{lang === 'am' ? 'ቀን ማስያዝ ይፈልጋሉ? በውል ያስይዙ (Book with Agreement)' : 'Ready to book? Switch to Agreement'}</span>
+        </button>
+
+        <a className="bf-back-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center',marginBottom:'8px'}}>
+          <Phone size={15}/> <span>{lang === 'am' ? 'በስልክ ይደውሉ: 09 10 52 69 62' : 'Call Us: 09 10 52 69 62'}</span>
+        </a>
+
+        <button type="button" className="bf-back-btn" onClick={onClose}>
+          {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
+        </button>
       </div>
-
-      <a
-        className="bf-primary-btn bf-tg-btn"
-        href={`https://t.me/HoopStudioSystemBot?start=discuss_${createdOrder?.id || 'new'}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{textDecoration:'none',justifyContent:'center',marginBottom:'10px'}}
-      >
-        <Send size={18}/> <span>{lang === 'am' ? 'በቴሌግራም ቦት በቀጥታ ይጠይቁ' : 'Ask on Telegram Bot Directly'}</span>
-      </a>
-
-      <a className="bf-back-btn" href={`tel:${PHONE_LINK}`} style={{textDecoration:'none',justifyContent:'center',marginBottom:'8px'}}>
-        <Phone size={15}/> <span>{lang === 'am' ? 'በስልክ ይደውሉ: 09 10 52 69 62' : 'Call Us: 09 10 52 69 62'}</span>
-      </a>
-
-      <button type="button" className="bf-back-btn" onClick={onClose}>
-        {lang === 'am' ? 'ወደ ዋናው ገጽ ተመለሱ' : 'Return to Website'}
-      </button>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="bf-overlay" role="dialog" aria-modal="true" aria-labelledby="bf-title">
@@ -1740,6 +1856,27 @@ function BookingFlowModal({ selectedPackage, onClose, lang }) {
           </div>
           <button className="bf-close-btn" aria-label="Close" onClick={onClose}><X size={20}/></button>
         </div>
+
+        {/* ── Capsule Segmented Mode Switch (Matches Screenshot 4: Talk with Bot or Agreement) ── */}
+        <div className="bf-segmented-mode-switch">
+          <button
+            type="button"
+            className={`bf-seg-btn ${step !== 5 ? 'bf-seg-active' : ''}`}
+            onClick={() => { if (step === 5) setStep(1); }}
+          >
+            <FileText size={15} />
+            <span>{lang === 'am' ? 'በውል ያስይዙ (Agreement)' : lang === 'om' ? 'Waliigalaan Qabadhaa' : 'Book with Agreement'}</span>
+          </button>
+          <button
+            type="button"
+            className={`bf-seg-btn ${step === 5 ? 'bf-seg-active' : ''}`}
+            onClick={() => setStep(5)}
+          >
+            <MessageCircle size={15} />
+            <span>{lang === 'am' ? 'ከቦት ጋር ይወያዩ (Talk with Bot)' : lang === 'om' ? 'Bootii Waliin Haasawaa' : 'Talk with Bot'}</span>
+          </button>
+        </div>
+
         {renderStepIndicator()}
         <div className="bf-panel-scroll">
           {step === 1 && renderStep1()}
@@ -4290,23 +4427,24 @@ function PackagesSection({ lang, openBooking }) {
                       ? 'btn-style-outline'
                       : 'btn-style-dark'
                   }`}
-                  onClick={() => handlePackageClick(pkg)}
+                  onClick={() => openBooking(pkg, 1)}
                 >
-                  <CalendarDays size={15} />
-                  <span>{t.pkgCta}</span>
-                  <ArrowRight size={16} />
+                  <FileText size={15} />
+                  <span>{lang === 'am' ? 'በውል ያስይዙ (Agreement)' : lang === 'om' ? 'Waliigalaan Qabadhaa' : 'Book with Agreement'}</span>
+                  <ArrowRight size={15} />
                 </button>
-                <a
-                  href={`https://t.me/HoopStudioSystemBot?start=inquire_${pkg.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  type="button"
                   className="card-v2-tg-inquire"
-                  onClick={(e) => e.stopPropagation()}
-                  title="Ask directly on Telegram Bot"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openBooking(pkg, 5);
+                  }}
+                  title="Talk with Telegram Bot"
                 >
-                  <Send size={13} />
-                  <span>{lang === 'am' ? 'በቴሌግራም ቦት ይጠይቁ' : 'Ask on Telegram Bot'}</span>
-                </a>
+                  <MessageCircle size={14} />
+                  <span>{lang === 'am' ? 'ከቦት ጋር ይወያዩ (Talk with Bot)' : lang === 'om' ? 'Bootii Waliin Haasawaa' : 'Talk with Bot'}</span>
+                </button>
               </div>
             </article>
           );
@@ -4481,6 +4619,7 @@ function App() {
   const [lang, setLang]       = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
   const [bookingPkg, setBookingPkg] = useState(null);
+  const [bookingInitialStep, setBookingInitialStep] = useState(1);
   const [showAdmin, setShowAdmin] = useState(() => {
     return typeof window !== 'undefined' && (window.location.hash === '#admin' || window.location.pathname.startsWith('/admin'));
   });
@@ -4514,8 +4653,9 @@ function App() {
     return () => { document.body.style.overflow = ''; };
   }, [loaded, bookingPkg, showAdmin, signId]);
 
-  const openBooking = (pkg = null) => {
+  const openBooking = (pkg = null, initialStep = 1) => {
     setBookingPkg(pkg || PACKAGES_BY_CATEGORY.wedding[0]);
+    setBookingInitialStep(initialStep);
     setMenuOpen(false);
   };
   const nav = (t) => { scrollToSection(t); setMenuOpen(false); };
@@ -4965,6 +5105,7 @@ function App() {
             selectedPackage={bookingPkg}
             onClose={() => setBookingPkg(null)}
             lang={lang}
+            initialStep={bookingInitialStep}
           />
         )}
       </main>
