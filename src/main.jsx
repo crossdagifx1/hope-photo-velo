@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import {
   ArrowDownRight, ArrowRight, ArrowUpRight, CalendarDays, Camera, Check,
   ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Copy, CreditCard, Edit2, ExternalLink,
-  Eye, Film, Globe, Heart, Layers, Lock, LogOut, MapPin, Menu, MessageCircle, Package, Pencil,
-  Phone, Play, Plus, Printer, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Trash2, Upload, Video, X, FileText, Download,
+  Eye, Film, Globe, Heart, Layers, Lock, LogOut, MapPin, Menu, MessageCircle, Moon, Package, Pencil,
+  Phone, Play, Plus, Printer, Quote, RefreshCw, Search, Send, Shield, Sliders, Sparkles, Star, Sun, Trash2, Upload, Video, X, FileText, Download,
   User, Building2, Hash, Clock, CheckCircle2, ShieldCheck, AlertCircle, HelpCircle, Award, Volume2
 } from 'lucide-react';
 import './styles.css';
@@ -1233,21 +1233,7 @@ function BookingFlowModal({ selectedPackage, onClose, lang, initialStep = 1 }) {
         </div>
       )}
 
-      {pkgAddons.length > 0 && (
-        <div className="bf-addons">
-          <p className="bf-deliv-label">{lang === 'am' ? 'ተጨማሪ አማራጮች:' : 'Optional Add-ons:'}</p>
-          <div className="bf-addon-grid">
-            {pkgAddons.map(a => {
-              const sel = addons.find(x => x.id === a.id);
-              return (
-                <button key={a.id} type="button" className={`bf-addon-chip ${sel ? 'bf-addon-selected':''}`} onClick={() => toggleAddon(a)}>
-                  {sel ? <Check size={11}/> : <Plus size={11}/>} {a.name} <span>+{a.price.toLocaleString()}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* Optional add-ons removed from step 1 for simplicity */}
 
       <div className="bf-divider" />
 
@@ -2062,22 +2048,14 @@ function AdminControlPanel({ onClose, lang }) {
     setChatSending(false);
   };
 
-  const sendAgreementLink = async (customAgreementId) => {
-    if (!activeChat?.chatId) return;
-    setSendingAgrLink(true);
-    try {
-      const r = await fetch(`${apiBase}/api/agreements`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'send_link', customAgreementId, chatId: activeChat.chatId })
-      });
-      const d = await r.json();
-      if (d.success) {
-        setStatus(`Agreement link sent: ${d.signingUrl}`);
-        setTimeout(() => setStatus(''), 3000);
-      }
-    } catch(e) { setStatus('Link send failed'); }
-    setSendingAgrLink(false);
+  const copyAgreementLink = (url) => {
+    if (!url) { setStatus('No link available — save first'); return; }
+    navigator.clipboard?.writeText(url).then(() => {
+      setStatus('Link copied to clipboard!');
+      setTimeout(() => setStatus(''), 2500);
+    }).catch(() => {
+      setStatus('Copy failed — use the URL below');
+    });
   };
 
   const saveCustomAgreement = async (agrData) => {
@@ -2630,17 +2608,25 @@ function AdminControlPanel({ onClose, lang }) {
                                 <ExternalLink size={13}/> Preview
                               </a>
                             )}
-                            {agr.clientChatId && (
+                            {agr.signingUrl && (
                               <button
                                 className="aoc-btn-approve"
-                                disabled={sendingAgrLink}
-                                onClick={() => sendAgreementLink(agr.id)}
+                                onClick={() => copyAgreementLink(agr.signingUrl)}
                               >
-                                {sendingAgrLink ? <span className="brc-spinner"/> : <Send size={13}/>}
-                                Send Link
+                                <Copy size={13}/> Copy Link
                               </button>
                             )}
                           </div>
+                          {agr.signingUrl && (
+                            <div style={{width:'100%', marginTop:'5px'}}>
+                              <input
+                                readOnly
+                                value={agr.signingUrl}
+                                style={{width:'100%', fontSize:'11px', padding:'5px 8px', border:'1px solid #e2e8f0', borderRadius:'6px', background:'#f8fafc', color:'#334155', cursor:'text', boxSizing:'border-box'}}
+                                onFocus={e => e.target.select()}
+                              />
+                            </div>
+                          )}
                         </div>
                       ))
                     )}
@@ -4300,6 +4286,48 @@ function _OldBookingPanel({ selectedPackage, onClose, lang }) {
 }
 
 /* ── PACKAGES SECTION (EXACT 3-CARD LAYOUT WITH TOP CATEGORY BUTTONS) ────── */
+// Per-category hero image sets (3 photos each, auto-slide)
+const CATEGORY_HERO_IMAGES = {
+  studio:       [0, 3, 7],
+  wedding:      [1, 4, 8],
+  mesk_special: [2, 5, 6],
+};
+
+function PackageCardCarousel({ category }) {
+  const indices = CATEGORY_HERO_IMAGES[category] || [0, 1, 2];
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => setSlide(s => (s + 1) % indices.length), 3000);
+    return () => clearInterval(t);
+  }, [indices.length]);
+
+  const img = galleryImages[indices[slide]];
+  return (
+    <div className="pkg-card-carousel">
+      {indices.map((idx, i) => (
+        <img
+          key={idx}
+          src={galleryImages[idx].src}
+          alt={galleryImages[idx].altEn}
+          className={`pkg-carousel-img ${i === slide ? 'pkg-carousel-active' : ''}`}
+          aria-hidden={i !== slide}
+        />
+      ))}
+      <div className="pkg-carousel-dots">
+        {indices.map((_, i) => (
+          <button
+            key={i}
+            className={`pkg-dot ${i === slide ? 'pkg-dot-active' : ''}`}
+            onClick={e => { e.stopPropagation(); setSlide(i); }}
+            aria-label={`Photo ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PackagesSection({ lang, openBooking }) {
   const [activeCategory, setActiveCategory] = useState('studio');
   const t = T[lang];
@@ -4415,6 +4443,9 @@ function PackagesSection({ lang, openBooking }) {
                   </li>
                 ))}
               </ul>
+
+              {/* Package Hero Image Carousel */}
+              <PackageCardCarousel category={activeCategory} />
 
               {/* Action Button: Opens Booking modal */}
               <div className="card-v2-cta-wrap">
@@ -4615,9 +4646,11 @@ function AgreementSigningPage({ signId, lang }) {
 
 /* ── APP ────────────────────────────────────────────────────────────────── */
 function App() {
-  const [loaded, setLoaded]   = useState(false);
-  const [lang, setLang]       = useState('am');
+  const [loaded, setLoaded]     = useState(false);
+  const [lang, setLang]         = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langDropOpen, setLangDropOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
   const [bookingPkg, setBookingPkg] = useState(null);
   const [bookingInitialStep, setBookingInitialStep] = useState(1);
   const [showAdmin, setShowAdmin] = useState(() => {
@@ -4633,6 +4666,21 @@ function App() {
     : null;
 
   const t = T[lang];
+
+  // Apply dark mode to <html>
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  // Close lang dropdown on outside click
+  useEffect(() => {
+    if (!langDropOpen) return;
+    const handler = (e) => {
+      if (!e.target.closest('.lang-dropdown-wrap')) setLangDropOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [langDropOpen]);
 
   useEffect(() => {
     const onHash = () => {
@@ -4657,9 +4705,16 @@ function App() {
     setBookingPkg(pkg || PACKAGES_BY_CATEGORY.wedding[0]);
     setBookingInitialStep(initialStep);
     setMenuOpen(false);
+    setLangDropOpen(false);
   };
-  const nav = (t) => { scrollToSection(t); setMenuOpen(false); };
-  const toggleLang = () => setLang(l => l === 'am' ? 'en' : l === 'en' ? 'om' : 'am');
+  const nav = (section) => { scrollToSection(section); setMenuOpen(false); };
+
+  const LANG_OPTIONS = [
+    { code: 'am', label: 'አማርኛ', short: 'አማ' },
+    { code: 'en', label: 'English', short: 'EN' },
+    { code: 'om', label: 'Afaan Oromoo', short: 'OR' },
+  ];
+  const currentLangOpt = LANG_OPTIONS.find(l => l.code === lang) || LANG_OPTIONS[0];
 
   const locImgs = [galleryImages[1].src, galleryImages[3].src, galleryImages[5].src];
 
@@ -4697,28 +4752,105 @@ function App() {
             <img src={`${ASSET}/hope-logo.png`} alt="HOPE" className="brand-logo" />
           </button>
           <nav className={menuOpen ? 'nav-links nav-open' : 'nav-links'}>
-            <button onClick={() => nav('story')}>{t.nav.about}</button>
-            <button onClick={() => nav('work')}>{t.nav.work}</button>
-            <button onClick={() => nav('craft')}>{t.nav.craft}</button>
-            <button onClick={() => nav('locations')}>{t.nav.locations}</button>
-            <button onClick={() => nav('pricing')}>{t.nav.pricing}</button>
-            <button onClick={() => nav('faq')}>{t.nav.faq}</button>
+            <button type="button" onClick={() => nav('story')}>{t.nav.about}</button>
+            <button type="button" onClick={() => nav('work')}>{t.nav.work}</button>
+            <button type="button" onClick={() => nav('craft')}>{t.nav.craft}</button>
+            <button type="button" onClick={() => nav('locations')}>{t.nav.locations}</button>
+            <button type="button" onClick={() => nav('pricing')}>{t.nav.pricing}</button>
+            <button type="button" onClick={() => nav('faq')}>{t.nav.faq}</button>
+
+            {/* Mobile Menu Extras (strictly hidden on desktop, only rendered in mobile drawer) */}
+            {menuOpen && (
+              <div className="mobile-menu-extras">
+                <div className="mobile-lang-select-wrap">
+                  <div className="mobile-lang-header">
+                    <Globe size={13} />
+                    <span>ቋንቋ / LANGUAGE</span>
+                  </div>
+                  <div className="mobile-lang-options">
+                    {LANG_OPTIONS.map(opt => (
+                      <button
+                        key={opt.code}
+                        type="button"
+                        className={`mobile-lang-opt ${lang === opt.code ? 'mobile-lang-active' : ''}`}
+                        onClick={() => { setLang(opt.code); setMenuOpen(false); }}
+                      >
+                        {lang === opt.code && <Check size={12}/>} {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <a
+                  className="mobile-direct-chat-btn"
+                  href="https://t.me/HoopStudioSystemBot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <MessageCircle size={15} />
+                  <span>{lang === 'am' ? 'ቀጥታ ቻት (Direct Chat)' : lang === 'om' ? 'Haasawa Kallattii' : 'Direct Chat'}</span>
+                </a>
+              </div>
+            )}
           </nav>
+
           <div className="header-right">
             <a className="header-call-btn" href={`tel:${PHONE_LINK}`} aria-label="Call HOPE">
-              <Phone size={15} />
+              <Phone size={13} className="header-call-icon" />
               <span className="call-text">{PHONE_DISPLAY}</span>
             </a>
-            <button className="lang-toggle" onClick={toggleLang} aria-label="Switch language">
-              <Globe size={15} />
-              <span>{lang === 'am' ? 'አማ' : lang === 'en' ? 'EN' : 'OR'}</span>
+
+            {/* Language Dropdown */}
+            <div className="lang-dropdown-wrap">
+              <button
+                type="button"
+                className={`lang-toggle lang-dropdown-trigger ${langDropOpen ? 'is-active' : ''}`}
+                onClick={() => setLangDropOpen(o => !o)}
+                aria-label="Switch language"
+                aria-expanded={langDropOpen}
+              >
+                <Globe size={13} className="lang-icon" />
+                <span className="lang-code-txt">{currentLangOpt.short}</span>
+                <ChevronDown size={12} className={`lang-chevron ${langDropOpen ? 'is-open' : ''}`} />
+              </button>
+              {langDropOpen && (
+                <div className="lang-dropdown-menu" role="listbox">
+                  <div className="lang-dropdown-label">ቋንቋ / Language</div>
+                  {LANG_OPTIONS.map(opt => (
+                    <button
+                      key={opt.code}
+                      type="button"
+                      className={`lang-drop-item ${lang === opt.code ? 'lang-drop-active' : ''}`}
+                      role="option"
+                      aria-selected={lang === opt.code}
+                      onClick={() => { setLang(opt.code); setLangDropOpen(false); }}
+                    >
+                      <span className="lang-drop-flag">{opt.code === 'am' ? '🇪🇹' : opt.code === 'en' ? '🇬🇧' : '🌿'}</span>
+                      <span className="lang-drop-name">{opt.label}</span>
+                      {lang === opt.code && <Check size={13} className="lang-check-icon" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Dark / Light Mode Toggle */}
+            <button
+              type="button"
+              className="dark-mode-toggle"
+              onClick={() => setDarkMode(d => !d)}
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {darkMode ? <Sun size={15} className="sun-icon" /> : <Moon size={15} className="moon-icon" />}
             </button>
-            <button className="header-book" onClick={() => openBooking()}>
+
+            <button type="button" className="header-book" onClick={() => openBooking()}>
               <span>{t.bookBtn}</span>
-              <CalendarDays size={15} />
+              <CalendarDays size={14} />
             </button>
-            <button className="menu-button icon-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
-              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            <button type="button" className="menu-button icon-button" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu">
+              {menuOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </header>
