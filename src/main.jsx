@@ -4562,24 +4562,24 @@ function AgreementSigningPage({ signId, lang }) {
   };
 
   if (loading) return (
-    <div style={{minHeight:'100vh',background:'#ffffff',display:'flex',alignItems:'center',justifyContent:'center',color:'#0f172a'}}>
+    <div className="asp-screen">
       <div className="brc-spinner" style={{width:40,height:40,borderWidth:3}}/> &nbsp; Loading agreement...
     </div>
   );
   if (error && !agreement) return (
-    <div style={{minHeight:'100vh',background:'#ffffff',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#dc2626',gap:16}}>
+    <div className="asp-screen asp-error-screen">
       <Shield size={48}/><h2>{error}</h2>
       <a href="/" style={{color:'#bd2637',fontWeight:700}}>← Return to HOPE Studio</a>
     </div>
   );
   if (submitted) return (
-    <div style={{minHeight:'100vh',background:'#ffffff',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#0f172a',gap:20,padding:24}}>
+    <div className="asp-screen asp-submitted-screen">
       <div style={{width:72,height:72,borderRadius:'50%',background:'linear-gradient(135deg,#16a34a,#15803d)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 10px 25px rgba(22,163,74,0.3)'}}>
         <Check size={36} color="#fff"/>
       </div>
       <h2 style={{color:'#16a34a',fontSize:28,fontWeight:800}}>Agreement Signed!</h2>
-      <p style={{color:'#64748b',maxWidth:400,textAlign:'center'}}>Your HOPE Studio service agreement has been digitally signed and recorded. Our team will contact you shortly.</p>
-      <div style={{background:'#f8fafc',border:'1.5px solid #e2e8f0',borderRadius:16,padding:20,maxWidth:380,width:'100%'}}>
+      <p style={{color:'var(--muted)',maxWidth:400,textAlign:'center'}}>Your HOPE Studio service agreement has been digitally signed and recorded. Our team will contact you shortly.</p>
+      <div className="asp-summary-card">
         <p style={{margin:'0 0 8px'}}><strong>Package:</strong> {agreement?.packageTitle}</p>
         <p style={{margin:'0 0 8px'}}><strong>Total:</strong> {(agreement?.price||0).toLocaleString()} ETB</p>
         <p style={{margin:0}}><strong>50% Deposit:</strong> {Math.round((agreement?.price||0)*0.5).toLocaleString()} ETB</p>
@@ -4587,7 +4587,7 @@ function AgreementSigningPage({ signId, lang }) {
       <a href={`tel:+251910526962`} style={{display:'inline-flex',alignItems:'center',gap:6,color:'#bd2637',textDecoration:'none',fontSize:18,fontWeight:800}}>
         <Phone size={18}/> 09 10 52 69 62
       </a>
-      <a href="/" style={{color:'#64748b',fontSize:14,fontWeight:600}}>← Return to HOPE Studio</a>
+      <a href="/" style={{color:'var(--muted)',fontSize:14,fontWeight:600}}>← Return to HOPE Studio</a>
     </div>
   );
 
@@ -4596,7 +4596,7 @@ function AgreementSigningPage({ signId, lang }) {
   const remaining = price - deposit;
 
   return (
-    <div style={{minHeight:'100vh',background:'#ffffff',color:'#0f172a',fontFamily:'Inter,sans-serif',padding:'24px 16px 80px'}}>
+    <div className="asp-wrap">
       <div style={{maxWidth:840,margin:'0 auto'}}>
         <DocumentStyleAgreement
           agreement={agreement}
@@ -4650,7 +4650,12 @@ function App() {
   const [lang, setLang]         = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
   const [langDropOpen, setLangDropOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const saved = localStorage.getItem('hope_theme');
+    if (saved) return saved === 'dark';
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const [bookingPkg, setBookingPkg] = useState(null);
   const [bookingInitialStep, setBookingInitialStep] = useState(1);
   const [showAdmin, setShowAdmin] = useState(() => {
@@ -4667,9 +4672,12 @@ function App() {
 
   const t = T[lang];
 
-  // Apply dark mode to <html>
+  // Apply dark mode to <html> and persist in localStorage
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    try {
+      localStorage.setItem('hope_theme', darkMode ? 'dark' : 'light');
+    } catch {}
   }, [darkMode]);
 
   // Close lang dropdown on outside click
