@@ -52,7 +52,8 @@ export default async function handler(req, res) {
     if (id) {
       const order = db.getOrder(id);
       if (!order) return res.status(404).json({ error: 'Order not found' });
-      return res.status(200).json({ order });
+      const comments = db.getMessages(id) || [];
+      return res.status(200).json({ order, comments });
     }
     const orders = db.getOrders();
     if (user_id) {
@@ -65,6 +66,33 @@ export default async function handler(req, res) {
   if (req.method === 'POST') {
     try {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+
+      // Handle Customer Comment submission
+      if (body.action === 'comment' || body.commentText) {
+        const targetId = body.orderId || body.id;
+        if (!targetId) return res.status(400).json({ error: 'Order ID required for comment' });
+        const text = body.text || body.commentText || '';
+        const sender = body.sender || 'client';
+        const senderName = body.senderName || 'Valued Client';
+
+        const newMsg = db.addMessage(targetId, { sender, senderName, text });
+        
+        // Notify Telegram Admin of customer comment
+        try {
+          await notifyAdmins(
+            `💬 <b>NEW CLIENT NOTE ON ORDER</b> <code>${targetId}</code>\n\n` +
+            `👤 <b>From:</b> ${senderName} (${sender})\n` +
+            `📝 <b>Comment:</b> <i>"${text}"</i>\n` +
+            `\n🔗 <a href="https://hope-photo-velo-jade.vercel.app/?order=${targetId}">Open Order Page</a>`
+          );
+        } catch (tgErr) {
+          console.warn('Failed to dispatch comment alert:', tgErr.message);
+        }
+
+        const comments = db.getMessages(targetId);
+        return res.status(201).json({ success: true, message: newMsg, comments });
+      }
+
       const base = Number(body.basePrice) || 0;
       const total = Number(body.totalPrice) || base;
       const deposit = Number(body.depositAmount) || Math.round(total * 0.3);
@@ -87,19 +115,32 @@ export default async function handler(req, res) {
         remainingBalance: total - deposit,
         paymentMethod: body.paymentMethod || null,
         paymentProof: body.paymentProof || null,
+        paymentReference: body.paymentReference || null,
         signatureDataUrl: body.signatureDataUrl || null,
         termsAccepted: Boolean(body.termsAccepted),
         notes: body.notes || '',
         status: body.status || (body.paymentProof ? 'PENDING_VERIFICATION' : 'DRAFT'),
+        paymentStatus: body.paymentStatus || (body.paymentProof || body.paymentMethod ? 'PENDING_VERIFICATION' : 'UNPAID'),
+        jobStatus: body.jobStatus || 'SCHEDULED',
         createdAt: new Date().toISOString()
       });
+
+      // If client left an initial note in the booking form, save it as first comment
+      if (body.notes && body.notes.trim()) {
+        db.addMessage(order.id, {
+          sender: 'client',
+          senderName: order.clientName,
+          text: body.notes.trim()
+        });
+      }
 
       // If proof of payment attached at creation, dispatch alert
       if (order.paymentProof) {
         await dispatchPaymentAlert(order);
       }
 
-      return res.status(201).json({ success: true, order });
+      const comments = db.getMessages(order.id) || [];
+      return res.status(201).json({ success: true, order, comments });
     } catch (e) {
       console.error('Error creating order:', e);
       return res.status(500).json({ error: e.message });
@@ -125,7 +166,8 @@ export default async function handler(req, res) {
         await dispatchPaymentAlert(updated);
       }
 
-      return res.status(200).json({ success: true, order: updated });
+      const comments = db.getMessages(id) || [];
+      return res.status(200).json({ success: true, order: updated, comments });
     } catch (e) {
       return res.status(500).json({ error: e.message });
     }

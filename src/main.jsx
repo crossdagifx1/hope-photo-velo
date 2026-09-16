@@ -10,6 +10,8 @@ import {
 import './styles.css';
 import { DEFAULT_AGREEMENTS_9, resolveAgreementForPackage, DEFAULT_PACKAGES, DEFAULT_CONTENT } from './agreementsData.js';
 import DocumentStyleAgreement from './DocumentStyleAgreement.jsx';
+import VeloBookingFlow from './VeloBookingFlow.jsx';
+import OrderStatusPage from './OrderStatusPage.jsx';
 
 /* ── CONSTANTS ──────────────────────────────────────────────────────────── */
 const PHONE_DISPLAY     = '09 10 52 69 62';
@@ -3760,8 +3762,8 @@ function AdminControlPanel({ onClose, lang }) {
                 </div>
 
                 {/* Add New FAQ Card */}
-                <div style={{background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:'14px', padding:'1.25rem', marginTop:'1rem'}}>
-                  <h5 style={{margin:'0 0 .8rem', fontSize:'.9rem', fontWeight:800, color:'#0f172a'}}>+ Add New FAQ</h5>
+                <div className="admin-add-faq-card">
+                  <h5 className="admin-add-faq-title">+ Add New FAQ</h5>
                   <div className="apt-split-grid" style={{gap:'.75rem'}}>
                     <input
                       className="bf-input"
@@ -4286,44 +4288,38 @@ function _OldBookingPanel({ selectedPackage, onClose, lang }) {
 }
 
 /* ── PACKAGES SECTION (EXACT 3-CARD LAYOUT WITH TOP CATEGORY BUTTONS) ────── */
-// Per-category hero image sets (3 photos each, auto-slide)
-const CATEGORY_HERO_IMAGES = {
-  studio:       [0, 3, 7],
-  wedding:      [1, 4, 8],
-  mesk_special: [2, 5, 6],
+// Unique single hero image per package ID — hand-picked after viewing all photos
+const PKG_CARD_IMAGE = {
+  // Studio: daytime park couple on railing (green trees)
+  'studio-10k':        `${ASSET}/hero-card-2.jpg`,
+  // Studio mid: solo bride with bouquet, urban park
+  'studio-145k':       `${ASSET}/gallery/photo_2026-07-03_20-34-45_7668160982247493632.jpg`,
+  // Studio premium: solo bride over-shoulder lush green
+  'studio-185k':       `${ASSET}/gallery/photo_2026-07-03_20-34-55_7668161038802964480.jpg`,
+  // Wedding bronze: face-to-face laughing couple, forest
+  'wedding-bronze':    `${ASSET}/hero-card-1.jpg`,
+  // Wedding silver: different couple at golden sunset, crown
+  'wedding-silver':    `${ASSET}/gallery/photo_2026-07-03_20-31-17_7668160925976699904.jpg`,
+  // Wedding golden: couple with long veil, dramatic dusk
+  'wedding-golden-75': `${ASSET}/gallery/photo_2026-07-03_20-31-27_7668160963138437120.jpg`,
+  // Mesk: lady in black gown, city nightscape
+  'mesk-16k':          `${ASSET}/gallery/photo_2026-07-03_20-37-48_7668161057622723584.jpg`,
+  // Mesk premium: romantic close moment, dark blue night
+  'mesk-20k':          `${ASSET}/gallery/photo_2026-07-03_20-37-56_7668161066939796480.jpg`,
+  // Special: couple in white daisy field, dramatic dark forest
+  'special-23k':       `${ASSET}/gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg`,
 };
 
-function PackageCardCarousel({ category }) {
-  const indices = CATEGORY_HERO_IMAGES[category] || [0, 1, 2];
-  const [slide, setSlide] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setSlide(s => (s + 1) % indices.length), 3000);
-    return () => clearInterval(t);
-  }, [indices.length]);
-
-  const img = galleryImages[indices[slide]];
+function PackageCardImage({ pkgId }) {
+  const src = PKG_CARD_IMAGE[pkgId];
+  if (!src) return null;
   return (
     <div className="pkg-card-carousel">
-      {indices.map((idx, i) => (
-        <img
-          key={idx}
-          src={galleryImages[idx].src}
-          alt={galleryImages[idx].altEn}
-          className={`pkg-carousel-img ${i === slide ? 'pkg-carousel-active' : ''}`}
-          aria-hidden={i !== slide}
-        />
-      ))}
-      <div className="pkg-carousel-dots">
-        {indices.map((_, i) => (
-          <button
-            key={i}
-            className={`pkg-dot ${i === slide ? 'pkg-dot-active' : ''}`}
-            onClick={e => { e.stopPropagation(); setSlide(i); }}
-            aria-label={`Photo ${i + 1}`}
-          />
-        ))}
-      </div>
+      <img
+        src={src}
+        alt="Package preview"
+        className="pkg-carousel-img pkg-carousel-active"
+      />
     </div>
   );
 }
@@ -4445,7 +4441,7 @@ function PackagesSection({ lang, openBooking }) {
               </ul>
 
               {/* Package Hero Image Carousel */}
-              <PackageCardCarousel category={activeCategory} />
+              <PackageCardImage pkgId={pkg.id} />
 
               {/* Action Button: Opens Booking modal */}
               <div className="card-v2-cta-wrap">
@@ -4614,10 +4610,10 @@ function AgreementSigningPage({ signId, lang }) {
           orderId={order?.id || agreement?.id}
         />
 
-        <div className="doc-no-print" style={{marginTop: 20, background:'#f8fafc', border:'1.5px solid #e2e8f0', borderRadius: 16, padding: 20}}>
+        <div className="doc-no-print asp-terms-box">
           <label style={{display:'flex',alignItems:'flex-start',gap:10,cursor:'pointer'}}>
             <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} style={{marginTop:3,accentColor:'#bd2637'}}/>
-            <span style={{color:'#334155',fontSize:13,lineHeight:1.5,fontWeight:600}}>
+            <span className="asp-terms-text" style={{fontSize:13,lineHeight:1.5,fontWeight:600}}>
               {lang === 'am'
                 ? 'ከላይ በሰነዱ የተዘረዘሩትን ሁሉ አንብቤ ተቀብያለሁ። የ 50% ቅድሚያ ክፍያ ሁኔታን አረጋግጣለሁ።'
                 : 'I have reviewed and agree to all terms in this document. I accept the 50% advance deposit requirement.'}
@@ -4670,6 +4666,32 @@ function App() {
     ? new URLSearchParams(window.location.search).get('sign')
     : null;
 
+  // URL-based order status tracking (?order=HOPE-xxx or #order/HOPE-xxx)
+  const [viewOrderId, setViewOrderId] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    const fromQuery = new URLSearchParams(window.location.search).get('order');
+    if (fromQuery) return fromQuery;
+    if (window.location.hash.startsWith('#order/')) return window.location.hash.replace('#order/', '');
+    return null;
+  });
+
+  useEffect(() => {
+    const checkOrderUrl = () => {
+      const fromQuery = new URLSearchParams(window.location.search).get('order');
+      if (fromQuery) { setViewOrderId(fromQuery); return; }
+      if (window.location.hash.startsWith('#order/')) {
+        setViewOrderId(window.location.hash.replace('#order/', ''));
+        return;
+      }
+    };
+    window.addEventListener('popstate', checkOrderUrl);
+    window.addEventListener('hashchange', checkOrderUrl);
+    return () => {
+      window.removeEventListener('popstate', checkOrderUrl);
+      window.removeEventListener('hashchange', checkOrderUrl);
+    };
+  }, []);
+
   const t = T[lang];
 
   // Apply dark mode to <html> and persist in localStorage
@@ -4701,13 +4723,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (showAdmin || signId) {
+    if (showAdmin || signId || viewOrderId) {
       document.body.style.overflow = '';
       return () => { document.body.style.overflow = ''; };
     }
     document.body.style.overflow = (!loaded || bookingPkg) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [loaded, bookingPkg, showAdmin, signId]);
+  }, [loaded, bookingPkg, showAdmin, signId, viewOrderId]);
 
   const openBooking = (pkg = null, initialStep = 1) => {
     setBookingPkg(pkg || PACKAGES_BY_CATEGORY.wedding[0]);
@@ -4725,6 +4747,27 @@ function App() {
   const currentLangOpt = LANG_OPTIONS.find(l => l.code === lang) || LANG_OPTIONS[0];
 
   const locImgs = [galleryImages[1].src, galleryImages[3].src, galleryImages[5].src];
+
+  if (viewOrderId) {
+    return (
+      <OrderStatusPage
+        orderId={viewOrderId}
+        lang={lang}
+        onBack={() => {
+          setViewOrderId(null);
+          if (window.location.search.includes('order=')) {
+            const params = new URLSearchParams(window.location.search);
+            params.delete('order');
+            const newSearch = params.toString() ? `?${params.toString()}` : '';
+            window.history.replaceState(null, '', window.location.pathname + newSearch);
+          }
+          if (window.location.hash.startsWith('#order/')) {
+            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+        }}
+      />
+    );
+  }
 
   if (signId) {
     return <AgreementSigningPage signId={signId} lang={lang} />;
@@ -5241,10 +5284,11 @@ function App() {
         </footer>
 
         {bookingPkg && (
-          <BookingFlowModal
+          <VeloBookingFlow
             selectedPackage={bookingPkg}
             onClose={() => setBookingPkg(null)}
             lang={lang}
+            onLangChange={setLang}
             initialStep={bookingInitialStep}
           />
         )}
