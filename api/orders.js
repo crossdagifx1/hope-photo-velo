@@ -1,5 +1,5 @@
 // api/orders.js - Order Management API with Telegram Verification Alerts
-import { db, notifyAdmins, notifyAdminsPhoto } from './_store.js';
+import { db, notifyAdmins, notifyAdminsPhoto, sendTelegramMessage } from './_store.js';
 
 // Function to dispatch instant admin alert with receipt photo & inline review buttons
 async function dispatchPaymentAlert(order) {
@@ -160,10 +160,49 @@ export default async function handler(req, res) {
       const isNewReceipt = patch.paymentProof && patch.paymentProof !== prevOrder.paymentProof;
       const isPendingVerif = patch.status === 'PENDING_VERIFICATION' && prevOrder.status !== 'PENDING_VERIFICATION';
 
+      // Check if payment was just verified
+      const isNewlyVerified = patch.paymentStatus === 'VERIFIED' && prevOrder.paymentStatus !== 'VERIFIED';
+      // Check if job stage was updated
+      const isJobStageChanged = patch.jobStatus && patch.jobStatus !== prevOrder.jobStatus;
+
       const updated = db.updateOrder(id, patch);
 
       if (isNewReceipt || isPendingVerif) {
         await dispatchPaymentAlert(updated);
+      }
+
+      // If client is connected to Telegram, send them live real-time notifications of admin updates!
+      const clientChatId = updated.telegramChatId || updated.telegramUserId;
+      if (clientChatId) {
+        if (isNewlyVerified) {
+          const deposit = updated.depositAmount || Math.round((updated.totalPrice || 0) * 0.5);
+          sendTelegramMessage(clientChatId,
+            `🎉 <b>PAYMENT VERIFIED & CONFIRMED!</b> 🥂\n\n` +
+            `Dear <b>${updated.clientName}</b>,\n` +
+            `Your deposit of <b>${deposit.toLocaleString()} ETB</b> for Order <code>${updated.id}</code> has been officially verified by our studio director!\n\n` +
+            `📅 <b>Event Date Locked:</b> ${updated.eventDate || 'Scheduled'}\n` +
+            `📦 <b>Package:</b> ${updated.packageName}\n\n` +
+            `✨ Your date is secured. Our creative production team will contact you for pre-shoot preparations.\n\n` +
+            `🔗 <a href="https://hope-photo-velo-jade.vercel.app/?order=${updated.id}">Track Live Status on Web Portal</a>`
+          ).catch(e => console.warn('Failed to notify client of verification:', e.message));
+        }
+
+        if (isJobStageChanged) {
+          const stageNames = {
+            SCHEDULED: '📅 Booking Reserved',
+            PREP: '👗 Pre-Shoot Preparation',
+            IN_PRODUCTION: '📸 Shoot Day (In Production)',
+            EDITING: '🎞️ Cinema Editing & Color Grading',
+            COMPLETED: '🎉 Completed & Ready for Pickup'
+          };
+          const stageLabel = stageNames[updated.jobStatus] || updated.jobStatus;
+          sendTelegramMessage(clientChatId,
+            `🎬 <b>PROJECT STATUS UPDATE!</b>\n\n` +
+            `Order <code>${updated.id}</code> has advanced to:\n` +
+            `👉 <b>${stageLabel}</b>\n\n` +
+            `🔗 <a href="https://hope-photo-velo-jade.vercel.app/?order=${updated.id}">Open Live Tracking Portal</a>`
+          ).catch(e => console.warn('Failed to notify client of stage change:', e.message));
+        }
       }
 
       const comments = db.getMessages(id) || [];

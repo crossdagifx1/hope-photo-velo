@@ -1895,6 +1895,15 @@ function AdminControlPanel({ onClose, lang }) {
   const [statusFilter, setStatusFilter]   = useState('all');
   const [receiptModalImg, setReceiptModalImg] = useState(null);
 
+  // Order Live Edit & Comments states
+  const [editingOrder, setEditingOrder]                 = useState(null);
+  const [savingOrder, setSavingOrder]                   = useState(false);
+  const [orderCommentsModal, setOrderCommentsModal]     = useState(null);
+  const [orderCommentsList, setOrderCommentsList]       = useState([]);
+  const [loadingComments, setLoadingComments]           = useState(false);
+  const [directorNoteText, setDirectorNoteText]         = useState('');
+  const [sendingDirectorNote, setSendingDirectorNote]   = useState(false);
+
   // Chat state
   const [chats, setChats]                 = useState([]);
   const [activeChat, setActiveChat]       = useState(null);
@@ -2100,15 +2109,150 @@ function AdminControlPanel({ onClose, lang }) {
 
   const updateOrderStatus = async (id, newStatus) => {
     try {
-      await fetch(`${apiBase}/api/orders`, {
+      const r = await fetch(`${apiBase}/api/orders`, {
         method: 'PATCH',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ id, status: newStatus })
       });
-      setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+      const d = await r.json();
+      if (d.success && d.order) {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, ...d.order } : o));
+      } else {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+      }
       setStatus(`Order #${id} set to ${newStatus}`);
       setTimeout(() => setStatus(''), 2500);
     } catch(e) { setStatus('Update failed'); }
+  };
+
+  const updateOrderJobStatus = async (id, jobStatus) => {
+    try {
+      const r = await fetch(`${apiBase}/api/orders`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, jobStatus })
+      });
+      const d = await r.json();
+      if (d.success && d.order) {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, ...d.order } : o));
+      } else {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, jobStatus } : o));
+      }
+      setStatus(`Order #${id} stage updated to ${jobStatus}`);
+      setTimeout(() => setStatus(''), 2500);
+    } catch (e) {
+      setStatus('Failed to update stage');
+    }
+  };
+
+  const updateOrderPaymentStatus = async (id, paymentStatus) => {
+    try {
+      const mappedStatus = paymentStatus === 'VERIFIED' ? 'CONFIRMED' : (paymentStatus === 'REJECTED' ? 'REJECTED' : 'PENDING_VERIFICATION');
+      const r = await fetch(`${apiBase}/api/orders`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, paymentStatus, status: mappedStatus })
+      });
+      const d = await r.json();
+      if (d.success && d.order) {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, ...d.order } : o));
+      } else {
+        setOrders(prev => prev.map(o => o.id === id ? { ...o, paymentStatus, status: mappedStatus } : o));
+      }
+      setStatus(`Order #${id} payment: ${paymentStatus}`);
+      setTimeout(() => setStatus(''), 2500);
+    } catch (e) {
+      setStatus('Failed to update payment');
+    }
+  };
+
+  const saveOrderEdits = async (e) => {
+    if (e?.preventDefault) e.preventDefault();
+    if (!editingOrder?.id) return;
+    setSavingOrder(true);
+    try {
+      const deposit = Number(editingOrder.depositAmount) || 0;
+      const total = Number(editingOrder.totalPrice) || 0;
+      const remaining = total - deposit;
+      const patchData = {
+        id: editingOrder.id,
+        clientName: editingOrder.clientName,
+        phone: editingOrder.phone,
+        eventDate: editingOrder.eventDate,
+        location: editingOrder.location,
+        packageName: editingOrder.packageName,
+        category: editingOrder.category || 'wedding',
+        totalPrice: total,
+        depositAmount: deposit,
+        remainingBalance: remaining,
+        paymentMethod: editingOrder.paymentMethod || 'telebirr',
+        paymentReference: editingOrder.paymentReference || '',
+        paymentStatus: editingOrder.paymentStatus || 'PENDING_VERIFICATION',
+        jobStatus: editingOrder.jobStatus || 'SCHEDULED',
+        notes: editingOrder.notes || '',
+        status: editingOrder.paymentStatus === 'VERIFIED' ? 'CONFIRMED' : (editingOrder.paymentStatus === 'REJECTED' ? 'REJECTED' : (editingOrder.status || 'PENDING_VERIFICATION'))
+      };
+      const r = await fetch(`${apiBase}/api/orders`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patchData)
+      });
+      const d = await r.json();
+      if (d.success && d.order) {
+        setOrders(prev => prev.map(o => o.id === editingOrder.id ? { ...o, ...d.order } : o));
+      } else {
+        setOrders(prev => prev.map(o => o.id === editingOrder.id ? { ...o, ...patchData } : o));
+      }
+      setEditingOrder(null);
+      setStatus(`Order #${patchData.id} updated & synced to DB!`);
+      setTimeout(() => setStatus(''), 2500);
+    } catch (err) {
+      setStatus('Failed to save order edits');
+    }
+    setSavingOrder(false);
+  };
+
+  const openOrderComments = async (order) => {
+    setOrderCommentsModal(order);
+    setLoadingComments(true);
+    setOrderCommentsList([]);
+    try {
+      const r = await fetch(`${apiBase}/api/orders?id=${encodeURIComponent(order.id)}`);
+      const d = await r.json();
+      if (Array.isArray(d?.comments)) {
+        setOrderCommentsList(d.comments);
+      }
+    } catch {}
+    setLoadingComments(false);
+  };
+
+  const sendDirectorComment = async (e) => {
+    if (e?.preventDefault) e.preventDefault();
+    if (!directorNoteText.trim() || !orderCommentsModal) return;
+    setSendingDirectorNote(true);
+    try {
+      const r = await fetch(`${apiBase}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'comment',
+          orderId: orderCommentsModal.id,
+          sender: 'admin',
+          senderName: 'HOPE Studio Director',
+          text: directorNoteText.trim()
+        })
+      });
+      const d = await r.json();
+      if (d.success && d.message) {
+        setOrderCommentsList(prev => [...prev, d.message]);
+        setDirectorNoteText('');
+        setStatus('Director note posted to order');
+        setTimeout(() => setStatus(''), 2000);
+      }
+    } catch {
+      setStatus('Failed to post note');
+    }
+    setSendingDirectorNote(false);
   };
 
   const addBlackout = async () => {
@@ -2790,37 +2934,149 @@ function AdminControlPanel({ onClose, lang }) {
                         </div>
                       </div>
 
+                      {/* 5-Step Order Progress Stepper (Interactive & Live Synced to DB) */}
+                      <div className="aoc-progress-stepper" style={{margin:'0 0 12px 0'}}>
+                        <div className="aoc-stepper-head">
+                          <span>Project Stage: <strong>{
+                            o.jobStatus === 'PREP' ? '2. Pre-Shoot Prep' :
+                            o.jobStatus === 'IN_PRODUCTION' ? '3. Shoot Day (In Production)' :
+                            o.jobStatus === 'EDITING' ? '4. Cinema Editing & Color' :
+                            o.jobStatus === 'COMPLETED' ? '5. Completed & Ready for Pickup!' :
+                            '1. Booking Reserved'
+                          }</strong></span>
+                          <span className="aoc-stepper-hint">Tap any stage to advance progress &amp; sync to DB</span>
+                        </div>
+                        <div className="aoc-stepper-track">
+                          {[
+                            { key: 'SCHEDULED', num: '1', title: 'Reserved' },
+                            { key: 'PREP', num: '2', title: 'Prep' },
+                            { key: 'IN_PRODUCTION', num: '3', title: 'Shoot Day' },
+                            { key: 'EDITING', num: '4', title: 'Editing' },
+                            { key: 'COMPLETED', num: '5', title: 'Completed' },
+                          ].map((st, idx) => {
+                            const stages = ['SCHEDULED', 'PREP', 'IN_PRODUCTION', 'EDITING', 'COMPLETED'];
+                            const currentIdx = stages.indexOf(o.jobStatus || 'SCHEDULED');
+                            const isCompleted = currentIdx > idx || o.jobStatus === 'COMPLETED';
+                            const isActive = (o.jobStatus || 'SCHEDULED') === st.key;
+                            return (
+                              <button
+                                key={st.key}
+                                type="button"
+                                className={`aoc-step-btn ${isActive ? 'active' : (isCompleted ? 'completed' : '')}`}
+                                onClick={() => updateOrderJobStatus(o.id, st.key)}
+                                title={`Set job progress to stage: ${st.title}`}
+                              >
+                                {isActive ? <Sparkles size={12}/> : (isCompleted ? <Check size={12}/> : <Clock size={12}/>)}
+                                <span>{st.num}. {st.title}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Payment Verification & Control Bar */}
+                      <div className="aoc-payment-bar" style={{margin:'0 0 14px 0'}}>
+                        <div style={{display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap'}}>
+                          <span className="aoc-lbl" style={{margin:0}}>Payment Status:</span>
+                          <span className={`aoc-pay-tag ${o.paymentStatus || (o.status === 'CONFIRMED' ? 'VERIFIED' : 'PENDING_VERIFICATION')}`}>
+                            {o.paymentStatus || (o.status === 'CONFIRMED' ? 'VERIFIED' : 'PENDING_VERIFICATION')}
+                          </span>
+                          {o.paymentReference && (
+                            <span style={{fontSize:'11px', color:'#64748b'}}>
+                              Txn Ref: <code style={{background:'#f1f5f9', padding:'2px 5px', borderRadius:'4px'}}>{o.paymentReference}</code>
+                            </span>
+                          )}
+                        </div>
+                        <div style={{display:'flex', alignItems:'center', gap:'6px', flexWrap:'wrap'}}>
+                          {o.paymentStatus !== 'VERIFIED' && (
+                            <button
+                              type="button"
+                              className="aoc-step-btn completed"
+                              style={{padding:'4px 10px', fontSize:'11px'}}
+                              onClick={() => updateOrderPaymentStatus(o.id, 'VERIFIED')}
+                              title="Verify Payment and Confirm Order"
+                            >
+                              <Check size={12}/> Verify Payment
+                            </button>
+                          )}
+                          {o.paymentStatus !== 'PENDING_VERIFICATION' && (
+                            <button
+                              type="button"
+                              className="aoc-step-btn"
+                              style={{padding:'4px 10px', fontSize:'11px'}}
+                              onClick={() => updateOrderPaymentStatus(o.id, 'PENDING_VERIFICATION')}
+                              title="Mark Payment as Pending"
+                            >
+                              <Clock size={12}/> Mark Pending
+                            </button>
+                          )}
+                          {o.paymentStatus !== 'REJECTED' && (
+                            <button
+                              type="button"
+                              className="aoc-step-btn"
+                              style={{padding:'4px 10px', fontSize:'11px', color:'#dc2626', borderColor:'#fca5a5'}}
+                              onClick={() => updateOrderPaymentStatus(o.id, 'REJECTED')}
+                              title="Reject Receipt"
+                            >
+                              <X size={12}/> Reject
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
                       {/* Card Action Buttons */}
                       <div className="aoc-card-actions">
-                        {o.status !== 'CONFIRMED' && (
-                          <button className="aoc-btn-approve" onClick={() => updateOrderStatus(o.id, 'CONFIRMED')}>
-                            <Check size={15}/> Approve Booking
-                          </button>
-                        )}
-                        {o.status !== 'REJECTED' && (
-                          <button className="aoc-btn-reject" onClick={() => updateOrderStatus(o.id, 'REJECTED')}>
-                            <X size={15}/> Reject
-                          </button>
-                        )}
-                        {o.status !== 'IN_DISCUSSION' && (
-                          <button className="aoc-btn-discuss" onClick={() => updateOrderStatus(o.id, 'IN_DISCUSSION')}>
-                            <MessageCircle size={15}/> Mark In Discussion
-                          </button>
-                        )}
-                        <a href={`tel:${o.phone}`} className="aoc-btn-call">
-                          <Phone size={14}/> Call Client
+                        <button
+                          type="button"
+                          className="aoc-btn-edit"
+                          onClick={() => setEditingOrder({
+                            ...o,
+                            depositAmount: o.depositAmount || Math.round((o.totalPrice || o.basePrice || 0) * 0.3),
+                            totalPrice: o.totalPrice || o.basePrice || 0,
+                            paymentStatus: o.paymentStatus || (o.status === 'CONFIRMED' ? 'VERIFIED' : 'PENDING_VERIFICATION'),
+                            jobStatus: o.jobStatus || 'SCHEDULED'
+                          })}
+                          title="Open Full Edit Modal to customize any details, dates, or prices"
+                        >
+                          <Edit2 size={14}/> Edit Full Order
+                        </button>
+
+                        <button
+                          type="button"
+                          className="aoc-btn-discuss"
+                          onClick={() => openOrderComments(o)}
+                          title="Read Client Comments & Send Studio Director Replies"
+                        >
+                          <MessageCircle size={14}/> Notes &amp; Comments
+                        </button>
+
+                        <a
+                          href={`/?order=${o.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="aoc-btn-portal"
+                          title="Open Client's Live Status & Tracking Portal in a new tab"
+                        >
+                          <ExternalLink size={14}/> View Client Portal
                         </a>
+
+                        <a href={`tel:${o.phone}`} className="aoc-btn-call" title="Call Client directly">
+                          <Phone size={14}/> Call
+                        </a>
+
                         {(o.telegramChatId || o.telegramUserId || chats.some(c => c.orderId === o.id || c.chatId === o.telegramUserId)) && (
                           <button
+                            type="button"
                             className="aoc-btn-discuss"
-                            style={{borderColor: '#22c55e', color: '#22c55e'}}
+                            style={{borderColor: '#22c55e', color: '#16a34a', background:'#f0fdf4'}}
                             onClick={() => {
                               const targetId = o.telegramChatId || o.telegramUserId || chats.find(c => c.orderId === o.id || c.chatId === o.telegramUserId)?.chatId;
                               setTab('chats');
                               if (targetId) loadChat(targetId);
                             }}
+                            title="Open direct live Telegram conversation with client"
                           >
-                            <MessageCircle size={15}/> View Telegram Chat
+                            <MessageCircle size={14}/> Telegram Chat
                           </button>
                         )}
                       </div>
@@ -4088,6 +4344,314 @@ function AdminControlPanel({ onClose, lang }) {
               </a>
               <button className="aoc-btn-reject" onClick={() => setReceiptModalImg(null)}>Close</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── FULL ORDER EDIT MODAL ── */}
+      {editingOrder && (
+        <div className="aoc-modal-backdrop" onClick={() => !savingOrder && setEditingOrder(null)}>
+          <div className="aoc-edit-modal-card" onClick={e => e.stopPropagation()}>
+            <div className="aoc-modal-head">
+              <div>
+                <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
+                  <span className="aoc-category-tag" style={{textTransform:'uppercase'}}>{editingOrder.category || 'wedding'}</span>
+                  <code style={{fontSize:'12px', color:'#bd2637', fontWeight:800}}>{editingOrder.id}</code>
+                </div>
+                <h3 style={{margin:'4px 0 0', fontSize:'1.2rem'}}>Edit Order Details &amp; Progress</h3>
+              </div>
+              <button
+                type="button"
+                className="aoc-modal-close"
+                onClick={() => !savingOrder && setEditingOrder(null)}
+              >
+                <X size={18}/>
+              </button>
+            </div>
+
+            <form onSubmit={saveOrderEdits} style={{display:'flex', flexDirection:'column', gap:'16px'}}>
+              <div className="aoc-form-grid">
+                <div className="aoc-form-field">
+                  <label>Client Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingOrder.clientName || ''}
+                    onChange={e => setEditingOrder(o => ({...o, clientName: e.target.value}))}
+                  />
+                </div>
+                <div className="aoc-form-field">
+                  <label>Client Phone Number</label>
+                  <input
+                    type="tel"
+                    required
+                    value={editingOrder.phone || ''}
+                    onChange={e => setEditingOrder(o => ({...o, phone: e.target.value}))}
+                  />
+                </div>
+              </div>
+
+              <div className="aoc-form-grid">
+                <div className="aoc-form-field">
+                  <label>Event Date</label>
+                  <input
+                    type="date"
+                    value={editingOrder.eventDate || ''}
+                    onChange={e => setEditingOrder(o => ({...o, eventDate: e.target.value}))}
+                  />
+                </div>
+                <div className="aoc-form-field">
+                  <label>Event Location / Venue</label>
+                  <input
+                    type="text"
+                    value={editingOrder.location || ''}
+                    onChange={e => setEditingOrder(o => ({...o, location: e.target.value}))}
+                    placeholder="e.g. Addis Ababa / Skylight Hotel"
+                  />
+                </div>
+              </div>
+
+              <div className="aoc-form-grid">
+                <div className="aoc-form-field">
+                  <label>Package Name</label>
+                  <input
+                    type="text"
+                    value={editingOrder.packageName || ''}
+                    onChange={e => setEditingOrder(o => ({...o, packageName: e.target.value}))}
+                  />
+                </div>
+                <div className="aoc-form-field">
+                  <label>Event Category</label>
+                  <select
+                    value={editingOrder.category || 'wedding'}
+                    onChange={e => setEditingOrder(o => ({...o, category: e.target.value}))}
+                  >
+                    <option value="wedding">Wedding (ሰርግ)</option>
+                    <option value="birthday">Birthday (ልደት)</option>
+                    <option value="commercial">Commercial / Corporate</option>
+                    <option value="melse">Melse (መልስ)</option>
+                    <option value="studio">Studio Session</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="aoc-form-grid" style={{gridTemplateColumns:'1fr 1fr 1fr'}}>
+                <div className="aoc-form-field">
+                  <label>Total Price (ETB)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editingOrder.totalPrice ?? ''}
+                    onChange={e => setEditingOrder(o => ({...o, totalPrice: Number(e.target.value)}))}
+                  />
+                </div>
+                <div className="aoc-form-field">
+                  <label>Deposit Amount (ETB)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={editingOrder.depositAmount ?? ''}
+                    onChange={e => setEditingOrder(o => ({...o, depositAmount: Number(e.target.value)}))}
+                  />
+                </div>
+                <div className="aoc-form-field">
+                  <label>Remaining Balance (ETB)</label>
+                  <input
+                    type="text"
+                    readOnly
+                    style={{background:'#f8fafc', color:'#64748b', fontWeight:700}}
+                    value={((Number(editingOrder.totalPrice) || 0) - (Number(editingOrder.depositAmount) || 0)).toLocaleString() + ' ETB'}
+                  />
+                </div>
+              </div>
+
+              <div className="aoc-form-grid">
+                <div className="aoc-form-field">
+                  <label>Payment Method</label>
+                  <select
+                    value={editingOrder.paymentMethod || 'telebirr'}
+                    onChange={e => setEditingOrder(o => ({...o, paymentMethod: e.target.value}))}
+                  >
+                    <option value="telebirr">Telebirr Mobile Money</option>
+                    <option value="cbe">CBE Commercial Bank Transfer</option>
+                    <option value="cash">Cash at Studio</option>
+                    <option value="bank_transfer">Other Bank Transfer</option>
+                  </select>
+                </div>
+                <div className="aoc-form-field">
+                  <label>Payment Txn / Ref Number</label>
+                  <input
+                    type="text"
+                    value={editingOrder.paymentReference || ''}
+                    onChange={e => setEditingOrder(o => ({...o, paymentReference: e.target.value}))}
+                    placeholder="e.g. CBE982736192 or Telebirr Trans ID"
+                  />
+                </div>
+              </div>
+
+              <div className="aoc-form-grid" style={{background:'#fdf4f4', padding:'12px', borderRadius:'12px', border:'1px solid #fecaca'}}>
+                <div className="aoc-form-field">
+                  <label style={{color:'#991b1b'}}>Payment Verification Status</label>
+                  <select
+                    value={editingOrder.paymentStatus || 'PENDING_VERIFICATION'}
+                    onChange={e => setEditingOrder(o => ({...o, paymentStatus: e.target.value}))}
+                    style={{borderColor:'#f87171', fontWeight:700}}
+                  >
+                    <option value="PENDING_VERIFICATION">⏳ PENDING VERIFICATION (Reviewing)</option>
+                    <option value="VERIFIED">✅ VERIFIED (Deposit Confirmed)</option>
+                    <option value="REJECTED">❌ REJECTED (Invalid / Rejected Proof)</option>
+                    <option value="UNPAID">⚪ UNPAID (No Deposit Yet)</option>
+                  </select>
+                </div>
+                <div className="aoc-form-field">
+                  <label style={{color:'#991b1b'}}>Production Job Stage</label>
+                  <select
+                    value={editingOrder.jobStatus || 'SCHEDULED'}
+                    onChange={e => setEditingOrder(o => ({...o, jobStatus: e.target.value}))}
+                    style={{borderColor:'#f87171', fontWeight:700}}
+                  >
+                    <option value="SCHEDULED">1. SCHEDULED — Booking Reserved &amp; Date Locked</option>
+                    <option value="PREP">2. PREP — Pre-Shoot Preparation &amp; Briefing</option>
+                    <option value="IN_PRODUCTION">3. IN_PRODUCTION — Shoot Day Coverage</option>
+                    <option value="EDITING">4. EDITING — Cinema Editing, Color &amp; Grading</option>
+                    <option value="COMPLETED">5. COMPLETED — Ready for Pickup / Delivered</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="aoc-form-field">
+                <label>Client / Internal Production Notes</label>
+                <textarea
+                  rows="3"
+                  value={editingOrder.notes || ''}
+                  onChange={e => setEditingOrder(o => ({...o, notes: e.target.value}))}
+                  placeholder="Special client wishes, garden preferences, camera crew assignments, etc."
+                />
+              </div>
+
+              <div style={{display:'flex', justifyContent:'flex-end', gap:'10px', marginTop:'8px'}}>
+                <button
+                  type="button"
+                  className="apt-btn-secondary"
+                  disabled={savingOrder}
+                  onClick={() => setEditingOrder(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="aoc-btn-approve"
+                  disabled={savingOrder}
+                  style={{padding:'0.65rem 1.5rem'}}
+                >
+                  {savingOrder ? <span className="brc-spinner"/> : <Check size={16}/>}
+                  {savingOrder ? 'Saving to Database...' : 'Save & Sync to Database'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── ORDER NOTES & COMMENTS DRAWER / MODAL ── */}
+      {orderCommentsModal && (
+        <div className="aoc-modal-backdrop" onClick={() => setOrderCommentsModal(null)}>
+          <div className="aoc-edit-modal-card" style={{maxWidth:'600px'}} onClick={e => e.stopPropagation()}>
+            <div className="aoc-modal-head">
+              <div>
+                <div style={{display:'flex', alignItems:'center', gap:'8px'}}>
+                  <MessageCircle size={16} color="#bd2637"/>
+                  <span style={{fontSize:'12px', fontWeight:800, color:'#bd2637'}}>ORDER DISCUSSION &amp; CLIENT NOTES</span>
+                </div>
+                <h3 style={{fontSize:'1.1rem', margin:'4px 0 0'}}>{orderCommentsModal.clientName} (<code>{orderCommentsModal.id}</code>)</h3>
+              </div>
+              <button
+                type="button"
+                className="aoc-modal-close"
+                onClick={() => setOrderCommentsModal(null)}
+              >
+                <X size={18}/>
+              </button>
+            </div>
+
+            {/* Comments Thread */}
+            <div style={{maxHeight:'320px', overflowY:'auto', display:'flex', flexDirection:'column', gap:'10px', padding:'10px 0'}}>
+              {loadingComments ? (
+                <div className="apt-empty-state" style={{padding:'20px'}}>
+                  <div className="brc-spinner"/> Loading client notes...
+                </div>
+              ) : orderCommentsList.length === 0 ? (
+                <div className="apt-empty-state" style={{padding:'20px'}}>
+                  <MessageCircle size={32} color="#94a3b8"/>
+                  <h4 style={{fontSize:'14px', margin:'8px 0 2px'}}>No Notes Left Yet</h4>
+                  <p style={{fontSize:'12px'}}>The client has not posted any extra notes on the tracking portal.</p>
+                </div>
+              ) : (
+                orderCommentsList.map((c, i) => {
+                  const isAdmin = c.sender === 'admin';
+                  return (
+                    <div
+                      key={c.id || i}
+                      style={{
+                        display:'flex',
+                        flexDirection:'column',
+                        alignSelf: isAdmin ? 'flex-end' : 'flex-start',
+                        maxWidth:'85%',
+                        background: isAdmin ? '#fdf2f2' : '#f1f5f9',
+                        border: isAdmin ? '1px solid #fecaca' : '1px solid #e2e8f0',
+                        borderRadius:'12px',
+                        padding:'10px 14px'
+                      }}
+                    >
+                      <div style={{display:'flex', justifyContent:'space-between', gap:'12px', marginBottom:'4px'}}>
+                        <strong style={{fontSize:'11px', color: isAdmin ? '#bd2637' : '#0f172a'}}>
+                          {isAdmin ? '🎬 HOPE Studio Director' : (c.senderName || 'Client')}
+                        </strong>
+                        <span style={{fontSize:'10px', color:'#94a3b8'}}>
+                          {c.timestamp ? new Date(c.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}
+                        </span>
+                      </div>
+                      <p style={{margin:0, fontSize:'13px', color:'#1e293b', whiteSpace:'pre-wrap', lineHeight:1.4}}>
+                        {c.text}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Quick Reply by Studio Director */}
+            <form onSubmit={sendDirectorComment} style={{display:'flex', flexDirection:'column', gap:'8px', borderTop:'1px solid #e2e8f0', paddingTop:'12px'}}>
+              <label style={{fontSize:'11px', fontWeight:700, color:'#475569'}}>Reply as Studio Director:</label>
+              <textarea
+                rows="2"
+                className="bf-input"
+                style={{fontSize:'13px', padding:'8px 12px'}}
+                placeholder="Type a response or status update for the client to see on their portal..."
+                value={directorNoteText}
+                onChange={e => setDirectorNoteText(e.target.value)}
+              />
+              <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:'4px'}}>
+                <a
+                  href={`/?order=${orderCommentsModal.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="aoc-btn-portal"
+                  style={{fontSize:'11px', padding:'5px 10px'}}
+                >
+                  <ExternalLink size={12}/> Open Live Client Portal
+                </a>
+                <button
+                  type="submit"
+                  className="aoc-btn-approve"
+                  disabled={sendingDirectorNote || !directorNoteText.trim()}
+                  style={{padding:'6px 14px', fontSize:'12px'}}
+                >
+                  {sendingDirectorNote ? <span className="brc-spinner"/> : <Send size={13}/>}
+                  {sendingDirectorNote ? 'Posting...' : 'Post Director Reply'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
