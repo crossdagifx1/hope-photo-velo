@@ -612,15 +612,9 @@ export async function syncFromCloud() {
 export async function syncToCloud(specificChatId = null) {
   // ── 1. PRIMARY: Write to Supabase PostgreSQL Database ──
   try {
-    const upserts = [
-      { key: 'chats', data: memoryStore.chats || {}, updated_at: new Date().toISOString() },
-      { key: 'orders', data: memoryStore.orders || {}, updated_at: new Date().toISOString() },
-      { key: 'custom_agreements', data: memoryStore.customAgreements || [], updated_at: new Date().toISOString() },
-      { key: 'signed_agreements', data: memoryStore.signedAgreements || [], updated_at: new Date().toISOString() },
-      { key: 'settings', data: memoryStore.settings || {}, updated_at: new Date().toISOString() }
-    ];
+    const upserts = [];
 
-    // Atomically persist each chat under its dedicated lifetime key
+    // Atomically persist specific chat or all in-memory chats under dedicated lifetime keys
     if (specificChatId && memoryStore.chats?.[String(specificChatId)]) {
       upserts.push({
         key: `chat_${specificChatId}`,
@@ -637,7 +631,26 @@ export async function syncToCloud(specificChatId = null) {
       }
     }
 
-    await supabase.from('app_store').upsert(upserts);
+    // Never wipe existing Supabase tables with empty objects/arrays from cold start
+    if (memoryStore.chats && Object.keys(memoryStore.chats).length > 0) {
+      upserts.push({ key: 'chats', data: memoryStore.chats, updated_at: new Date().toISOString() });
+    }
+    if (memoryStore.orders && Object.keys(memoryStore.orders).length > 0) {
+      upserts.push({ key: 'orders', data: memoryStore.orders, updated_at: new Date().toISOString() });
+    }
+    if (Array.isArray(memoryStore.customAgreements) && memoryStore.customAgreements.length > 0) {
+      upserts.push({ key: 'custom_agreements', data: memoryStore.customAgreements, updated_at: new Date().toISOString() });
+    }
+    if (Array.isArray(memoryStore.signedAgreements) && memoryStore.signedAgreements.length > 0) {
+      upserts.push({ key: 'signed_agreements', data: memoryStore.signedAgreements, updated_at: new Date().toISOString() });
+    }
+    if (memoryStore.settings && Object.keys(memoryStore.settings).length > 0) {
+      upserts.push({ key: 'settings', data: memoryStore.settings, updated_at: new Date().toISOString() });
+    }
+
+    if (upserts.length > 0) {
+      await supabase.from('app_store').upsert(upserts);
+    }
   } catch (e) {
     console.warn('[SUPABASE] syncToCloud error:', e.message);
   }
