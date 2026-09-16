@@ -47,6 +47,13 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Sync latest orders and messages from Supabase Cloud on every request
+  try {
+    await db.syncFromCloud();
+  } catch (syncErr) {
+    console.warn('api/orders syncFromCloud warning:', syncErr.message);
+  }
+
   if (req.method === 'GET') {
     const { id, user_id } = req.query;
     if (id) {

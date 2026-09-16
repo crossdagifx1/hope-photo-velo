@@ -1070,23 +1070,50 @@ export default async function handler(req, res) {
         // If message is or contains an order ID like "HOPE-1234"
         const possibleOrderId = extractOrderId(text);
         if (possibleOrderId) {
-          const order = db.getOrder(possibleOrderId);
-          if (order) {
-            db.updateOrder(possibleOrderId, {
+          let order = db.getOrder(possibleOrderId);
+          if (!order) {
+            order = db.saveOrder({
+              id: possibleOrderId,
+              clientName: firstName + (from.last_name ? ' ' + from.last_name : ''),
               telegramChatId: chatId,
-              telegramUsername: username || order.telegramUsername,
-              telegramUserId: chatId
+              telegramUsername: username || null,
+              telegramUserId: chatId,
+              paymentStatus: 'PENDING_VERIFICATION',
+              status: 'PENDING_VERIFICATION',
+              jobStatus: 'SCHEDULED',
+              packageName: 'Studio Service',
+              totalPrice: 14500,
+              depositAmount: 7250,
+              remainingBalance: 7250,
+              eventDate: new Date().toISOString().split('T')[0]
             });
-            db.linkChatToOrder(chatId, possibleOrderId);
-            await db.syncToCloud();
-
-            const card = buildOrderCardText(order);
-            await sendTelegramMessage(chatId,
-              `🔍 <b>Found Booking <code>${possibleOrderId}</code>:</b>\n\n` + card,
-              { reply_markup: buildClientOrderKeyboard(possibleOrderId) }
-            );
-            return res.status(200).json({ ok: true });
           }
+
+          db.updateOrder(possibleOrderId, {
+            telegramChatId: chatId,
+            telegramUsername: username || order.telegramUsername,
+            telegramUserId: chatId
+          });
+          db.linkChatToOrder(chatId, possibleOrderId);
+          await db.syncToCloud();
+
+          const card = buildOrderCardText(order);
+          await sendTelegramMessage(chatId,
+            `🔍 <b>Found Booking <code>${possibleOrderId}</code>:</b>\n\n` + card,
+            { reply_markup: buildClientOrderKeyboard(possibleOrderId) }
+          );
+
+          // Alert admins
+          const deposit = order.depositAmount || Math.round((order.totalPrice || 0) * 0.5);
+          await notifyAdmins(
+            `🔔 <b>CLIENT LOOKUP ORDER:</b> <code>${possibleOrderId}</code>\n` +
+            `👤 Client: ${order.clientName} (@${username || 'N/A'})\n` +
+            `💰 Deposit: ${deposit.toLocaleString()} ETB | Status: ${order.paymentStatus || 'PENDING'}\n\n` +
+            `<i>Client requested order details via Telegram bot text.</i>`,
+            { reply_markup: buildAdminOrderKeyboard(possibleOrderId, chatId) }
+          );
+
+          return res.status(200).json({ ok: true });
         }
 
         // Default /start for client

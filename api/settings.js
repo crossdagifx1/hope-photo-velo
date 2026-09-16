@@ -10,6 +10,13 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  // Sync state from Supabase Cloud on every request
+  try {
+    await db.syncFromCloud();
+  } catch (syncErr) {
+    console.warn('api/settings syncFromCloud warning:', syncErr.message);
+  }
+
   if (req.method === 'GET') {
     const settings = db.getSettings();
     const { includeAdminData, pin } = req.query;
