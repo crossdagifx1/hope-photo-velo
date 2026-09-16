@@ -230,7 +230,7 @@ function buildClientOrderKeyboard(orderId) {
         { text: '💬 Leave Note for Director', callback_data: `ask_note:${orderId}` }
       ],
       [
-        { text: '📞 Call Studio Director (0910526962)', url: 'tel:+251910526962' }
+        { text: '📞 Studio Hotline (09 10 52 69 62)', callback_data: 'call_hotline' }
       ]
     ]
   };
@@ -412,6 +412,19 @@ export default async function handler(req, res) {
             `✍️ <b>Leave a Note for HOPE Studio Directors:</b>\n\n` +
             `Type any instruction, shoot preference, or question here. It will be recorded directly under Order <code>${orderId}</code> and forwarded to our directors!`
           );
+          return res.status(200).json({ ok: true });
+        }
+
+        // 2b. Client requests hotline popup
+        if (data === 'call_hotline') {
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              callback_query_id: callbackId,
+              text: '📞 Studio Hotline: 09 10 52 69 62\n📍 Tigat Building, Hayahulet, Addis Ababa',
+              show_alert: true
+            })
+          });
           return res.status(200).json({ ok: true });
         }
 

@@ -978,7 +978,30 @@ export async function sendTelegramMessage(chatId, text, extra = {}) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', ...extra })
     });
-    return await res.json();
+    const json = await res.json();
+    if (json.ok) return json;
+
+    console.warn(`[TELEGRAM] Primary sendMessage to ${chatId} failed: ${json.description}. Attempting fallback...`);
+
+    // Fallback 1: retry without reply_markup in case of button schema error
+    if (extra.reply_markup) {
+      const fb1 = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+      });
+      const json1 = await fb1.json();
+      if (json1.ok) return json1;
+    }
+
+    // Fallback 2: retry as plain text (stripping HTML tags)
+    const plainText = text.replace(/<[^>]*>/g, '');
+    const fb2 = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: plainText })
+    });
+    return await fb2.json();
   } catch (err) {
     console.error(`Telegram message error to ${chatId}:`, err.message);
     return { ok: false, error: err.message };
