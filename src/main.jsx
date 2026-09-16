@@ -1910,6 +1910,8 @@ function AdminControlPanel({ onClose, lang }) {
   const [chatMessages, setChatMessages]   = useState([]);
   const [chatReplyText, setChatReplyText] = useState('');
   const [chatSending, setChatSending]     = useState(false);
+  const [chatSearchTerm, setChatSearchTerm] = useState('');
+  const messagesEndRef                    = useRef(null);
 
   // Agreements state
   const [defaultAgr9, setDefaultAgr9]     = useState([]);
@@ -2023,6 +2025,13 @@ function AdminControlPanel({ onClose, lang }) {
     return () => clearInterval(pollInterval);
   }, [unlocked, tab, activeChat?.chatId]);
 
+  // Auto-scroll to bottom of chat thread when messages change or chat is selected
+  useEffect(() => {
+    if (tab === 'chats' && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, tab, activeChat?.chatId]);
+
   const loadChat = async (chatId) => {
     try {
       const r = await fetch(`${apiBase}/api/chat?chat_id=${chatId}&mark_read=1`);
@@ -2050,7 +2059,11 @@ function AdminControlPanel({ onClose, lang }) {
       });
       const d = await r.json();
       if (d.success) {
-        setChatMessages(prev => [...prev, d.message]);
+        if (Array.isArray(d.messages) && d.messages.length > 0) {
+          setChatMessages(d.messages);
+        } else if (d.message) {
+          setChatMessages(prev => [...prev, d.message]);
+        }
         setChatReplyText('');
         setStatus('Reply sent via Telegram');
         setTimeout(() => setStatus(''), 2000);
@@ -2426,6 +2439,20 @@ function AdminControlPanel({ onClose, lang }) {
     );
   });
 
+  // Filtered chats by search query
+  const filteredChats = chats.filter(c => {
+    if (!chatSearchTerm.trim()) return true;
+    const q = chatSearchTerm.toLowerCase();
+    return (
+      (c.firstName && c.firstName.toLowerCase().includes(q)) ||
+      (c.lastName && c.lastName.toLowerCase().includes(q)) ||
+      (c.username && c.username.toLowerCase().includes(q)) ||
+      (c.chatId && String(c.chatId).includes(q)) ||
+      (c.lastMessage && c.lastMessage.toLowerCase().includes(q)) ||
+      (c.orderId && c.orderId.toLowerCase().includes(q))
+    );
+  });
+
   /* ── 1. PIN LOCK SCREEN (STANDALONE) ── */
   if (!unlocked) {
     return (
@@ -2559,13 +2586,26 @@ function AdminControlPanel({ onClose, lang }) {
               {/* LEFT: Chat list */}
               <div className="admin-chat-sidebar">
                 <div className="admin-chat-sidebar-header">
-                  <h4>Conversations</h4>
-                  <button className="apt-btn-secondary" onClick={loadData}><RefreshCw size={13}/></button>
+                  <h4>Conversations ({chats.length})</h4>
+                  <button className="apt-btn-secondary" onClick={loadData} title="Refresh conversations"><RefreshCw size={13}/></button>
                 </div>
-                {chats.length === 0 ? (
-                  <div className="admin-empty">No conversations yet. Users who message the bot will appear here.</div>
+                <div className="admin-chat-search-wrap">
+                  <Search size={13} color="#94a3b8"/>
+                  <input
+                    type="text"
+                    className="admin-chat-search-input"
+                    placeholder="Search by client, @handle, ID..."
+                    value={chatSearchTerm}
+                    onChange={e => setChatSearchTerm(e.target.value)}
+                  />
+                  {chatSearchTerm && (
+                    <button className="admin-chat-clear-btn" onClick={() => setChatSearchTerm('')} title="Clear search">×</button>
+                  )}
+                </div>
+                {filteredChats.length === 0 ? (
+                  <div className="admin-empty">{chatSearchTerm ? 'No matching clients found.' : 'No conversations yet. Users who message the bot will appear here.'}</div>
                 ) : (
-                  chats.map(c => (
+                  filteredChats.map(c => (
                     <button
                       key={c.chatId}
                       className={`admin-chat-list-item ${activeChat?.chatId === c.chatId ? 'admin-chat-item-active' : ''}`}
@@ -2588,21 +2628,34 @@ function AdminControlPanel({ onClose, lang }) {
                   <div className="admin-chat-empty">
                     <MessageCircle size={48} color="#55556a"/>
                     <h4>Select a conversation</h4>
-                    <p>Click on a chat in the list to view the conversation and reply.</p>
+                    <p>Click on a chat in the list to view the full lifetime conversation and reply.</p>
                   </div>
                 ) : (
                   <>
                     <div className="admin-chat-thread-header">
-                      <div>
-                        <h4>{activeChat.firstName} {activeChat.lastName || ''}</h4>
-                        <span>Chat ID: <code>{activeChat.chatId}</code>{activeChat.orderId ? ` · Order: ${activeChat.orderId}` : ''}</span>
+                      <div className="admin-chat-header-user-info">
+                        <h4>
+                          {activeChat.firstName} {activeChat.lastName || ''}
+                          {activeChat.username ? <span className="acli-handle"> @{activeChat.username}</span> : ''}
+                          <span className="admin-chat-lifetime-pill" title="Lifetime chat history is permanently stored & synced">
+                            ✓ {chatMessages.length} Messages in Lifetime History
+                          </span>
+                        </h4>
+                        <div className="admin-chat-header-sub">
+                          <span>Chat ID: <code>{activeChat.chatId}</code></span>
+                          {activeChat.orderId && (
+                            <span className="admin-chat-order-pill">
+                              Linked Order: <strong>{activeChat.orderId}</strong>
+                            </span>
+                          )}
+                        </div>
                       </div>
                       <div className="admin-chat-thread-actions">
                         <button className="aoc-btn-discuss" onClick={() => setTab('agreements')} title="Create custom agreement for this client">
                           <Layers size={14}/> Customize Agreement
                         </button>
                         {activeChat.orderId && (
-                          <a href={`tel:${orders.find(o=>o.id===activeChat.orderId)?.phone}`} className="aoc-btn-call">
+                          <a href={`tel:${orders.find(o=>o.id===activeChat.orderId)?.phone || ''}`} className="aoc-btn-call">
                             <Phone size={14}/> Call
                           </a>
                         )}
@@ -2611,18 +2664,92 @@ function AdminControlPanel({ onClose, lang }) {
 
                     <div className="admin-chat-messages">
                       {chatMessages.length === 0 ? (
-                        <div className="admin-empty">No messages in this conversation yet.</div>
+                        <div className="admin-empty">No messages in this lifetime conversation yet.</div>
                       ) : (
-                        chatMessages.map(m => (
-                          <div key={m.id} className={`admin-chat-msg ${m.sender === 'admin' ? 'msg-admin' : 'msg-client'}`}>
-                            <div className="admin-chat-msg-bubble">
-                              <div className="admin-chat-msg-sender">{m.sender === 'admin' ? 'Admin' : 'Client'}</div>
-                              <div className="admin-chat-msg-text">{m.text}</div>
-                              <div className="admin-chat-msg-time">{new Date(m.timestamp).toLocaleTimeString()}</div>
-                            </div>
-                          </div>
-                        ))
+                        (() => {
+                          let lastDate = null;
+                          return chatMessages.map((m, idx) => {
+                            const msgDate = new Date(m.timestamp || Date.now());
+                            const today = new Date();
+                            const yesterday = new Date(today);
+                            yesterday.setDate(yesterday.getDate() - 1);
+
+                            let dateHeader = msgDate.toLocaleDateString(undefined, {
+                              weekday: 'long',
+                              month: 'short',
+                              day: 'numeric',
+                              year: msgDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+                            });
+                            if (msgDate.toDateString() === today.toDateString()) dateHeader = 'Today';
+                            else if (msgDate.toDateString() === yesterday.toDateString()) dateHeader = 'Yesterday';
+
+                            const showDateDivider = dateHeader !== lastDate;
+                            if (showDateDivider) lastDate = dateHeader;
+
+                            const isImg = m.data?.photoUrl || m.data?.fileUrl || (typeof m.text === 'string' && (m.text.includes('cloudinary') || m.text.includes('/receipts/') || m.text.match(/\.(jpg|jpeg|png|webp)/i)));
+                            const imgUrl = m.data?.photoUrl || m.data?.fileUrl || (isImg && typeof m.text === 'string' ? m.text.match(/https?:\/\/[^\s]+/)?.[0] : null);
+
+                            const isAgreementLink = (typeof m.text === 'string' && (m.text.includes('/agreement/') || m.text.includes('?agreement=')));
+                            const isWebPortal = m.source === 'web_portal' || m.type === 'portal_note';
+
+                            return (
+                              <React.Fragment key={m.id || idx}>
+                                {showDateDivider && (
+                                  <div className="admin-chat-date-divider">
+                                    <span>{dateHeader}</span>
+                                  </div>
+                                )}
+                                <div className={`admin-chat-msg ${m.sender === 'admin' ? 'msg-admin' : 'msg-client'}`}>
+                                  <div className="admin-chat-msg-bubble">
+                                    <div className="admin-chat-msg-sender-row">
+                                      <span className="admin-chat-msg-sender">
+                                        {m.sender === 'admin' ? 'HOPE Studio Director' : (m.senderName || activeChat.firstName || 'Client')}
+                                      </span>
+                                      {isWebPortal && (
+                                        <span className="admin-chat-badge-portal">
+                                          🌐 Web Portal Note
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="admin-chat-msg-text">{m.text}</div>
+
+                                    {/* Thumbnail preview if message has image/receipt */}
+                                    {imgUrl && (
+                                      <div className="admin-chat-receipt-card">
+                                        <img
+                                          src={imgUrl}
+                                          alt="Attachment / Receipt"
+                                          className="admin-chat-receipt-img"
+                                          onClick={() => window.open(imgUrl, '_blank')}
+                                          title="Click to view full image"
+                                        />
+                                        <span className="admin-chat-receipt-caption">📎 Click to enlarge attachment</span>
+                                      </div>
+                                    )}
+
+                                    {/* Agreement link preview button */}
+                                    {isAgreementLink && (
+                                      <a
+                                        href={m.text.match(/https?:\/\/[^\s]+/)?.[0] || '#'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="admin-chat-agreement-btn"
+                                      >
+                                        <FileText size={13}/> Open Official Digital Agreement
+                                      </a>
+                                    )}
+
+                                    <div className="admin-chat-msg-time">
+                                      {msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  </div>
+                                </div>
+                              </React.Fragment>
+                            );
+                          });
+                        })()
                       )}
+                      <div ref={messagesEndRef} />
                     </div>
 
                     <div className="admin-chat-reply-bar">

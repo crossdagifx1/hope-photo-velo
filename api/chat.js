@@ -24,15 +24,17 @@ export default async function handler(req, res) {
     if (chat_id) {
       if (mark_read === '1') {
         db.markChatRead(chat_id);
-        await db.syncToCloud();
+        await db.syncToCloud(chat_id);
       }
       const chat = db.getChat(chat_id) || db.getOrCreateChat(chat_id);
       const linkedOrder = chat.orderId ? db.getOrder(chat.orderId) : null;
-      return res.status(200).json({ chat, order: linkedOrder, messages: chat.messages || [] });
+      const sortedMessages = (chat.messages || []).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      return res.status(200).json({ chat, order: linkedOrder, messages: sortedMessages });
     }
 
     if (order_id) {
-      return res.status(200).json({ messages: db.getMessages(order_id), order: db.getOrder(order_id) });
+      const orderMsgs = (db.getMessages(order_id) || []).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      return res.status(200).json({ messages: orderMsgs, order: db.getOrder(order_id) });
     }
 
     return res.status(400).json({ error: 'chat_id, order_id, or list=1 required' });
@@ -52,7 +54,7 @@ export default async function handler(req, res) {
 
         await db.syncFromCloud();
 
-        // Store in DB
+        // Store in DB permanently with dedicated per-chat cloud sync
         const message = db.addChatMessage(String(targetChatId), {
           sender: 'admin',
           senderName: senderName || 'HOPE Studio Director',
@@ -73,14 +75,21 @@ export default async function handler(req, res) {
           });
         }
 
-        await db.syncToCloud();
+        await db.syncToCloud(String(targetChatId));
 
         // Deliver via Telegram to the client
         await sendTelegramMessage(String(targetChatId),
           `📸 <b>HOPE Studio — Director Reply</b>\n\n${text}\n\n<i>📞 09 10 52 69 62</i>`
         );
 
-        return res.status(201).json({ success: true, message, delivered: true });
+        const updatedChat = db.getChat(String(targetChatId));
+        return res.status(201).json({
+          success: true,
+          message,
+          chat: updatedChat,
+          messages: updatedChat?.messages || [],
+          delivered: true
+        });
       }
 
       // ── ACTION: Send custom agreement link to client via Telegram ──

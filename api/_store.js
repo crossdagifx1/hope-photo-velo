@@ -489,11 +489,59 @@ export async function syncFromCloud() {
     if (!error && Array.isArray(rows) && rows.length > 0) {
       if (!memoryStore.chats) memoryStore.chats = {};
       if (!memoryStore.orders) memoryStore.orders = {};
+
+      const mergeChatData = (cid, incomingChat) => {
+        if (!incomingChat) return;
+        const idStr = String(cid);
+        if (!memoryStore.chats[idStr]) {
+          memoryStore.chats[idStr] = {
+            ...incomingChat,
+            chatId: idStr,
+            messages: Array.isArray(incomingChat.messages) ? [...incomingChat.messages] : []
+          };
+        } else {
+          // Deep-merge all messages to guarantee zero message loss
+          const messageMap = new Map();
+          for (const m of (memoryStore.chats[idStr].messages || [])) {
+            const key = m.id || (m.timestamp + '_' + m.text);
+            messageMap.set(key, m);
+          }
+          for (const m of (incomingChat.messages || [])) {
+            const key = m.id || (m.timestamp + '_' + m.text);
+            messageMap.set(key, m);
+          }
+          memoryStore.chats[idStr].messages = Array.from(messageMap.values()).sort(
+            (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
+          );
+
+          // Preserve client names (never overwrite with admin)
+          if (incomingChat.firstName && incomingChat.firstName !== 'HOPE Studio Director' && incomingChat.firstName !== 'HOPE Studio Management') {
+            memoryStore.chats[idStr].firstName = incomingChat.firstName;
+          }
+          if (incomingChat.lastName) memoryStore.chats[idStr].lastName = incomingChat.lastName;
+          if (incomingChat.username) memoryStore.chats[idStr].username = incomingChat.username;
+          if (incomingChat.orderId && !memoryStore.chats[idStr].orderId) {
+            memoryStore.chats[idStr].orderId = incomingChat.orderId;
+          }
+          if (new Date(incomingChat.lastMessageAt || 0) > new Date(memoryStore.chats[idStr].lastMessageAt || 0)) {
+            memoryStore.chats[idStr].lastMessage = incomingChat.lastMessage;
+            memoryStore.chats[idStr].lastMessageAt = incomingChat.lastMessageAt;
+          }
+          if (incomingChat.unreadCount !== undefined) {
+            memoryStore.chats[idStr].unreadCount = incomingChat.unreadCount;
+          }
+        }
+      };
+
       for (const row of rows) {
         if (row.key === 'chats' && row.data) {
           for (const [cid, chat] of Object.entries(row.data)) {
-            memoryStore.chats[cid] = chat;
+            mergeChatData(cid, chat);
           }
+        }
+        if (row.key?.startsWith('chat_') && row.data) {
+          const cid = row.key.replace('chat_', '');
+          mergeChatData(cid, row.data);
         }
         if (row.key === 'orders' && row.data) {
           for (const [oid, ord] of Object.entries(row.data)) {
@@ -524,24 +572,19 @@ export async function syncFromCloud() {
       if (json.data?.chats) {
         if (!memoryStore.chats) memoryStore.chats = {};
         for (const [cid, chat] of Object.entries(json.data.chats)) {
-          if (!memoryStore.chats[cid]) {
-            memoryStore.chats[cid] = chat;
+          const idStr = String(cid);
+          if (!memoryStore.chats[idStr]) {
+            memoryStore.chats[idStr] = chat;
           } else {
-            const existingIds = new Set((memoryStore.chats[cid].messages || []).map(m => m.id));
+            const existingIds = new Set((memoryStore.chats[idStr].messages || []).map(m => m.id));
             for (const msg of (chat.messages || [])) {
               if (!existingIds.has(msg.id)) {
-                memoryStore.chats[cid].messages.push(msg);
+                memoryStore.chats[idStr].messages.push(msg);
               }
             }
-            if (new Date(chat.lastMessageAt || 0) > new Date(memoryStore.chats[cid].lastMessageAt || 0)) {
-              memoryStore.chats[cid].lastMessage = chat.lastMessage;
-              memoryStore.chats[cid].lastMessageAt = chat.lastMessageAt;
-            }
-            if (chat.orderId && !memoryStore.chats[cid].orderId) {
-              memoryStore.chats[cid].orderId = chat.orderId;
-            }
-            if (chat.unreadCount !== undefined) {
-              memoryStore.chats[cid].unreadCount = chat.unreadCount;
+            if (new Date(chat.lastMessageAt || 0) > new Date(memoryStore.chats[idStr].lastMessageAt || 0)) {
+              memoryStore.chats[idStr].lastMessage = chat.lastMessage;
+              memoryStore.chats[idStr].lastMessageAt = chat.lastMessageAt;
             }
           }
         }
@@ -566,7 +609,7 @@ export async function syncFromCloud() {
   }
 }
 
-export async function syncToCloud() {
+export async function syncToCloud(specificChatId = null) {
   // ── 1. PRIMARY: Write to Supabase PostgreSQL Database ──
   try {
     const upserts = [
@@ -576,6 +619,24 @@ export async function syncToCloud() {
       { key: 'signed_agreements', data: memoryStore.signedAgreements || [], updated_at: new Date().toISOString() },
       { key: 'settings', data: memoryStore.settings || {}, updated_at: new Date().toISOString() }
     ];
+
+    // Atomically persist each chat under its dedicated lifetime key
+    if (specificChatId && memoryStore.chats?.[String(specificChatId)]) {
+      upserts.push({
+        key: `chat_${specificChatId}`,
+        data: memoryStore.chats[String(specificChatId)],
+        updated_at: new Date().toISOString()
+      });
+    } else {
+      for (const [cid, cData] of Object.entries(memoryStore.chats || {})) {
+        upserts.push({
+          key: `chat_${cid}`,
+          data: cData,
+          updated_at: new Date().toISOString()
+        });
+      }
+    }
+
     await supabase.from('app_store').upsert(upserts);
   } catch (e) {
     console.warn('[SUPABASE] syncToCloud error:', e.message);
@@ -677,11 +738,14 @@ export const db = {
   getOrCreateChat(chatId, userInfo = {}) {
     if (!memoryStore.chats) memoryStore.chats = {};
     const idStr = String(chatId);
+    const cleanFirstName = userInfo.first_name || userInfo.firstName || '';
+    const isAdminTitle = cleanFirstName === 'HOPE Studio Director' || cleanFirstName === 'HOPE Studio Management';
+
     if (!memoryStore.chats[idStr]) {
       memoryStore.chats[idStr] = {
         chatId: idStr,
         userId: userInfo.id ? String(userInfo.id) : idStr,
-        firstName: userInfo.first_name || userInfo.firstName || 'Client',
+        firstName: (!isAdminTitle && cleanFirstName) ? cleanFirstName : 'Client',
         lastName: userInfo.last_name || userInfo.lastName || '',
         username: userInfo.username || '',
         lastMessage: '',
@@ -691,7 +755,7 @@ export const db = {
         messages: []
       };
     } else {
-      if (userInfo.first_name || userInfo.firstName) memoryStore.chats[idStr].firstName = userInfo.first_name || userInfo.firstName;
+      if (!isAdminTitle && cleanFirstName) memoryStore.chats[idStr].firstName = cleanFirstName;
       if (userInfo.last_name || userInfo.lastName) memoryStore.chats[idStr].lastName = userInfo.last_name || userInfo.lastName;
       if (userInfo.username) memoryStore.chats[idStr].username = userInfo.username;
     }
@@ -704,23 +768,59 @@ export const db = {
   },
   getChat(chatId) {
     if (!memoryStore.chats) memoryStore.chats = {};
-    return memoryStore.chats[String(chatId)] || null;
+    const idStr = String(chatId);
+    const chat = memoryStore.chats[idStr] || null;
+    if (chat) {
+      // Deep-merge order comments if orderId is linked so that all lifetime portal notes are included
+      if (chat.orderId && memoryStore.messages?.[chat.orderId]) {
+        const orderMsgs = memoryStore.messages[chat.orderId];
+        const map = new Map((chat.messages || []).map(m => [m.id || (m.timestamp + '_' + m.text), m]));
+        for (const om of orderMsgs) {
+          const k = om.id || (om.timestamp + '_' + om.text);
+          if (!map.has(k)) {
+            map.set(k, {
+              id: om.id || ('omsg-' + Date.now()),
+              chatId: idStr,
+              sender: om.sender || 'client',
+              senderName: om.senderName || (om.sender === 'admin' ? 'HOPE Studio Director' : chat.firstName || 'Client'),
+              text: om.text || '',
+              type: om.type || 'portal_note',
+              data: om.data || { orderId: chat.orderId },
+              timestamp: om.timestamp || new Date().toISOString(),
+              source: 'web_portal'
+            });
+          }
+        }
+        chat.messages = Array.from(map.values()).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      }
+    }
+    return chat;
   },
   addChatMessage(chatId, msg) {
     const idStr = String(chatId);
-    const chat = db.getOrCreateChat(idStr, { firstName: msg.senderName, first_name: msg.senderName });
+    const isClient = msg.sender !== 'admin' && msg.sender !== 'system';
+    const userInfo = (isClient && msg.senderName && msg.senderName !== 'HOPE Studio Director')
+      ? { firstName: msg.senderName }
+      : {};
+    const chat = db.getOrCreateChat(idStr, userInfo);
     const messageObj = {
-      id: 'cmsg-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      id: msg.id || ('cmsg-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6)),
       chatId: idStr,
       sender: msg.sender || 'client',
-      senderName: msg.senderName || (msg.sender === 'admin' ? 'HOPE Studio Management' : chat.firstName || 'Client'),
+      senderName: msg.senderName || (msg.sender === 'admin' ? 'HOPE Studio Director' : chat.firstName || 'Client'),
       text: msg.text || '',
       type: msg.type || 'text',
       data: msg.data || null,
-      timestamp: new Date().toISOString()
+      timestamp: msg.timestamp || new Date().toISOString()
     };
     if (!chat.messages) chat.messages = [];
-    chat.messages.push(messageObj);
+    // Ensure no duplicate IDs in array
+    const existingIdx = chat.messages.findIndex(m => m.id === messageObj.id);
+    if (existingIdx >= 0) {
+      chat.messages[existingIdx] = messageObj;
+    } else {
+      chat.messages.push(messageObj);
+    }
     chat.lastMessage = msg.text || (msg.type === 'agreement_link' ? '📜 Agreement link sent' : 'Message');
     chat.lastMessageAt = messageObj.timestamp;
     if (msg.sender !== 'admin' && msg.sender !== 'system') {
@@ -729,17 +829,19 @@ export const db = {
       chat.unreadCount = 0;
     }
     persistStore();
+    syncToCloud(idStr);
     return messageObj;
   },
   markChatRead(chatId) {
     const chat = db.getChat(chatId);
-    if (chat) { chat.unreadCount = 0; persistStore(); }
+    if (chat) { chat.unreadCount = 0; persistStore(); syncToCloud(chatId); }
     return chat;
   },
   linkChatToOrder(chatId, orderId) {
     const chat = db.getOrCreateChat(chatId);
     chat.orderId = orderId;
     persistStore();
+    syncToCloud(chatId);
     return chat;
   },
 
