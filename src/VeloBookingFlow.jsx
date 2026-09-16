@@ -627,26 +627,27 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       const qrFrameX = (W - QS) / 2;
       const qrFrameY = qrBoxY + 34;
 
-      // Viewfinder Corner Accents (Luxury minimalist aesthetic)
+      // Viewfinder Corner Accents (Luxury minimalist aesthetic - offset for clear quiet zone)
       const mkLen = 14;
+      const mkOffset = 12; // 12px clear offset outside QR quiet zone
       c.strokeStyle = '#b89248';
       c.lineWidth = 2.5;
       c.lineCap = 'round';
       // Top-Left
-      c.beginPath(); c.moveTo(qrFrameX - 6, qrFrameY - 6 + mkLen); c.lineTo(qrFrameX - 6, qrFrameY - 6); c.lineTo(qrFrameX - 6 + mkLen, qrFrameY - 6); c.stroke();
+      c.beginPath(); c.moveTo(qrFrameX - mkOffset, qrFrameY - mkOffset + mkLen); c.lineTo(qrFrameX - mkOffset, qrFrameY - mkOffset); c.lineTo(qrFrameX - mkOffset + mkLen, qrFrameY - mkOffset); c.stroke();
       // Top-Right
-      c.beginPath(); c.moveTo(qrFrameX + QS + 6 - mkLen, qrFrameY - 6); c.lineTo(qrFrameX + QS + 6, qrFrameY - 6); c.lineTo(qrFrameX + QS + 6, qrFrameY - 6 + mkLen); c.stroke();
+      c.beginPath(); c.moveTo(qrFrameX + QS + mkOffset - mkLen, qrFrameY - mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY - mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY - mkOffset + mkLen); c.stroke();
       // Bottom-Left
-      c.beginPath(); c.moveTo(qrFrameX - 6, qrFrameY + QS + 6 - mkLen); c.lineTo(qrFrameX - 6, qrFrameY + QS + 6); c.lineTo(qrFrameX - 6 + mkLen, qrFrameY + QS + 6); c.stroke();
+      c.beginPath(); c.moveTo(qrFrameX - mkOffset, qrFrameY + QS + mkOffset - mkLen); c.lineTo(qrFrameX - mkOffset, qrFrameY + QS + mkOffset); c.lineTo(qrFrameX - mkOffset + mkLen, qrFrameY + QS + mkOffset); c.stroke();
       // Bottom-Right
-      c.beginPath(); c.moveTo(qrFrameX + QS + 6 - mkLen, qrFrameY + QS + 6); c.lineTo(qrFrameX + QS + 6, qrFrameY + QS + 6); c.lineTo(qrFrameX + QS + 6, qrFrameY + QS + 6 - mkLen); c.stroke();
+      c.beginPath(); c.moveTo(qrFrameX + QS + mkOffset - mkLen, qrFrameY + QS + mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY + QS + mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY + QS + mkOffset - mkLen); c.stroke();
 
-      // Generate ultra-crisp local QR code data URL (Pure deep obsidian on pure white)
+      // Generate ultra-crisp local QR code data URL (Pure deep obsidian on pure white with proper quiet zone)
       let qrDataUrl = '';
       try {
         qrDataUrl = await QRCodeLib.toDataURL(trackingUrl, {
           width: 500,
-          margin: 2,
+          margin: 4,
           errorCorrectionLevel: 'M',
           color: { dark: '#0a0a0f', light: '#ffffff' }
         });

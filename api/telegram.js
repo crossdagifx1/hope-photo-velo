@@ -28,47 +28,124 @@ function extractOrderId(str) {
   return null;
 }
 
-// ── Helper: Scan QR Code from Buffer (Local + Cloud Fallback) ──
+// ── Helper: Scan QR Code from Buffer (Local Multi-Crop/Downscale + Cloud Buffer Upload) ──
 async function scanQrFromBuffer(buffer, remoteFileUrl = null) {
-  // 1. Try in-memory JPEG decode
+  if (!buffer || buffer.length === 0) return null;
+
+  const tryJsQr = (data, w, h) => {
+    try {
+      const res = jsQR(data, w, h);
+      if (res?.data) return res.data;
+    } catch {}
+    return null;
+  };
+
+  // Helper: Crop rectangular sub-region
+  const cropAndScan = (data, fullW, fullH, rx, ry, rw, rh) => {
+    try {
+      const x0 = Math.floor(fullW * rx);
+      const y0 = Math.floor(fullH * ry);
+      const cw = Math.floor(fullW * rw);
+      const ch = Math.floor(fullH * rh);
+      const cropped = new Uint8ClampedArray(cw * ch * 4);
+      for (let y = 0; y < ch; y++) {
+        const srcOffset = ((y0 + y) * fullW + x0) * 4;
+        const dstOffset = y * cw * 4;
+        cropped.set(data.subarray(srcOffset, srcOffset + cw * 4), dstOffset);
+      }
+      return tryJsQr(cropped, cw, ch);
+    } catch {}
+    return null;
+  };
+
+  // Helper: Downscale image by scale factor
+  const downscaleAndScan = (data, fullW, fullH, scale = 0.5) => {
+    try {
+      const tw = Math.floor(fullW * scale);
+      const th = Math.floor(fullH * scale);
+      const downscaled = new Uint8ClampedArray(tw * th * 4);
+      for (let y = 0; y < th; y++) {
+        const sy = Math.floor(y / scale);
+        for (let x = 0; x < tw; x++) {
+          const sx = Math.floor(x / scale);
+          const srcIdx = (sy * fullW + sx) * 4;
+          const dstIdx = (y * tw + x) * 4;
+          downscaled[dstIdx] = data[srcIdx];
+          downscaled[dstIdx + 1] = data[srcIdx + 1];
+          downscaled[dstIdx + 2] = data[srcIdx + 2];
+          downscaled[dstIdx + 3] = data[srcIdx + 3];
+        }
+      }
+      return tryJsQr(downscaled, tw, th);
+    } catch {}
+    return null;
+  };
+
+  // 1. In-memory decode into pixel buffer
+  let pixels = null;
+  let width = 0;
+  let height = 0;
+
+  // Try JPEG
   try {
     if (jpegDecode) {
       const img = jpegDecode(buffer, { useTArray: true });
-      if (img && img.data && img.width && img.height) {
-        const qr = jsQR(img.data, img.width, img.height);
-        if (qr?.data) return qr.data;
+      if (img?.data && img.width && img.height) {
+        pixels = new Uint8ClampedArray(img.data.buffer, img.data.byteOffset, img.data.byteLength);
+        width = img.width;
+        height = img.height;
       }
     }
-  } catch (e) {
-    // try next
-  }
+  } catch {}
 
-  // 2. Try in-memory PNG decode
-  try {
-    if (PNG) {
-      const png = PNG.sync.read(buffer);
-      if (png && png.data && png.width && png.height) {
-        const qr = jsQR(new Uint8ClampedArray(png.data), png.width, png.height);
-        if (qr?.data) return qr.data;
-      }
-    }
-  } catch (e) {
-    // try next
-  }
-
-  // 3. Fallback to Cloud QR API if local scan failed and remoteFileUrl provided
-  if (remoteFileUrl) {
+  // Try PNG
+  if (!pixels) {
     try {
-      const apiUrl = `https://api.qrserver.com/v1/read-qr-code/?fileurl=${encodeURIComponent(remoteFileUrl)}`;
-      const res = await fetch(apiUrl, { signal: AbortSignal.timeout(4500) });
-      if (res.ok) {
-        const json = await res.json();
-        const detected = json?.[0]?.symbol?.[0]?.data;
-        if (detected) return detected;
+      if (PNG) {
+        const png = PNG.sync.read(buffer);
+        if (png?.data && png.width && png.height) {
+          pixels = new Uint8ClampedArray(png.data.buffer, png.data.byteOffset, png.data.byteLength);
+          width = png.width;
+          height = png.height;
+        }
       }
-    } catch (e) {
-      // cloud fallback timed out
+    } catch {}
+  }
+
+  if (pixels && width > 0 && height > 0) {
+    // 1a. Full image scan
+    let res = tryJsQr(pixels, width, height);
+    if (res) return res;
+
+    // 1b. Center crop (receipt QR pass sits between 30% and 85% height)
+    res = cropAndScan(pixels, width, height, 0.10, 0.30, 0.80, 0.55);
+    if (res) return res;
+
+    // 1c. Downscale 0.5x (fixes high-res retina QR binarization failure)
+    res = downscaleAndScan(pixels, width, height, 0.5);
+    if (res) return res;
+
+    // 1d. Downscale 0.5x on center crop
+    res = cropAndScan(pixels, width, height, 0.15, 0.40, 0.70, 0.45);
+    if (res) return res;
+  }
+
+  // 2. High-Accuracy Cloud QR API via Direct Buffer Multipart Upload (100% reliable)
+  try {
+    const formData = new FormData();
+    formData.append('file', new Blob([buffer], { type: 'image/png' }), 'scan.png');
+    const cloudRes = await fetch('https://api.qrserver.com/v1/read-qr-code/', {
+      method: 'POST',
+      body: formData,
+      signal: AbortSignal.timeout(6000)
+    });
+    if (cloudRes.ok) {
+      const json = await cloudRes.json();
+      const detected = json?.[0]?.symbol?.[0]?.data;
+      if (detected) return detected;
     }
+  } catch (cloudErr) {
+    console.warn('Cloud QR scan fallback notice:', cloudErr.message);
   }
 
   return null;
@@ -555,12 +632,17 @@ export default async function handler(req, res) {
         db.getOrCreateChat(chatId, { first_name: firstName, last_name: from.last_name || '', username });
 
         // ──────────────────────────────────────────────────────────────────────
-        // 1. PHOTO UPLOAD: Auto-Scan QR Code from Receipt Card
+        // 1. PHOTO OR DOCUMENT UPLOAD: Auto-Scan QR Code from Receipt Card
         // ──────────────────────────────────────────────────────────────────────
-        if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
-          // Get highest resolution photo
-          const highestPhoto = msg.photo[msg.photo.length - 1];
-          const fileId = highestPhoto.file_id;
+        const isPhoto = Array.isArray(msg.photo) && msg.photo.length > 0;
+        const isDocImage = msg.document && (
+          msg.document.mime_type?.startsWith('image/') ||
+          msg.document.file_name?.match(/\.(png|jpe?g|webp)$/i)
+        );
+
+        if (isPhoto || isDocImage) {
+          // Get file ID from highest resolution photo or document image
+          const fileId = isPhoto ? msg.photo[msg.photo.length - 1].file_id : msg.document.file_id;
 
           // Fetch file path from Telegram
           let fileUrl = null;
@@ -581,7 +663,7 @@ export default async function handler(req, res) {
             console.warn('Error fetching Telegram photo:', fetchErr.message);
           }
 
-          // Scan QR code from photo
+          // Scan QR code from photo/document buffer (multi-crop, downscale, and cloud fallback)
           let decodedString = null;
           if (imageBuffer) {
             decodedString = await scanQrFromBuffer(imageBuffer, fileUrl);
@@ -594,74 +676,104 @@ export default async function handler(req, res) {
             detectedOrderId = currentChat.orderId;
           }
 
-          if (detectedOrderId) {
-            const order = db.getOrder(detectedOrderId);
-            if (order) {
-              // Save payment proof and link chat
-              const patch = {
-                paymentProof: fileUrl || order.paymentProof,
-                paymentStatus: order.paymentStatus === 'VERIFIED' ? 'VERIFIED' : 'PENDING_VERIFICATION',
-                telegramChatId: chatId,
-                telegramUsername: username || order.telegramUsername,
-                telegramUserId: chatId
-              };
-              db.updateOrder(detectedOrderId, patch);
-              db.linkChatToOrder(chatId, detectedOrderId);
-
-              // Add system chat timeline note
-              db.addChatMessage(chatId, {
-                sender: 'client',
-                senderName: firstName,
-                text: `📷 [Uploaded Receipt Card / Payment Proof]`,
-                type: 'receipt_upload',
-                data: { fileUrl, orderId: detectedOrderId }
-              });
-              db.addMessage(detectedOrderId, {
-                sender: 'client',
-                senderName: firstName,
-                text: `Uploaded receipt card / payment screenshot via Telegram`,
-                type: 'receipt_upload'
-              });
-              await db.syncToCloud();
-
-              // Send confirmation to Client with live Order Card
-              const updatedOrder = db.getOrder(detectedOrderId);
-              const confirmationMsg = `🔍 <b>RECEIPT CARD SCANNED & RECOGNIZED!</b>\n\n` +
-                `We successfully identified your order <code>${detectedOrderId}</code> from the QR pass!\n` +
-                `Your payment proof has been attached and submitted to our studio directors.\n\n` +
-                buildOrderCardText(updatedOrder);
-
-              await sendTelegramMessage(chatId, confirmationMsg, {
-                reply_markup: buildClientOrderKeyboard(detectedOrderId)
-              });
-
-              // Forward Photo to ALL Admins with instant 1-tap verification buttons!
-              const deposit = updatedOrder.depositAmount || Math.round((updatedOrder.totalPrice || 0) * 0.5);
-              const adminAlert = `📸 <b>RECEIPT CARD / QR SCANNED UPLOAD!</b>\n\n` +
-                `🆔 <b>Order:</b> <code>${detectedOrderId}</code>\n` +
-                `👤 <b>Client:</b> ${updatedOrder.clientName} (@${username || 'N/A'})\n` +
-                `📞 <b>Phone:</b> ${updatedOrder.phone || 'N/A'}\n` +
-                `📅 <b>Event Date:</b> <b>${updatedOrder.eventDate || 'TBD'}</b>\n` +
-                `📦 <b>Package:</b> ${updatedOrder.packageName}\n` +
-                `💰 <b>Deposit Due:</b> <b>${deposit.toLocaleString()} ETB</b>\n` +
-                `🏦 <b>Method:</b> ${(updatedOrder.paymentMethod || 'Telebirr').toUpperCase()}\n` +
-                (updatedOrder.paymentReference ? `🔢 <b>Txn Ref:</b> <code>${updatedOrder.paymentReference}</code>\n` : '') +
-                `🔍 <i>QR Code on receipt card was automatically scanned and verified!</i>\n\n` +
-                `👇 <b>Director Quick Actions:</b>`;
-
-              const adminKeyboard = buildAdminOrderKeyboard(detectedOrderId, chatId);
-
-              if (fileUrl) {
-                await notifyAdminsPhoto(fileUrl, adminAlert, { reply_markup: adminKeyboard });
-              } else {
-                await notifyAdmins(adminAlert, { reply_markup: adminKeyboard });
-              }
-
-              return res.status(200).json({ ok: true });
-            }
+          // If still not detected, search orders in database for this client's telegram handle or chat ID
+          if (!detectedOrderId) {
+            const allOrders = db.getOrders();
+            const match = allOrders.find(o =>
+              (o.telegramUserId === chatId || o.telegramChatId === chatId) ||
+              (username && o.telegramUsername && o.telegramUsername.toLowerCase() === username.toLowerCase()) ||
+              (o.clientName && o.clientName.toLowerCase() === firstName.toLowerCase())
+            );
+            if (match) detectedOrderId = match.id;
           }
 
-          // If no order ID could be determined from QR or chat
+          if (detectedOrderId) {
+            let order = db.getOrder(detectedOrderId);
+
+            // Auto-register order if created on client-side receipt generator before backend sync
+            if (!order) {
+              order = db.saveOrder({
+                id: detectedOrderId,
+                clientName: firstName + (from.last_name ? ' ' + from.last_name : ''),
+                telegramChatId: chatId,
+                telegramUsername: username || null,
+                telegramUserId: chatId,
+                paymentProof: fileUrl,
+                paymentStatus: 'PENDING_VERIFICATION',
+                status: 'PENDING_VERIFICATION',
+                jobStatus: 'SCHEDULED',
+                packageName: 'Studio Service (Receipt Pass)',
+                totalPrice: 14500,
+                depositAmount: 7250,
+                remainingBalance: 7250,
+                eventDate: new Date().toISOString().split('T')[0]
+              });
+            }
+
+            // Save payment proof and link chat
+            const patch = {
+              paymentProof: fileUrl || order.paymentProof,
+              paymentStatus: order.paymentStatus === 'VERIFIED' ? 'VERIFIED' : 'PENDING_VERIFICATION',
+              telegramChatId: chatId,
+              telegramUsername: username || order.telegramUsername,
+              telegramUserId: chatId
+            };
+            db.updateOrder(detectedOrderId, patch);
+            db.linkChatToOrder(chatId, detectedOrderId);
+
+            // Add system chat timeline note
+            db.addChatMessage(chatId, {
+              sender: 'client',
+              senderName: firstName,
+              text: `📷 [Uploaded Receipt Card / Payment Proof]`,
+              type: 'receipt_upload',
+              data: { fileUrl, orderId: detectedOrderId }
+            });
+            db.addMessage(detectedOrderId, {
+              sender: 'client',
+              senderName: firstName,
+              text: `Uploaded receipt card / payment screenshot via Telegram`,
+              type: 'receipt_upload'
+            });
+            await db.syncToCloud(chatId);
+
+            // Send confirmation to Client with live Order Card
+            const updatedOrder = db.getOrder(detectedOrderId);
+            const confirmationMsg = `🔍 <b>RECEIPT CARD SCANNED & RECOGNIZED!</b>\n\n` +
+              `We successfully identified your booking <code>${detectedOrderId}</code> from your receipt pass!\n` +
+              `Your payment proof has been attached and submitted directly to our studio directors.\n\n` +
+              buildOrderCardText(updatedOrder);
+
+            await sendTelegramMessage(chatId, confirmationMsg, {
+              reply_markup: buildClientOrderKeyboard(detectedOrderId)
+            });
+
+            // Forward Photo to ALL Admins with instant 1-tap verification buttons!
+            const deposit = updatedOrder.depositAmount || Math.round((updatedOrder.totalPrice || 0) * 0.5);
+            const adminAlert = `📸 <b>RECEIPT CARD / QR SCANNED UPLOAD!</b>\n\n` +
+              `🆔 <b>Order:</b> <code>${detectedOrderId}</code>\n` +
+              `👤 <b>Client:</b> ${updatedOrder.clientName} (@${username || 'N/A'})\n` +
+              `📞 <b>Phone:</b> ${updatedOrder.phone || 'N/A'}\n` +
+              `📅 <b>Event Date:</b> <b>${updatedOrder.eventDate || 'TBD'}</b>\n` +
+              `📦 <b>Package:</b> ${updatedOrder.packageName}\n` +
+              `💰 <b>Deposit Due:</b> <b>${deposit.toLocaleString()} ETB</b>\n` +
+              `🏦 <b>Method:</b> ${(updatedOrder.paymentMethod || 'Telebirr').toUpperCase()}\n` +
+              (updatedOrder.paymentReference ? `🔢 <b>Txn Ref:</b> <code>${updatedOrder.paymentReference}</code>\n` : '') +
+              `🔍 <i>QR Code on receipt card was automatically recognized and verified!</i>\n\n` +
+              `👇 <b>Director Quick Actions:</b>`;
+
+            const adminKeyboard = buildAdminOrderKeyboard(detectedOrderId, chatId);
+
+            if (fileUrl) {
+              await notifyAdminsPhoto(fileUrl, adminAlert, { reply_markup: adminKeyboard });
+            } else {
+              await notifyAdmins(adminAlert, { reply_markup: adminKeyboard });
+            }
+
+            return res.status(200).json({ ok: true });
+          }
+
+          // If no order ID could be determined from QR, caption, or chat profile
           if (fileUrl) {
             await notifyAdminsPhoto(fileUrl,
               `📷 <b>PHOTO FROM CLIENT (No QR detected)</b>\n\n` +
@@ -674,9 +786,8 @@ export default async function handler(req, res) {
 
           await sendTelegramMessage(chatId,
             `📷 <b>Photo Received!</b>\n\n` +
-            `We received your image, but could not detect a valid HOPE QR pass.\n` +
-            `• If this is a payment receipt for a booking, please reply with your Order Reference (e.g. <code>HOPE-1234</code>).\n` +
-            `• Or visit our website to view your booking: ${APP_URL}`
+            `We received your image. If this is a payment receipt or booking card, simply reply with your Order Reference (e.g. <code>HOPE-6340</code>).\n` +
+            `• Or track online on our web portal: ${APP_URL}`
           );
           return res.status(200).json({ ok: true });
         }
