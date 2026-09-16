@@ -649,8 +649,9 @@ export default function OrderStatusPage({ orderId, lang = 'am', onBack }) {
           <div className="vop-qr-content">
             <QRCode
               value={window.location.href}
-              size={140}
-              label={activeLang === 'am' ? 'ይህንን QR ስካን በማድረግ በቀጥታ ይመልከቱ' : 'Scan to view this live page anytime'}
+              size={210}
+              label={activeLang === 'am' ? 'በስልክ ካሜራ ወይም በቴሌግራም ቦት ስካን ያድርጉ' : 'Scan with camera or Telegram bot'}
+              sublabel={activeLang === 'am' ? 'ይፋዊ የዲጂታል ፓስፖርት QR' : 'HOPE Studio Official Pass'}
             />
             <div className="vop-qr-meta">
               <h3 className="vop-qr-title">HOPE Photo &amp; Velo Studio</h3>

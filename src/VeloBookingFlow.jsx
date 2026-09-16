@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { resolveAgreementForPackage, DEFAULT_AGREEMENTS_9 } from './agreementsData.js';
 import QRCode from './QRCode.jsx';
+import QRCodeLib from 'qrcode';
 
 const ASSET = '/assets';
 const PHONE_LINK = '+251910526962';
@@ -476,9 +477,9 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       const curRefId = createdOrder?.id || orderId;
       const trackingUrl = `${window.location.origin}/?order=${curRefId}`;
 
-      const W = 620;
-      const H = 940;
-      const scale = 2; // High DPI Retina
+      const W = 640;
+      const H = 1060;
+      const scale = 2; // High DPI Retina (1280 x 2120)
 
       const cv = document.createElement('canvas');
       cv.width = W * scale;
@@ -600,42 +601,83 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         ry += 30;
       });
 
-      // 5. QR Code Box
+      // 5. Minimalist Luxury Hero QR Pass (Bigger, High-Contrast & Viewfinder Accents)
       const qrBoxY = ry + 16;
-      const QS = 130;
-      const qrBoxX = (W - (QS + 32)) / 2;
+      const QS = 220; // Expanded to 220px! (over 70% larger for instant detection)
+      const qrBoxW = QS + 48; // 268px wide container
+      const qrBoxH = QS + 94; // 314px tall container
+      const qrBoxX = (W - qrBoxW) / 2;
 
+      // Card container background
       c.fillStyle = '#ffffff';
-      cRR(c, qrBoxX, qrBoxY, QS + 32, QS + 48, 16);
+      cRR(c, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 20);
       c.fill();
-      c.strokeStyle = '#ede5d8';
-      c.lineWidth = 1;
-      cRR(c, qrBoxX, qrBoxY, QS + 32, QS + 48, 16);
+      c.strokeStyle = '#e8dfd3';
+      c.lineWidth = 1.5;
+      cRR(c, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 20);
       c.stroke();
 
-      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&color=1a1614&bgcolor=ffffff&margin=4&data=${encodeURIComponent(trackingUrl)}`;
-
-      try {
-        const qrImg = await loadImg(qrUrl);
-        c.drawImage(qrImg, (W - QS) / 2, qrBoxY + 12, QS, QS);
-      } catch {
-        c.fillStyle = '#1a1614';
-        c.fillRect((W - QS) / 2, qrBoxY + 12, QS, QS);
-        c.fillStyle = '#ffffff';
-        c.font = 'bold 11px Arial, sans-serif';
-        c.textAlign = 'center';
-        c.fillText('OFFICIAL QR', W / 2, qrBoxY + 12 + QS / 2);
-        c.textAlign = 'left';
-      }
-
-      c.fillStyle = '#7a6e66';
+      // Top Tag
+      c.fillStyle = '#b89248';
       c.font = 'bold 10px Arial, sans-serif';
       c.textAlign = 'center';
-      c.fillText('SCAN WITH CAMERA TO TRACK LIVE ORDER & COMMENTS', W / 2, qrBoxY + QS + 32);
+      c.fillText('✦  OFFICIAL DIGITAL VERIFICATION PASS  ✦', W / 2, qrBoxY + 22);
+
+      // Frame position
+      const qrFrameX = (W - QS) / 2;
+      const qrFrameY = qrBoxY + 34;
+
+      // Viewfinder Corner Accents (Luxury minimalist aesthetic)
+      const mkLen = 14;
+      c.strokeStyle = '#b89248';
+      c.lineWidth = 2.5;
+      c.lineCap = 'round';
+      // Top-Left
+      c.beginPath(); c.moveTo(qrFrameX - 6, qrFrameY - 6 + mkLen); c.lineTo(qrFrameX - 6, qrFrameY - 6); c.lineTo(qrFrameX - 6 + mkLen, qrFrameY - 6); c.stroke();
+      // Top-Right
+      c.beginPath(); c.moveTo(qrFrameX + QS + 6 - mkLen, qrFrameY - 6); c.lineTo(qrFrameX + QS + 6, qrFrameY - 6); c.lineTo(qrFrameX + QS + 6, qrFrameY - 6 + mkLen); c.stroke();
+      // Bottom-Left
+      c.beginPath(); c.moveTo(qrFrameX - 6, qrFrameY + QS + 6 - mkLen); c.lineTo(qrFrameX - 6, qrFrameY + QS + 6); c.lineTo(qrFrameX - 6 + mkLen, qrFrameY + QS + 6); c.stroke();
+      // Bottom-Right
+      c.beginPath(); c.moveTo(qrFrameX + QS + 6 - mkLen, qrFrameY + QS + 6); c.lineTo(qrFrameX + QS + 6, qrFrameY + QS + 6); c.lineTo(qrFrameX + QS + 6, qrFrameY + QS + 6 - mkLen); c.stroke();
+
+      // Generate ultra-crisp local QR code data URL (Pure deep obsidian on pure white)
+      let qrDataUrl = '';
+      try {
+        qrDataUrl = await QRCodeLib.toDataURL(trackingUrl, {
+          width: 500,
+          margin: 2,
+          errorCorrectionLevel: 'M',
+          color: { dark: '#0a0a0f', light: '#ffffff' }
+        });
+      } catch {
+        qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&color=0a0a0f&bgcolor=ffffff&margin=4&ecc=M&data=${encodeURIComponent(trackingUrl)}`;
+      }
+
+      try {
+        const qrImg = await loadImg(qrDataUrl);
+        c.drawImage(qrImg, qrFrameX, qrFrameY, QS, QS);
+      } catch {
+        c.fillStyle = '#0a0a0f';
+        c.fillRect(qrFrameX, qrFrameY, QS, QS);
+        c.fillStyle = '#ffffff';
+        c.font = 'bold 12px Arial, sans-serif';
+        c.fillText('OFFICIAL QR PASS', W / 2, qrFrameY + QS / 2);
+      }
+
+      // Instruction Subtitle
+      c.fillStyle = '#1a1614';
+      c.font = 'bold 11px Arial, sans-serif';
+      c.textAlign = 'center';
+      c.fillText('SCAN WITH CAMERA OR TELEGRAM BOT TO TRACK STATUS', W / 2, qrFrameY + QS + 20);
+
+      c.fillStyle = '#b89248';
+      c.font = 'bold 10.5px "DM Mono", monospace';
+      c.fillText(`REF: ${curRefId}  •  hope-photo-velo-jade.vercel.app`, W / 2, qrFrameY + QS + 36);
       c.textAlign = 'left';
 
       // 6. Perforated Tear Line
-      const tearY = qrBoxY + QS + 62;
+      const tearY = qrBoxY + qrBoxH + 24;
       c.setLineDash([5, 5]);
       c.strokeStyle = '#d4c5b0';
       c.lineWidth = 1.5;
@@ -659,7 +701,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       });
 
       // 7. Footer text
-      const fy = tearY + 30;
+      const fy = tearY + 28;
       c.fillStyle = '#7a6e66';
       c.font = '500 11px Arial, sans-serif';
       c.textAlign = 'center';
@@ -1378,8 +1420,9 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <div className="vbf-rc-qr-card">
                 <QRCode
                   value={trackingUrl}
-                  size={150}
-                  label={activeLang === 'am' ? 'ይህንን QR ስካን በማድረግ በቀጥታ ይከታተሉ' : 'Scan to view live order & comments'}
+                  size={220}
+                  label={activeLang === 'am' ? 'በስልክ ካሜራ ወይም በቴሌግራም ስካን ያድርጉ' : 'Scan with phone camera or Telegram bot'}
+                  sublabel={activeLang === 'am' ? 'ይፋዊ የዲጂታል ፓስፖርት QR' : 'HOPE Studio Official Pass'}
                 />
               </div>
               <div className="vbf-rc-qr-instructions">
