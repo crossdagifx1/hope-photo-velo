@@ -11,8 +11,11 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0",
     "@vitejs/plugin-react": "latest",
+    "jpeg-js": "^0.4.4",
+    "jsqr": "^1.4.0",
     "lucide-react": "latest",
     "pg": "^8.23.0",
+    "pngjs": "^7.0.0",
     "react": "latest",
     "react-dom": "latest",
     "vite": "latest"

@@ -7240,6 +7240,18 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 .vop-telegram-btn:hover { background: #ebe4da; }
 
+.vop-tg-pill-btn {
+  background: #0088cc !important;
+  color: #ffffff !important;
+  border-color: #0088cc !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.vop-tg-pill-btn:hover {
+  background: #0077b5 !important;
+}
+
 /* Loading State */
 .vop-loading-screen {
   min-height: 70vh; display: flex; flex-direction: column;

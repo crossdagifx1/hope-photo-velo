@@ -620,7 +620,13 @@ export const db = {
   getOrders() {
     return Object.values(memoryStore.orders || {}).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   },
-  getOrder(id) { return memoryStore.orders?.[id] || null; },
+  getOrder(id) {
+    if (!id) return null;
+    if (memoryStore.orders?.[id]) return memoryStore.orders[id];
+    const upper = String(id).toUpperCase();
+    if (memoryStore.orders?.[upper]) return memoryStore.orders[upper];
+    return Object.values(memoryStore.orders || {}).find(o => o.id?.toUpperCase() === upper) || null;
+  },
   saveOrder(order) {
     if (!order.id) order.id = 'HOPE-' + Math.floor(1000 + Math.random() * 9000);
     if (!order.createdAt) order.createdAt = new Date().toISOString();
@@ -628,13 +634,25 @@ export const db = {
     memoryStore.orders[order.id] = order;
     if (order.telegramUserId) db.linkChatToOrder(order.telegramUserId, order.id);
     persistStore();
+    syncToCloud();
     return order;
   },
   updateOrder(id, patch) {
-    if (!memoryStore.orders[id]) return null;
-    memoryStore.orders[id] = { ...memoryStore.orders[id], ...patch, updatedAt: new Date().toISOString() };
+    if (!id) return null;
+    let targetId = id;
+    if (!memoryStore.orders[targetId]) {
+      const upper = String(id).toUpperCase();
+      if (memoryStore.orders[upper]) targetId = upper;
+      else {
+        const found = Object.values(memoryStore.orders || {}).find(o => o.id?.toUpperCase() === upper);
+        if (found) targetId = found.id;
+        else return null;
+      }
+    }
+    memoryStore.orders[targetId] = { ...memoryStore.orders[targetId], ...patch, updatedAt: new Date().toISOString() };
     persistStore();
-    return memoryStore.orders[id];
+    syncToCloud();
+    return memoryStore.orders[targetId];
   },
   getMessages(orderId) { return memoryStore.messages?.[orderId] || []; },
   getAllMessages() { return memoryStore.messages || {}; },

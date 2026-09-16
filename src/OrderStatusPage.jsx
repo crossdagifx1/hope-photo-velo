@@ -292,6 +292,17 @@ export default function OrderStatusPage({ orderId, lang = 'am', onBack }) {
               <h1 className="vop-meta-id">{order?.id || orderId}</h1>
             </div>
             <div className="vop-share-actions">
+              <a
+                href={`https://t.me/HoopStudioSystemBot?start=order_${order?.id || orderId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="vop-share-btn vop-tg-pill-btn"
+                title="Track via Telegram Bot"
+                style={{ textDecoration: 'none' }}
+              >
+                <Send size={13} />
+                <span>{activeLang === 'am' ? 'ቴሌግራም ቦት' : 'Telegram Bot'}</span>
+              </a>
               <button
                 type="button"
                 className="vop-share-btn"
