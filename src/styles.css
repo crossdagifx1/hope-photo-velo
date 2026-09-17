@@ -1916,6 +1916,22 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   background: #ffffff;
   border-bottom: 1px solid #f0ebe4;
   flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+.vbf-header--hero-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 25;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.88) 0%, rgba(255,255,255,0.45) 60%, transparent 100%);
+  border-bottom: none;
+  padding: 16px 20px 24px;
+}
+.vbf-header--hero-overlay .vbf-back-icon,
+.vbf-header--hero-overlay .vbf-menu-icon {
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.06);
+  color: #1a1614;
 }
 .vbf-back-icon, .vbf-menu-icon {
   width: 36px; height: 36px; border-radius: 50%;
@@ -1947,19 +1963,26 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 .vbf-step-scroll {
   flex: 1; overflow-y: auto;
   display: flex; flex-direction: column;
-  scrollbar-width: thin; scrollbar-color: #d6cfc6 transparent;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: #fafaf9;
 }
+.vbf-step-scroll::-webkit-scrollbar {
+  display: none;
+}
+.vbf-step1-scroll {
+  background: #ffffff;
+}
 
-/* ── STEP 1: Package Hero Slidable Carousel ── */
+/* ── STEP 1: Package Hero Image with Curvy Overlap Card matching Image 2 ── */
 .vbf-hero-img-wrap {
-  position: relative; width: 100%; height: 220px; flex-shrink: 0;
+  position: relative; width: 100%; height: 330px; flex-shrink: 0;
   overflow: hidden; background: #1a1614;
   user-select: none; touch-action: pan-y;
 }
 .vbf-carousel-track {
   display: flex; width: 100%; height: 100%;
-  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .vbf-carousel-slide {
   min-width: 100%; width: 100%; height: 100%;
@@ -1967,278 +1990,191 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 .vbf-hero-img {
   width: 100%; height: 100%; object-fit: cover;
-  object-position: center 30%;
+  object-position: center 26%;
   display: block;
+}
+
+/* Slide Counter Badge (e.g. 2 / 3) */
+.vbf-slide-counter {
+  position: absolute;
+  top: 68px;
+  right: 18px;
+  z-index: 15;
+  background: rgba(26, 22, 20, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.06em;
+  pointer-events: none;
+}
+
+/* Nav Arrows */
+.vbf-carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(26, 22, 20, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.vbf-carousel-nav-btn:hover {
+  background: rgba(26, 22, 20, 0.8);
+  transform: translateY(-50%) scale(1.08);
+}
+.vbf-carousel-nav-btn.prev { left: 14px; }
+.vbf-carousel-nav-btn.next { right: 14px; }
+
+/* Slide Indicator Dots (above curvy overlap) */
+.vbf-carousel-dots {
+  position: absolute;
+  bottom: 78px;
+  right: 22px;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+.vbf-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+.vbf-dot.active {
+  width: 18px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 .vbf-hero-overlay {
   position: absolute; inset: 0;
-  background: linear-gradient(to right, rgba(20,14,10,0.72) 0%, rgba(20,14,10,0.3) 60%, transparent 100%);
-  display: flex; align-items: flex-end; padding: 20px 22px 22px;
+  background: linear-gradient(
+    to bottom,
+    rgba(20,14,10,0.08) 0%,
+    rgba(20,14,10,0.2) 35%,
+    rgba(20,14,10,0.55) 75%,
+    rgba(20,14,10,0.82) 100%
+  );
+  display: flex; align-items: flex-start;
+  padding: 82px 24px 20px;
   pointer-events: none;
 }
 .vbf-hero-text { display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
 .vbf-hero-eyebrow {
-  font-size: 0.62rem; font-weight: 800; letter-spacing: 0.22em;
-  color: rgba(255,255,255,0.75); text-transform: uppercase;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.22em;
+  color: #f3dfaa; text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.8);
 }
 .vbf-hero-title {
   font-family: 'Playfair Display', serif;
-  font-size: 1.4rem; font-weight: 800; line-height: 1.2;
-  color: #ffffff; text-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  font-size: 1.55rem; font-weight: 800; line-height: 1.16;
+  color: #ffffff; text-shadow: 0 2px 14px rgba(0,0,0,0.8);
+  letter-spacing: -0.01em;
 }
 .vbf-hero-line {
-  width: 32px; height: 2.5px; background: #b89248; margin-top: 5px; border-radius: 2px;
+  width: 38px; height: 3px; background: #d4af37; margin-top: 6px; border-radius: 2px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.6);
 }
 
-/* Carousel Arrow Navigation (Left & Right Buttons) */
-.vbf-carousel-arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  z-index: 5;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(20, 14, 10, 0.52);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ffffff;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
-}
-.vbf-carousel-arrow:hover {
-  background: rgba(20, 14, 10, 0.85);
-  border-color: rgba(255, 255, 255, 0.6);
-  transform: translateY(-50%) scale(1.08);
-}
-.vbf-carousel-arrow:active {
-  transform: translateY(-50%) scale(0.95);
-}
-.vbf-carousel-arrow-prev { left: 12px; }
-.vbf-carousel-arrow-next { right: 12px; }
-
-/* Carousel Dots Indicator */
-.vbf-carousel-dots {
-  position: absolute; bottom: 12px; right: 16px; z-index: 5;
-  display: flex; align-items: center; gap: 5px;
-}
-.vbf-carousel-dot {
-  width: 7px; height: 7px; border-radius: 999px;
-  background: rgba(255, 255, 255, 0.45);
-  border: none; padding: 0; cursor: pointer;
-  transition: all 0.25s ease;
-}
-.vbf-carousel-dot-active {
-  width: 20px;
-  background: #ffffff;
-  box-shadow: 0 0 8px rgba(255,255,255,0.7);
-}
-
-/* Carousel Counter Badge */
-.vbf-carousel-badge {
-  position: absolute; top: 12px; right: 14px; z-index: 5;
-  background: rgba(20, 14, 10, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  font-size: 0.68rem; font-weight: 700;
-  padding: 3px 8px; border-radius: 999px;
-  letter-spacing: 0.05em;
-}
-
-/* ── Hamburger Menu Overlay & Drawer ── */
-.vbf-menu-overlay {
-  position: absolute; inset: 0; z-index: 60;
-  background: rgba(15, 23, 42, 0.52);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  display: flex; flex-direction: column; justify-content: flex-start;
-  animation: vbf-fade-in 0.2s ease-out;
-}
-@keyframes vbf-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-.vbf-menu-drawer {
-  background: #ffffff;
-  border-bottom-left-radius: 24px;
-  border-bottom-right-radius: 24px;
-  padding: 18px 20px 22px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
-  display: flex; flex-direction: column; gap: 16px;
-  border-bottom: 1px solid #ede8e1;
-  animation: vbf-drawer-drop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
-@keyframes vbf-drawer-drop {
-  from { transform: translateY(-30px); opacity: 0; }
-  to   { transform: translateY(0);     opacity: 1; }
-}
-.vbf-menu-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-bottom: 12px; border-bottom: 1px solid #f0ebe4;
-}
-.vbf-menu-title {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 1rem; font-weight: 800; color: #1a1614;
-}
-.vbf-menu-close-btn {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: #f4f1ec; border: none;
-  display: flex; align-items: center; justify-content: center;
-  color: #3d3530; cursor: pointer; transition: background 0.2s;
-}
-.vbf-menu-close-btn:hover { background: #ebe5dc; }
-
-/* Language Selector */
-.vbf-menu-section { display: flex; flex-direction: column; gap: 8px; }
-.vbf-menu-section-lbl {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 0.72rem; font-weight: 800; color: #7a6e66;
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
-.vbf-lang-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-}
-.vbf-lang-opt {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 4px; padding: 10px 6px; border-radius: 12px;
-  background: #fafaf9; border: 1.5px solid #ede8e1;
-  cursor: pointer; transition: all 0.2s ease; text-align: center;
-}
-.vbf-lang-opt:hover {
-  background: #fff; border-color: #b89248;
-}
-.vbf-lang-opt-active {
-  background: #1a1614 !important;
-  border-color: #1a1614 !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(26,22,20,0.18);
-}
-.vbf-lang-flag { font-size: 1.15rem; line-height: 1; }
-.vbf-lang-name {
-  font-size: 0.76rem; font-weight: 700; color: inherit;
-}
-.vbf-lang-check {
-  margin-top: 2px; color: #f0e6c8;
-}
-
-/* Chat Bot Button */
-.vbf-chatbot-btn {
-  display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; border-radius: 14px;
-  background: linear-gradient(135deg, #1a1614 0%, #2e2621 100%);
-  color: #ffffff; text-decoration: none;
-  border: 1px solid rgba(184, 146, 72, 0.4);
-  box-shadow: 0 6px 18px rgba(26,22,20,0.18);
-  cursor: pointer; transition: all 0.22s ease;
-}
-.vbf-chatbot-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(26,22,20,0.26);
-  border-color: #b89248;
-}
-.vbf-chatbot-icon-wrap {
-  width: 40px; height: 40px; border-radius: 12px;
-  background: rgba(184, 146, 72, 0.2);
-  border: 1px solid rgba(184, 146, 72, 0.5);
-  display: flex; align-items: center; justify-content: center;
-  color: #f0e6c8; flex-shrink: 0;
-}
-.vbf-chatbot-text { flex: 1; min-width: 0; }
-.vbf-chatbot-main {
-  font-size: 0.92rem; font-weight: 800; color: #ffffff; line-height: 1.25;
-}
-.vbf-chatbot-sub {
-  font-size: 0.72rem; color: #b5aba0; margin-top: 2px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.vbf-chatbot-arrow { color: #b89248; flex-shrink: 0; }
-
-.vbf-menu-footer {
-  display: flex; gap: 10px; margin-top: 4px;
-}
-.vbf-menu-exit-btn {
-  width: 100%; padding: 11px; border-radius: 10px;
-  background: #f4f1ec; border: 1px solid #e0d8d0;
-  color: #5c4b2a; font-size: 0.82rem; font-weight: 700;
-  cursor: pointer; transition: all 0.15s;
-}
-.vbf-menu-exit-btn:hover {
-  background: #ebe5dc; color: #1a1614;
-}
-
-/* ── Package Card (Step 1) ── */
+/* ── Package Card (Step 1) — Beautiful Curvy Overlap Design ── */
 .vbf-pkg-card {
   background: #ffffff;
-  border-radius: 24px 24px 0 0;
-  margin-top: -18px;
-  padding: 22px 20px 8px;
+  border-radius: 38px 38px 0 0;
+  margin-top: -68px;
+  position: relative;
+  z-index: 10;
+  padding: 28px 22px 28px;
   flex: 1;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+  box-shadow: 0 -16px 36px rgba(0,0,0,0.09);
+  display: flex;
+  flex-direction: column;
 }
 .vbf-pkg-badge-row { margin-bottom: 10px; }
 .vbf-pkg-badge {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 6px;
   background: #1a1614; color: #f0e6c8;
-  padding: 0.28rem 0.75rem; border-radius: 999px;
-  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em;
+  padding: 0.32rem 0.85rem; border-radius: 999px;
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em;
+  box-shadow: 0 2px 8px rgba(26,22,20,0.15);
 }
 .vbf-pkg-title {
   font-family: 'Playfair Display', serif;
-  font-size: 1.55rem; font-weight: 800; color: #1a1614;
-  margin: 0 0 4px; letter-spacing: -0.02em; line-height: 1.2;
+  font-size: 1.65rem; font-weight: 800; color: #1a1614;
+  margin: 6px 0 4px; letter-spacing: -0.02em; line-height: 1.2;
 }
-.vbf-pkg-desc { font-size: 0.85rem; color: #7a6e66; margin: 0 0 10px; line-height: 1.5; }
+.vbf-pkg-desc { font-size: 0.86rem; color: #7a6e66; margin: 0 0 14px; line-height: 1.45; }
 .vbf-pkg-price {
   margin-bottom: 18px;
 }
 .vbf-price-num {
   font-family: 'DM Mono', monospace;
-  font-size: 2.1rem; font-weight: 800; color: #b89248; letter-spacing: -0.03em;
+  font-size: 2.15rem; font-weight: 800; color: #b89248; letter-spacing: -0.03em;
 }
 .vbf-price-cur {
-  font-size: 0.9rem; font-weight: 700; color: #7a6e66;
+  font-size: 0.92rem; font-weight: 700; color: #7a6e66;
 }
 
 /* ── Feature Icons Grid ── */
 .vbf-feature-icons {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 10px; margin-bottom: 18px;
+  gap: 12px; margin-bottom: 18px;
 }
 .vbf-feature-icon-item {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
 }
 .vbf-feature-icon-box {
-  width: 48px; height: 48px; border-radius: 14px;
-  background: #f7f3ee; border: 1px solid #ebe3d9;
+  width: 52px; height: 52px; border-radius: 16px;
+  background: #faf8f5; border: 1.2px solid #ede8e1;
   display: flex; align-items: center; justify-content: center;
-  color: #3d3530; transition: background 0.2s;
+  color: #3d3530; transition: all 0.2s;
+}
+.vbf-feature-icon-box:hover {
+  background: #f4f0e8; border-color: #d4af37;
 }
 .vbf-feature-icon-item span {
-  font-size: 0.6rem; font-weight: 700; color: #7a6e66;
+  font-size: 0.65rem; font-weight: 700; color: #7a6e66;
   text-align: center; line-height: 1.2;
 }
 
 /* ── Divider ── */
-.vbf-divider { border: none; border-top: 1px solid #f0ebe4; margin: 4px 0 14px; }
+.vbf-divider { border: none; border-top: 1px solid #f0ebe4; margin: 4px 0 16px; }
 
 /* ── Section ── */
-.vbf-section { margin-bottom: 14px; }
+.vbf-section { margin-bottom: 16px; }
 .vbf-section-title {
-  font-size: 0.82rem; font-weight: 800; color: #1a1614;
-  margin: 0 0 8px; letter-spacing: 0.01em;
+  font-size: 0.88rem; font-weight: 800; color: #1a1614;
+  margin: 0 0 10px; letter-spacing: 0.01em;
 }
 .vbf-optional { font-weight: 500; color: #a09488; }
 
 /* ── What's Included List ── */
 .vbf-deliv-list {
   list-style: none; padding: 0; margin: 0;
-  display: flex; flex-direction: column; gap: 6px;
+  display: flex; flex-direction: column; gap: 8px;
 }
 .vbf-deliv-list li {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 0.84rem; color: #3d3530; font-weight: 500; line-height: 1.4;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.86rem; color: #2e2621; font-weight: 600; line-height: 1.45;
 }
-.vbf-check-icon { color: #3d3530; flex-shrink: 0; }
+.vbf-check-icon { color: #b89248; flex-shrink: 0; }
 
 /* ── Add-ons List ── */
 .vbf-addons-list { display: flex; flex-direction: column; gap: 6px; }
@@ -2267,6 +2203,12 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 .vbf-cta-wrap {
   padding: 16px 20px 28px; background: #ffffff;
   border-top: 1px solid #f0ebe4; flex-shrink: 0;
+  margin-top: auto;
+}
+.vbf-pkg-card .vbf-cta-wrap {
+  padding: 22px 0 6px;
+  background: transparent;
+  border-top: none;
   margin-top: auto;
 }
 .vbf-cta-btn {
@@ -2349,144 +2291,158 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 }
 .vbf-step3-sub { font-size: 0.84rem; color: #7a6e66; margin: 4px 0 0; }
 
-/* ── Contract Card ── */
+/* ── Contract Card matching Image 1 ── */
 .vbf-contract-card {
   background: #ffffff; border: 1px solid #ede8e1;
   border-radius: 18px; overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.04);
 }
 .vbf-contract-card-header {
   display: flex; align-items: center; gap: 12px;
-  padding: 14px 16px; border-bottom: 1px solid #f0ebe4;
+  padding: 14px 18px; border-bottom: 1px solid #f0ebe4;
+  background: #ffffff;
 }
-.vbf-contract-icon-wrap { flex-shrink: 0; }
-.vbf-contract-icon {
-  width: 40px; height: 40px; border-radius: 10px;
-  background: #fff0f0; display: flex; align-items: center; justify-content: center;
+.vbf-contract-pdf-badge {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: #dc2626; color: #ffffff;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; box-shadow: 0 2px 8px rgba(220,38,38,0.25);
 }
 .vbf-contract-meta { flex: 1; }
-.vbf-contract-doc-name { font-size: 0.88rem; font-weight: 800; color: #1a1614; }
-.vbf-contract-doc-id  { font-size: 0.72rem; color: #b89248; font-weight: 700; margin-top: 1px; }
+.vbf-contract-doc-name { font-size: 0.92rem; font-weight: 800; color: #1a1614; }
+.vbf-contract-doc-id  { font-size: 0.74rem; color: #b89248; font-weight: 700; font-family: 'DM Mono', monospace; margin-top: 1px; }
 .vbf-contract-expand {
-  background: #f7f3ee; border: none; border-radius: 8px;
+  background: transparent; border: none; border-radius: 8px;
   width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-  color: #7a6e66; cursor: pointer; transition: background 0.2s;
+  color: #3d3530; cursor: pointer; transition: background 0.2s;
 }
-.vbf-contract-expand:hover { background: #ebe3d9; }
+.vbf-contract-expand:hover { background: #f4f1ec; }
 
 /* ── Contract Viewer ── */
 .vbf-contract-viewer {
-  padding: 16px 18px 12px;
-  min-height: 220px;
-  background: #fdfcfb;
+  padding: 18px 20px 14px;
+  min-height: 230px;
+  background: #ffffff;
 }
 .vbf-contract-page { display: flex; flex-direction: column; gap: 10px; }
+.vbf-contract-sheet-p1 { display: flex; flex-direction: column; gap: 9px; }
 
-/* ── Document Styles ── */
+/* ── Document Styles matching Image 1 ── */
 .vbf-doc-hope-header {
   display: flex; flex-direction: column; align-items: center;
-  gap: 3px; text-align: center; padding-bottom: 8px;
+  gap: 2px; text-align: center; padding-bottom: 4px;
 }
 .vbf-doc-hope-logo {
   font-family: 'Playfair Display', serif;
-  font-size: 1.6rem; font-weight: 900;
-  color: #bd2637; letter-spacing: 0.08em;
+  font-size: 1.65rem; font-weight: 900;
+  color: #bd2637; letter-spacing: 0.1em; line-height: 1.1;
 }
 .vbf-doc-studio-name {
-  font-size: 0.7rem; font-weight: 800; color: #1a1614;
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 0.72rem; font-weight: 800; color: #1a1614;
+  letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px;
 }
 .vbf-doc-studio-contact {
-  font-size: 0.65rem; color: #7a6e66; font-weight: 500;
+  font-size: 0.65rem; color: #7a6e66; font-weight: 500; margin-top: 1px;
 }
 .vbf-doc-divider-full {
   width: 100%; border-top: 1px solid #1a1614; margin: 4px 0;
 }
 .vbf-doc-contract-title {
-  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em;
-  color: #1a1614; text-transform: uppercase;
+  font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em;
+  color: #1a1614; text-transform: uppercase; text-align: center;
 }
-.vbf-doc-section { display: flex; flex-direction: column; gap: 6px; }
+.vbf-doc-section { display: flex; flex-direction: column; gap: 4px; }
 .vbf-doc-section-num {
-  font-size: 0.74rem; font-weight: 800; color: #1a1614;
-  text-transform: uppercase; letter-spacing: 0.04em;
+  font-size: 0.72rem; font-weight: 800; color: #1a1614;
+  text-transform: uppercase; letter-spacing: 0.03em;
 }
 .vbf-doc-parties-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
 }
 .vbf-doc-party {
   display: flex; flex-direction: column; gap: 2px;
-  font-size: 0.74rem; color: #3d3530; line-height: 1.5;
+  font-size: 0.72rem; color: #3d3530; line-height: 1.45;
 }
 .vbf-doc-party-label { font-weight: 800; color: #1a1614; }
-.vbf-doc-pkg-title { font-size: 0.78rem; font-weight: 800; color: #1a1614; }
+.vbf-doc-pkg-title { font-size: 0.74rem; font-weight: 800; color: #1a1614; }
 .vbf-doc-deliv-list {
-  padding-left: 16px; margin: 0;
-  display: flex; flex-direction: column; gap: 3px;
+  padding-left: 0; margin: 0; list-style: none;
+  display: flex; flex-direction: column; gap: 2.5px;
 }
-.vbf-doc-deliv-list li { font-size: 0.74rem; color: #3d3530; line-height: 1.5; }
+.vbf-doc-deliv-list li { font-size: 0.72rem; color: #3d3530; line-height: 1.45; }
 .vbf-doc-clause-body { font-size: 0.74rem; color: #3d3530; line-height: 1.6; margin: 0; }
 
-/* ── Contract Pagination ── */
+/* ── Contract Pagination matching Image 1: < 1/4 > ── */
 .vbf-contract-pagination {
-  display: flex; align-items: center; justify-content: center; gap: 14px;
+  display: flex; align-items: center; justify-content: center; gap: 20px;
   margin-top: 14px; padding-top: 12px;
   border-top: 1px solid #f0ebe4;
 }
-.vbf-page-btn {
+.vbf-page-arrow-btn {
   width: 28px; height: 28px; border-radius: 50%;
-  background: #f7f3ee; border: 1px solid #ede8e1;
+  background: transparent; border: none;
   display: flex; align-items: center; justify-content: center;
-  color: #3d3530; cursor: pointer; transition: all 0.2s;
+  color: #7a6e66; cursor: pointer; transition: all 0.2s;
 }
-.vbf-page-btn:hover:not(:disabled) { background: #ebe3d9; }
-.vbf-page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-.vbf-page-label { font-size: 0.8rem; font-weight: 700; color: #3d3530; }
+.vbf-page-arrow-btn:hover:not(:disabled) { color: #1a1614; background: #f4f1ec; }
+.vbf-page-arrow-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+.vbf-page-label {
+  font-size: 0.85rem; font-weight: 700; color: #1a1614;
+  font-family: 'DM Mono', monospace; letter-spacing: 0.05em;
+}
 
-/* ── Signature Section ── */
+/* ── Signature Section matching Image 1 ── */
 .vbf-sig-section {
   background: #ffffff; border: 1px solid #ede8e1;
-  border-radius: 16px; overflow: hidden;
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
 }
 .vbf-sig-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; border-bottom: 1px solid #f0ebe4;
+  padding: 14px 18px 10px;
 }
 .vbf-sig-title {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 0.85rem; font-weight: 800; color: #1a1614;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.95rem; font-weight: 800; color: #1a1614;
 }
 .vbf-sig-clear {
   background: none; border: none; color: #b89248;
-  font-size: 0.8rem; font-weight: 700; cursor: pointer;
+  font-size: 0.84rem; font-weight: 700; cursor: pointer;
+  transition: opacity 0.2s;
 }
-.vbf-sig-pad-wrap {
-  position: relative; min-height: 130px;
+.vbf-sig-clear:hover { opacity: 0.75; }
+.vbf-sig-canvas-container {
+  padding: 0 16px 16px;
 }
-.vbf-sig-pad-wrap .sig-pad-wrap { border: none; border-radius: 0; }
-.vbf-sig-pad-wrap .sig-canvas { height: 130px; cursor: crosshair; }
-.vbf-sig-placeholder {
+.vbf-sig-pad-box {
+  position: relative;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+}
+.vbf-sig-canvas {
+  display: block; width: 100%; height: 130px;
+  cursor: crosshair; touch-action: none;
+  background: #ffffff;
+}
+.vbf-sig-watermark {
   position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; pointer-events: none;
+  color: #94a3b8; font-size: 0.82rem; font-weight: 500;
 }
-.vbf-sig-placeholder span { font-size: 0.8rem; color: #b5aba0; font-weight: 500; }
-.vbf-sig-preview {
-  padding: 10px; min-height: 130px;
-  display: flex; align-items: center; justify-content: center;
-}
-.vbf-sig-img { max-height: 110px; width: auto; }
 
 /* ── Terms Checkbox ── */
 .vbf-terms-row {
   display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
-  padding: 0 2px;
+  padding: 2px 4px;
 }
 .vbf-terms-check {
   width: 18px; height: 18px; flex-shrink: 0; margin-top: 1px;
-  accent-color: #5c4b2a; cursor: pointer;
+  accent-color: #1a1614; cursor: pointer;
 }
-.vbf-terms-text { font-size: 0.82rem; color: #3d3530; line-height: 1.55; font-weight: 500; }
+.vbf-terms-text { font-size: 0.84rem; color: #3d3530; line-height: 1.5; font-weight: 500; }
 .vbf-terms-link { color: #b89248; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 
 /* ── Error ── */
@@ -7077,101 +7033,102 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   font-size: 0.82rem; color: #7a6e66; margin: 0; line-height: 1.5;
 }
 
-/* ── Amount Due Summary Card ── */
+/* ── Amount Due Summary Card matching Image 2 ── */
 .vbf-pay-amount-card {
-  background: #fdfbf7; border: 1px solid #ede8e1;
-  border-radius: 16px; padding: 14px 16px;
+  background: #fdfbf7; border: 1.5px solid #ede8e1;
+  border-radius: 18px; padding: 16px 18px;
   display: flex; flex-direction: column; gap: 8px;
 }
 .vbf-pay-amount-row {
   display: flex; align-items: center; justify-content: space-between;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
 }
 .vbf-pay-amount-lbl { color: #7a6e66; font-weight: 500; }
-.vbf-pay-amount-val { font-weight: 700; color: #1a1614; }
+.vbf-pay-amount-val { font-weight: 800; color: #1a1614; font-size: 0.92rem; }
 .vbf-pay-deposit-row {
-  padding: 8px 0; border-top: 1px dashed #e2dad0; border-bottom: 1px dashed #e2dad0;
-  margin: 2px 0;
+  padding: 10px 0; border-top: 1.5px dashed #e2dad0; border-bottom: 1.5px dashed #e2dad0;
+  margin: 3px 0;
 }
 .vbf-pay-deposit-row .vbf-pay-amount-lbl {
-  font-weight: 800; color: #1a1614; font-size: 0.88rem;
+  font-weight: 800; color: #1a1614; font-size: 0.9rem;
 }
 .vbf-pay-deposit-val {
-  font-weight: 900; color: #16a34a; font-size: 1.05rem;
+  font-weight: 900; color: #16a34a; font-size: 1.15rem;
 }
 
-/* ── Payment Method Cards List ── */
+/* ── Payment Method Cards List matching Image 2 ── */
 .vbf-pay-methods-list {
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 12px;
 }
 .vbf-pay-method-card {
   background: #ffffff; border: 1.5px solid #ede8e1;
-  border-radius: 16px; padding: 14px;
+  border-radius: 18px; padding: 16px;
   cursor: pointer; transition: all 0.2s ease;
-  display: flex; flex-direction: column; gap: 10px;
+  display: flex; flex-direction: column; gap: 12px;
 }
 .vbf-pay-method-card:hover {
   border-color: #d4c5b0;
   box-shadow: 0 4px 14px rgba(0,0,0,0.04);
 }
 .vbf-pay-method-card.selected {
-  border-color: #1a1614;
-  background: #fcfbfa;
-  box-shadow: 0 4px 16px rgba(26,22,20,0.08);
+  border: 2px solid #1a1614;
+  background: #ffffff;
+  box-shadow: 0 4px 18px rgba(26,22,20,0.07);
 }
 .vbf-pay-method-top {
   display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
 }
 .vbf-pay-radio-wrap {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 12px;
 }
 .vbf-pay-radio {
-  width: 18px; height: 18px; border-radius: 50%;
-  border: 2px solid #cbd5e1; flex-shrink: 0;
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid #cbd5e1; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.2s; background: #ffffff;
 }
 .vbf-pay-radio.checked {
-  border-color: #1a1614;
-  background: #1a1614;
-}
-.vbf-pay-radio.checked::after {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  border: 2px solid #1a1614;
   background: #ffffff;
 }
+.vbf-pay-radio.checked::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: #1a1614;
+}
 .vbf-pay-title {
-  font-size: 0.88rem; font-weight: 800; color: #1a1614;
+  font-size: 0.94rem; font-weight: 800; color: #1a1614;
 }
 .vbf-pay-desc {
-  font-size: 0.72rem; color: #7a6e66; margin-top: 1px;
+  font-size: 0.74rem; color: #7a6e66; margin-top: 2px;
 }
 .vbf-pay-tag {
-  font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.04em; background: #fff4e5; color: #b89248;
-  padding: 3px 8px; border-radius: 999px; border: 1px solid #fed7aa;
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.02em; background: #fff7ed; color: #b45309;
+  padding: 3px 10px; border-radius: 999px; border: 1px solid #fed7aa;
+  flex-shrink: 0;
 }
 .vbf-pay-acc-box {
-  background: #f7f4ef; border: 1px solid #ede7dd;
-  border-radius: 12px; padding: 10px 12px;
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: #f7f4ee; border: 1px solid #ede7dc;
+  border-radius: 14px; padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
 .vbf-pay-acc-info {
   display: flex; flex-direction: column; gap: 2px;
 }
 .vbf-pay-acc-num {
-  font-family: 'DM Mono', monospace; font-size: 0.95rem; font-weight: 800;
-  color: #1a1614; letter-spacing: 0.05em;
+  font-family: 'DM Mono', monospace; font-size: 1.08rem; font-weight: 900;
+  color: #1a1614; letter-spacing: 0.04em;
 }
 .vbf-pay-acc-name {
-  font-size: 0.72rem; color: #7a6e66; font-weight: 600;
+  font-size: 0.74rem; color: #6b635b; font-weight: 600;
 }
 .vbf-pay-copy-btn {
-  background: #ffffff; border: 1px solid #ede8e1;
-  border-radius: 8px; padding: 6px 12px;
-  font-size: 0.74rem; font-weight: 700; color: #1a1614;
-  display: flex; align-items: center; gap: 5px;
+  background: #ffffff; border: 1px solid #ded6ca;
+  border-radius: 9px; padding: 7px 14px;
+  font-size: 0.78rem; font-weight: 700; color: #1a1614;
+  display: flex; align-items: center; gap: 6px;
   cursor: pointer; transition: all 0.2s;
-  flex-shrink: 0;
+  flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 .vbf-pay-copy-btn:hover { background: #f0ebe4; }
 .vbf-pay-copy-btn.copied {
@@ -7754,6 +7711,166 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   .vop-card { padding: 16px; border-radius: 16px; }
   .vop-qr-content { flex-direction: column; text-align: center; align-items: center; }
   .vop-telegram-btn { align-self: center; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   VELO BOOKING FLOW — DESKTOP VIEWPORT LAYOUT (min-width: 860px)
+   ══════════════════════════════════════════════════════════════════ */
+@media (min-width: 860px) {
+  .vbf-modal {
+    max-width: 1060px !important;
+    width: 92vw !important;
+    height: min(88dvh, 840px) !important;
+    max-height: 840px !important;
+    border-radius: 28px !important;
+    box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+  }
+  .vbf-header {
+    padding: 18px 32px 14px !important;
+  }
+  .vbf-header--hero-overlay {
+    position: relative !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #f0ebe4 !important;
+    padding: 16px 32px !important;
+  }
+  .vbf-header--hero-overlay .vbf-back-icon,
+  .vbf-header--hero-overlay .vbf-menu-icon {
+    background: #f4f1ec !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Step 1: 2-column side-by-side with horizontal curvy overlap */
+  .vbf-step1-scroll {
+    flex-direction: row !important;
+    overflow: hidden !important;
+    height: 100% !important;
+    background: #ffffff !important;
+    position: relative !important;
+  }
+  .vbf-step1-scroll .vbf-hero-img-wrap {
+    width: 47% !important;
+    height: 100% !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    border-radius: 0 !important;
+  }
+  .vbf-step1-scroll .vbf-hero-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+  .vbf-step1-scroll .vbf-hero-overlay {
+    padding: 36px 28px 24px !important;
+  }
+  .vbf-step1-scroll .vbf-slide-counter {
+    top: 20px !important;
+    right: 20px !important;
+  }
+  .vbf-step1-scroll .vbf-carousel-dots {
+    bottom: 24px !important;
+    right: 24px !important;
+  }
+  .vbf-step1-scroll .vbf-pkg-card {
+    width: 57% !important;
+    margin-top: 0 !important;
+    margin-left: -36px !important;
+    border-radius: 36px 0 0 36px !important;
+    box-shadow: -16px 0 40px rgba(0, 0, 0, 0.1) !important;
+    overflow-y: auto !important;
+    padding: 34px 40px 28px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: #d6cfc6 transparent !important;
+    position: relative !important;
+    z-index: 10 !important;
+    height: 100% !important;
+  }
+  .vbf-step1-scroll .vbf-pkg-title {
+    font-size: 1.85rem !important;
+  }
+  .vbf-step1-scroll .vbf-feature-icons {
+    gap: 14px !important;
+  }
+  .vbf-step1-scroll .vbf-feature-icon-box {
+    width: 58px !important;
+    height: 58px !important;
+  }
+  .vbf-step1-scroll .vbf-pkg-card .vbf-cta-wrap {
+    padding-top: 20px !important;
+    margin-top: auto !important;
+  }
+
+  /* Step 2: 2-column Calendar & Contact inputs */
+  .vbf-step2-body {
+    display: grid !important;
+    grid-template-columns: 1.15fr 1fr !important;
+    gap: 32px !important;
+    padding: 28px 40px 20px !important;
+    align-items: start !important;
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  .vbf-step2-header {
+    grid-column: 1 / -1 !important;
+  }
+  .vbf-contact-section {
+    padding-top: 4px !important;
+  }
+
+  /* Step 3: 2-column Contract & Signature Pad */
+  .vbf-step3-body {
+    display: grid !important;
+    grid-template-columns: 1.18fr 0.95fr !important;
+    gap: 32px !important;
+    padding: 28px 40px 20px !important;
+    align-items: start !important;
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  .vbf-step3-header {
+    grid-column: 1 / -1 !important;
+  }
+  .vbf-contract-card {
+    height: 100% !important;
+  }
+  .vbf-sig-section {
+    padding-top: 0 !important;
+  }
+
+  /* Step 4: Centered luxury card */
+  .vbf-confirm-body {
+    max-width: 620px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    padding: 36px 36px 28px !important;
+  }
+
+  /* Step 5: 2-column Payment Summary & Methods */
+  .vbf-step5-body {
+    display: grid !important;
+    grid-template-columns: 0.95fr 1.25fr !important;
+    gap: 32px !important;
+    padding: 28px 40px 20px !important;
+    align-items: start !important;
+    max-width: 1000px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+  .vbf-step5-header {
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Step 6: Centered Receipt */
+  .vbf-receipt-view {
+    max-width: 560px !important;
+    margin: 0 auto !important;
+  }
 }
 
 

@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, useImperativeHandle } from 'react';
 import {
   ArrowRight, Camera, Check, ChevronLeft, ChevronRight, Edit2,
   ExternalLink, FileText, Film, Globe, MapPin, Menu, MessageCircle,
   Phone, Plus, Send, Star, User, X, CreditCard, Copy, Printer,
-  Download, ShieldCheck, Clock, Sparkles, Share2
+  Download, ShieldCheck, Clock, Sparkles, Share2, Crown, Maximize2, Users, Image as ImageIcon
 } from 'lucide-react';
 import { resolveAgreementForPackage, DEFAULT_AGREEMENTS_9 } from './agreementsData.js';
 import QRCode from './QRCode.jsx';
@@ -62,28 +62,35 @@ const PACKAGE_HERO_IMAGES = {
 };
 
 function getPackageHeroImages(pkg) {
-  if (!pkg) return [`${ASSET}/hero-bg.jpg`, `${ASSET}/couple-hd-closeup.jpg`, `${ASSET}/hero-wedding.jpg`];
-  if (pkg.id && PACKAGE_HERO_IMAGES[pkg.id]) return PACKAGE_HERO_IMAGES[pkg.id];
+  const cameraHero = `${ASSET}/camera-hero.jpg`;
+  if (!pkg) return [cameraHero, `${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`];
+  if (pkg.id && PACKAGE_HERO_IMAGES[pkg.id]) {
+    return [cameraHero, ...PACKAGE_HERO_IMAGES[pkg.id].slice(0, 2)];
+  }
   const price = parseInt((pkg.price || '0').toString().replace(/[^0-9]/g, ''), 10);
-  if (price === 10000) return PACKAGE_HERO_IMAGES['studio-10k'];
-  if (price === 14500) return PACKAGE_HERO_IMAGES['studio-145k'];
-  if (price === 18500) return PACKAGE_HERO_IMAGES['studio-185k'];
-  if (price === 45000) return PACKAGE_HERO_IMAGES['wedding-bronze'];
-  if (price === 60000) return PACKAGE_HERO_IMAGES['wedding-silver'];
-  if (price === 75000) return PACKAGE_HERO_IMAGES['wedding-golden-75'];
-  if (price === 16000) return PACKAGE_HERO_IMAGES['mesk-16k'];
-  if (price === 20000) return PACKAGE_HERO_IMAGES['mesk-20k'];
-  if (price === 23000) return PACKAGE_HERO_IMAGES['special-23k'];
-  if (pkg.category === 'wedding') return PACKAGE_HERO_IMAGES['wedding-bronze'];
-  if (pkg.category === 'mesk_special' || pkg.category === 'outdoor') return PACKAGE_HERO_IMAGES['mesk-16k'];
-  return [`${ASSET}/hero-bg.jpg`, `${ASSET}/couple-hd-closeup.jpg`, `${ASSET}/hero-wedding.jpg`];
+  if (price === 10000) return [cameraHero, ...PACKAGE_HERO_IMAGES['studio-10k'].slice(0, 2)];
+  if (price === 14500) return [cameraHero, ...PACKAGE_HERO_IMAGES['studio-145k'].slice(0, 2)];
+  if (price === 18500) return [cameraHero, ...PACKAGE_HERO_IMAGES['studio-185k'].slice(0, 2)];
+  if (price === 45000) return [cameraHero, ...PACKAGE_HERO_IMAGES['wedding-bronze'].slice(0, 2)];
+  return [cameraHero, `${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`];
 }
 
-/* ── Inline Signature Pad ── */
-function VeloSigPad({ onSign, onClear }) {
+/* ── Inline Signature Pad matching Image 1 ── */
+const VeloSigPad = React.forwardRef(function VeloSigPad({ onSign, onClear }, ref) {
   const canvasRef = useRef(null);
   const drawing = useRef(false);
-  const hasDrawn = useRef(false);
+  const [hasDrawn, setHasDrawn] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    clear: () => {
+      const canvas = canvasRef.current;
+      if (canvas) {
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+      }
+      setHasDrawn(false);
+      onClear();
+    }
+  }));
 
   const getPos = (e, canvas) => {
     const rect = canvas.getBoundingClientRect();
@@ -109,55 +116,42 @@ function VeloSigPad({ onSign, onClear }) {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     ctx.strokeStyle = '#1a1614';
-    ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2.8;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     const pos = getPos(e, canvas);
     ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
-    hasDrawn.current = true;
+    if (!hasDrawn) setHasDrawn(true);
   };
 
   const stop = (e) => {
     e.preventDefault();
     drawing.current = false;
-    if (hasDrawn.current) {
+    if (canvasRef.current) {
       onSign(canvasRef.current.toDataURL('image/png'));
     }
   };
 
-  const clear = () => {
-    const canvas = canvasRef.current;
-    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-    hasDrawn.current = false;
-    onClear();
-  };
-
   return (
-    <div style={{ position: 'relative', minHeight: '130px' }}>
+    <div className="vbf-sig-pad-box">
       <canvas
         ref={canvasRef}
         width={480}
         height={140}
-        style={{
-          display: 'block', width: '100%', height: '130px',
-          cursor: 'crosshair', touchAction: 'none',
-          background: '#ffffff'
-        }}
+        className="vbf-sig-canvas"
         onMouseDown={start} onMouseMove={draw} onMouseUp={stop} onMouseLeave={stop}
         onTouchStart={start} onTouchMove={draw} onTouchEnd={stop}
       />
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        gap: '6px', pointerEvents: 'none'
-      }}>
-        <Edit2 size={22} style={{ color: '#b5aba0' }}/>
-        <span style={{ fontSize: '0.8rem', color: '#b5aba0', fontWeight: 500 }}>Tap to sign here</span>
-      </div>
+      {!hasDrawn && (
+        <div className="vbf-sig-watermark">
+          <Edit2 size={24} style={{ color: '#b5aba0' }} />
+          <span>Tap to sign here</span>
+        </div>
+      )}
     </div>
   );
-}
+});
 
 /* ── Calendar Picker ── */
 function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] }) {
@@ -273,6 +267,8 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   const [contractPage, setContractPage] = useState(1);
   const [defaultAgreements9, setDefaultAgreements9] = useState(DEFAULT_AGREEMENTS_9);
   const [selectedAgrTemplate, setSelectedAgrTemplate] = useState(() => resolveAgreementForPackage(selectedPackage, DEFAULT_AGREEMENTS_9));
+  const sigPadRef = useRef(null);
+  const [contractFullscreen, setContractFullscreen] = useState(false);
 
   // Payment & Receipt States (Step 5 & 6)
   const [payMethod, setPayMethod]       = useState('telebirr');
@@ -327,15 +323,18 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     setSlideIdx(prev => (prev - 1 + images.length) % images.length);
   };
 
-  // Auto-slide every 3.5 seconds, resets when package changes
+  // Auto-slide every 3.5 seconds
   useEffect(() => {
+    if (!images || images.length <= 1) return;
     const timer = setInterval(() => {
       setSlideIdx(prev => (prev + 1) % images.length);
     }, 3500);
     return () => clearInterval(timer);
   }, [selectedPackage?.id, images.length]);
 
-  const touchStartX = useRef(null);
+  useEffect(() => {
+    setSlideIdx(0);
+  }, [selectedPackage?.id]);
   const touchStartY = useRef(null);
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
@@ -725,15 +724,15 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   };
 
   const pkgIcons = [
-    { icon: <Camera size={22}/>, label: activeLang === 'am' ? 'ፎቶግራፊ' : activeLang === 'om' ? 'Suuraa' : 'Photography' },
-    { icon: <Film size={22}/>, label: activeLang === 'am' ? 'ቪዲዮግራፊ' : activeLang === 'om' ? 'Viidiyoo' : 'Videography' },
-    { icon: <User size={22}/>, label: activeLang === 'am' ? 'ባለሙያ ቡድን' : activeLang === 'om' ? 'Garee Hojii' : 'Professional Team' },
-    { icon: <Star size={22}/>, label: activeLang === 'am' ? 'ከፍተኛ ጥራት' : activeLang === 'om' ? 'Qulqullina' : 'High-Quality Output' },
+    { icon: <Camera size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ፎቶግራፊ' : 'Photography' },
+    { icon: <Film size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ቪዲዮግራፊ' : 'Videography' },
+    { icon: <Users size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ባለሙያ ቡድን' : 'Professional Team' },
+    { icon: <ImageIcon size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ከፍተኛ ጥራት' : 'High-Quality Output' },
   ];
 
   // ── Header ──
   const renderHeader = () => (
-    <div className="vbf-header">
+    <div className={`vbf-header ${step === 1 ? 'vbf-header--hero-overlay' : ''}`}>
       <button
         className="vbf-back-icon"
         onClick={step === 1 ? onClose : () => setStep(s => Math.max(1, s - 1))}
@@ -766,8 +765,8 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
 
   // ── STEP 1: Package Details ──
   const renderStep1 = () => (
-    <div className="vbf-step-scroll">
-      {/* Slidable Hero Image Carousel (3 distinct best package images) */}
+    <div className="vbf-step-scroll vbf-step1-scroll">
+      {/* Tall Hero Image Carousel with Auto-slide & Touch Gestures */}
       <div
         className="vbf-hero-img-wrap"
         onTouchStart={handleTouchStart}
@@ -781,47 +780,11 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             <div key={i} className="vbf-carousel-slide">
               <img
                 src={imgSrc}
-                alt={`${pkgName} preview ${i + 1}`}
+                alt={`${pkgName} slide ${i + 1}`}
                 className="vbf-hero-img"
                 loading="eager"
               />
             </div>
-          ))}
-        </div>
-
-        {/* User-requested left/right arrow buttons */}
-        <button
-          type="button"
-          className="vbf-carousel-arrow vbf-carousel-arrow-prev"
-          onClick={prevSlide}
-          aria-label="Previous image"
-        >
-          <ChevronLeft size={20} strokeWidth={2.6}/>
-        </button>
-        <button
-          type="button"
-          className="vbf-carousel-arrow vbf-carousel-arrow-next"
-          onClick={nextSlide}
-          aria-label="Next image"
-        >
-          <ChevronRight size={20} strokeWidth={2.6}/>
-        </button>
-
-        {/* Counter Badge */}
-        <div className="vbf-carousel-badge">
-          {slideIdx + 1} / {images.length}
-        </div>
-
-        {/* Dot indicators */}
-        <div className="vbf-carousel-dots">
-          {images.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              className={`vbf-carousel-dot${i === slideIdx ? ' vbf-carousel-dot-active' : ''}`}
-              onClick={(e) => { e.stopPropagation(); setSlideIdx(i); }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
           ))}
         </div>
 
@@ -843,13 +806,55 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             <div className="vbf-hero-line"/>
           </div>
         </div>
+
+        {/* Slide Counter Badge (e.g. 2 / 3) */}
+        {images.length > 1 && (
+          <div className="vbf-slide-counter">
+            {slideIdx + 1} / {images.length}
+          </div>
+        )}
+
+        {/* Interactive Prev/Next Navigation Buttons */}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="vbf-carousel-nav-btn prev"
+              onClick={prevSlide}
+              aria-label="Previous image"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              type="button"
+              className="vbf-carousel-nav-btn next"
+              onClick={nextSlide}
+              aria-label="Next image"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </>
+        )}
+
+        {/* Slide Indicator Dots */}
+        {images.length > 1 && (
+          <div className="vbf-carousel-dots">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`vbf-dot ${i === slideIdx ? 'active' : ''}`}
+                onClick={(e) => { e.stopPropagation(); setSlideIdx(i); }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Package Card */}
+      {/* Package Card — High-Radius Curvy Overlap on Image */}
       <div className="vbf-pkg-card">
         <div className="vbf-pkg-badge-row">
           <span className="vbf-pkg-badge">
-            <Star size={11} style={{ color: '#b89248' }}/> {badgeText}
+            <Crown size={12} style={{ color: '#d4af37' }}/> {badgeText}
           </span>
         </div>
         <h2 className="vbf-pkg-title">{pkgName}</h2>
@@ -859,7 +864,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
           <span className="vbf-price-cur"> ETB</span>
         </div>
 
-        {/* Feature Icons */}
+        {/* Feature Icons Grid */}
         <div className="vbf-feature-icons">
           {pkgIcons.map((f, i) => (
             <div key={i} className="vbf-feature-icon-item">
@@ -872,24 +877,31 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         <div className="vbf-divider"/>
 
         {/* What's Included */}
-        {deliverables.length > 0 && (
-          <div className="vbf-section">
-            <h4 className="vbf-section-title">
-              {activeLang === 'am' ? 'የተካተቱ አገልግሎቶች' : activeLang === 'om' ? 'Waanneen Dabalaman' : "What's Included"}
-            </h4>
-            <ul className="vbf-deliv-list">
-              {deliverables.map((d, i) => (
-                <li key={i}><Check size={13} className="vbf-check-icon"/> {d}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+        <div className="vbf-section">
+          <h4 className="vbf-section-title">
+            {activeLang === 'am' ? 'የተካተቱ አገልግሎቶች' : "What's Included"}
+          </h4>
+          <ul className="vbf-deliv-list">
+            {(deliverables.length > 0 ? deliverables : [
+              '200 Thank-You Cards',
+              '40×60 Board Photo',
+              'Professional Makeup',
+              '10 Post Photos',
+              '150 Soft Copies'
+            ]).map((d, i) => (
+              <li key={i}>
+                <Check size={15} className="vbf-check-icon" strokeWidth={2.5} />
+                <span>{d.replace(/^•\s*/, '')}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-      <div className="vbf-cta-wrap">
-        <button className="vbf-cta-btn" onClick={handleStep1Next}>
-          {activeLang === 'am' ? 'ቀን ወደመምረጥ ይቀጥሉ' : activeLang === 'om' ? 'Guyyaa Filachuutti Fufa' : 'Continue to Date Selection'} <ArrowRight size={18}/>
-        </button>
+        <div className="vbf-cta-wrap">
+          <button className="vbf-cta-btn" onClick={handleStep1Next}>
+            {activeLang === 'am' ? 'ቀን ወደመምረጥ ይቀጥሉ' : 'Continue to Date Selection'} <ArrowRight size={18}/>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -898,7 +910,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   const renderStep2 = () => (
     <form onSubmit={handleStep2Next} className="vbf-step-scroll">
       <div className="vbf-step2-body">
-        <div>
+        <div className="vbf-step2-header">
           <h2 className="vbf-step2-title">Select Your Date</h2>
           <p className="vbf-step2-sub">Choose a date for your event.</p>
         </div>
@@ -964,148 +976,246 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     </form>
   );
 
-  // ── STEP 3: Agreement + Signature ──
-  const renderStep3 = () => (
-    <div className="vbf-step-scroll">
-      <div className="vbf-step3-body">
-        <div>
-          <h2 className="vbf-step3-title">Sign the Agreement</h2>
-          <p className="vbf-step3-sub">Please review the contract and provide your signature.</p>
-        </div>
+  // ── STEP 3: Agreement + Signature matching Image 1 ──
+  const renderStep3 = () => {
+    const formattedDate = form.date
+      ? new Date(form.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '13 Sept 2026';
 
-        {/* Contract Document Card */}
-        <div className="vbf-contract-card">
-          <div className="vbf-contract-card-header">
-            <div className="vbf-contract-icon">
-              <FileText size={20} style={{ color: '#dc2626' }}/>
-            </div>
-            <div className="vbf-contract-meta">
-              <div className="vbf-contract-doc-name">Contract Document</div>
-              <div className="vbf-contract-doc-id">{orderId}</div>
-            </div>
-            <button type="button" className="vbf-contract-expand"><ExternalLink size={16}/></button>
+    const clientPhone = form.phone || '0987654324';
+    const clientLocation = form.location || 'Addis Ababa';
+    const curOrderId = createdOrder?.id || `HOPE-AGR-STUDIO-${basePrice || 14500}`;
+
+    const contractDeliverables = (deliverables && deliverables.length > 0)
+      ? deliverables
+      : [
+        '200 Thank-You Cards',
+        '40×60 Board Photo',
+        'Professional Makeup',
+        '10 Post Photos',
+        '150 Soft Copies'
+      ];
+
+    return (
+      <div className="vbf-step-scroll">
+        <div className="vbf-step3-body">
+          <div className="vbf-step3-header">
+            <h2 className="vbf-step3-title">
+              {activeLang === 'am' ? 'ስምምነቱን ይፈርሙ' : 'Sign the Agreement'}
+            </h2>
+            <p className="vbf-step3-sub">
+              {activeLang === 'am'
+                ? 'እባክዎ ውሉን ገምግመው ፊርማዎን ያኑሩ።'
+                : 'Please review the contract and provide your signature.'}
+            </p>
           </div>
 
-          {/* Contract Viewer */}
-          <div className="vbf-contract-viewer">
-            {/* Page 1: Header + Parties */}
-            {contractPage === 1 && (
-              <div className="vbf-contract-page">
-                <div className="vbf-doc-hope-header">
-                  <div className="vbf-doc-hope-logo">HOPE</div>
-                  <div className="vbf-doc-studio-name">HOPE PHOTO &amp; VELO STUDIO</div>
-                  <div className="vbf-doc-studio-contact">+251 9 10 52 69 62 | +251 9 95 27 08 94 | Addis Ababa</div>
-                  <div className="vbf-doc-divider-full"/>
-                  <div className="vbf-doc-contract-title">OFFICIAL CLIENT SERVICE &amp; PRODUCTION CONTRACT</div>
-                  <div className="vbf-doc-divider-full"/>
-                </div>
-                <div className="vbf-doc-section">
-                  <div className="vbf-doc-section-num">1. CONTRACTING PARTIES</div>
-                  <div className="vbf-doc-parties-grid">
-                    <div className="vbf-doc-party">
-                      <div className="vbf-doc-party-label">+ Service Provider:</div>
-                      <div>HOPE Photo &amp; Velo</div>
-                      <div>Addis Ababa, Ethiopia</div>
-                    </div>
-                    <div className="vbf-doc-party">
-                      <div className="vbf-doc-party-label">+ Client:</div>
-                      <div>{form.location || 'Addis Ababa'}</div>
-                      <div>Phone: {form.phone || '—'}</div>
-                      <div>Date: {form.date ? new Date(form.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
-                    </div>
-                  </div>
-                </div>
+          {/* Contract Document Card */}
+          <div className="vbf-contract-card">
+            <div className="vbf-contract-card-header">
+              <div className="vbf-contract-pdf-badge">
+                <FileText size={18} strokeWidth={2.4} />
               </div>
-            )}
-
-            {/* Page 2: Package & Deliverables */}
-            {contractPage === 2 && (
-              <div className="vbf-contract-page">
-                <div className="vbf-doc-section">
-                  <div className="vbf-doc-section-num">2. PACKAGE &amp; DELIVERABLES</div>
-                  <div className="vbf-doc-pkg-title">{pkgName} (Official Package)</div>
-                  <ul className="vbf-doc-deliv-list">
-                    {deliverables.map((d, i) => <li key={i}>{d}</li>)}
-                  </ul>
+              <div className="vbf-contract-meta">
+                <div className="vbf-contract-doc-name">
+                  {activeLang === 'am' ? 'የውል ሰነድ' : 'Contract Document'}
                 </div>
+                <div className="vbf-contract-doc-id">{curOrderId}</div>
               </div>
-            )}
-
-            {/* Page 3: Payment Terms */}
-            {contractPage === 3 && (
-              <div className="vbf-contract-page">
-                <div className="vbf-doc-section">
-                  <div className="vbf-doc-section-num">3. PAYMENT TERMS</div>
-                  <ul className="vbf-doc-deliv-list">
-                    <li>50% upfront — 50% after delivery</li>
-                    <li>Total Amount: {totalPrice.toLocaleString()} ETB</li>
-                    <li>Advance Deposit: {deposit.toLocaleString()} ETB</li>
-                    <li>Balance Due: {remaining.toLocaleString()} ETB</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* Page 4: Clauses */}
-            {contractPage === 4 && (
-              <div className="vbf-contract-page">
-                {resolvedClauses.slice(0, 2).map((clause, i) => (
-                  <div key={i} className="vbf-doc-section" style={{ marginBottom: '10px' }}>
-                    <div className="vbf-doc-section-num">{clause.heading}</div>
-                    <p className="vbf-doc-clause-body">{clause.body}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Pagination */}
-            <div className="vbf-contract-pagination">
-              <button type="button" className="vbf-page-btn" onClick={() => setContractPage(p => Math.max(1, p - 1))} disabled={contractPage === 1}>
-                <ChevronLeft size={14}/>
-              </button>
-              <span className="vbf-page-label">{contractPage} / {TOTAL_CONTRACT_PAGES}</span>
-              <button type="button" className="vbf-page-btn" onClick={() => setContractPage(p => Math.min(TOTAL_CONTRACT_PAGES, p + 1))} disabled={contractPage === TOTAL_CONTRACT_PAGES}>
-                <ChevronRight size={14}/>
+              <button
+                type="button"
+                className="vbf-contract-expand"
+                onClick={() => setContractFullscreen(prev => !prev)}
+                title="Expand Document"
+              >
+                <Maximize2 size={16} />
               </button>
             </div>
-          </div>
-        </div>
 
-        {/* Signature */}
-        <div className="vbf-sig-section">
-          <div className="vbf-sig-header">
-            <div className="vbf-sig-title"><Edit2 size={15}/> Your Signature</div>
-            {signature && (
-              <button type="button" className="vbf-sig-clear" onClick={() => setSignature(null)}>Clear</button>
-            )}
-          </div>
-          {signature ? (
-            <div style={{ padding: '12px', minHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img src={signature} alt="Signature" style={{ maxHeight: '100px', width: 'auto' }}/>
+            {/* Contract Viewer */}
+            <div className="vbf-contract-viewer">
+              {/* Page 1: Official Executive Contract Sheet matching Image 1 */}
+              {contractPage === 1 && (
+                <div className="vbf-contract-page vbf-contract-sheet-p1">
+                  <div className="vbf-doc-hope-header">
+                    <div className="vbf-doc-hope-logo">HOPE</div>
+                    <div className="vbf-doc-studio-name">HOPE PHOTO &amp; VELO STUDIO</div>
+                    <div className="vbf-doc-studio-contact">+251 9 10 52 69 62 | +251 9 95 27 08 94 | Addis Ababa</div>
+                    <div className="vbf-doc-divider-full" />
+                    <div className="vbf-doc-contract-title">OFFICIAL CLIENT SERVICE &amp; PRODUCTION CONTRACT</div>
+                    <div className="vbf-doc-divider-full" />
+                  </div>
+
+                  {/* 1. Contracting Parties */}
+                  <div className="vbf-doc-section">
+                    <div className="vbf-doc-section-num">1. CONTRACTING PARTIES</div>
+                    <div className="vbf-doc-parties-grid">
+                      <div className="vbf-doc-party">
+                        <div className="vbf-doc-party-label">• Service Provider:</div>
+                        <div>HOPE Photo &amp; Velo</div>
+                        <div>Addis Ababa, Ethiopia</div>
+                      </div>
+                      <div className="vbf-doc-party">
+                        <div className="vbf-doc-party-label">• Client:</div>
+                        <div>{clientLocation}</div>
+                        <div>Phone: {clientPhone}</div>
+                        <div>Date: {formattedDate}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Package & Deliverables */}
+                  <div className="vbf-doc-section">
+                    <div className="vbf-doc-section-num">2. PACKAGE &amp; DELIVERABLES</div>
+                    <div className="vbf-doc-pkg-title">• {pkgName} (Official Package)</div>
+                    <ul className="vbf-doc-deliv-list">
+                      {contractDeliverables.map((d, i) => (
+                        <li key={i}>• {d.replace(/^•\s*/, '')}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* 3. Payment Terms */}
+                  <div className="vbf-doc-section">
+                    <div className="vbf-doc-section-num">3. PAYMENT TERMS</div>
+                    <ul className="vbf-doc-deliv-list">
+                      <li>• 50% upfront — 50% after delivery</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Page 2: Copyright & Usage Rights */}
+              {contractPage === 2 && (
+                <div className="vbf-contract-page">
+                  <div className="vbf-doc-section">
+                    <div className="vbf-doc-section-num">4. COPYRIGHT &amp; USAGE RIGHTS</div>
+                    <p className="vbf-doc-clause-body">
+                      The studio retains artistic copyright for all original captured media. The client receives full, perpetual, non-exclusive rights for personal reproduction, printing, and digital sharing.
+                    </p>
+                    <p className="vbf-doc-clause-body">
+                      High-resolution soft copies are delivered free of watermarks upon final balance settlement.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Page 3: Production & Timeline */}
+              {contractPage === 3 && (
+                <div className="vbf-contract-page">
+                  <div className="vbf-doc-section">
+                    <div className="vbf-doc-section-num">5. TIMELINE &amp; DELIVERY</div>
+                    <ul className="vbf-doc-deliv-list">
+                      <li>• Retouched photography gallery: 7 to 14 working days</li>
+                      <li>• Cinematic highlight video teaser: 10 working days</li>
+                      <li>• Full documentary film &amp; printed deliverables: 21 to 30 days</li>
+                      <li>• Safe cloud archive backup maintained for 90 days post-event</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Page 4: Rescheduling & Guarantee */}
+              {contractPage === 4 && (
+                <div className="vbf-contract-page">
+                  <div className="vbf-doc-section">
+                    <div className="vbf-doc-section-num">6. RESCHEDULING &amp; GUARANTEE</div>
+                    <p className="vbf-doc-clause-body">
+                      Date rescheduling is permitted without penalty when requested at least 7 days in advance, subject to studio calendar availability.
+                    </p>
+                    <p className="vbf-doc-clause-body">
+                      The advance deposit legally secures production personnel, cameras, lighting equipment, and vehicle logistics exclusively for your event.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Pagination matching Image 1: < 1/4 > */}
+              <div className="vbf-contract-pagination">
+                <button
+                  type="button"
+                  className="vbf-page-arrow-btn"
+                  onClick={() => setContractPage(p => Math.max(1, p - 1))}
+                  disabled={contractPage === 1}
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="vbf-page-label">{contractPage} / {TOTAL_CONTRACT_PAGES}</span>
+                <button
+                  type="button"
+                  className="vbf-page-arrow-btn"
+                  onClick={() => setContractPage(p => Math.min(TOTAL_CONTRACT_PAGES, p + 1))}
+                  disabled={contractPage === TOTAL_CONTRACT_PAGES}
+                  aria-label="Next page"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
-          ) : (
-            <VeloSigPad onSign={setSignature} onClear={() => setSignature(null)}/>
-          )}
+          </div>
+
+          {/* Signature Section matching Image 1 */}
+          <div className="vbf-sig-section">
+            <div className="vbf-sig-header">
+              <div className="vbf-sig-title">
+                <Edit2 size={16} />
+                <span>{activeLang === 'am' ? 'የእርስዎ ፊርማ' : 'Your Signature'}</span>
+              </div>
+              <button
+                type="button"
+                className="vbf-sig-clear"
+                onClick={() => {
+                  setSignature(null);
+                  sigPadRef.current?.clear?.();
+                }}
+              >
+                {activeLang === 'am' ? 'አጥፋ' : 'Clear'}
+              </button>
+            </div>
+            <div className="vbf-sig-canvas-container">
+              <VeloSigPad
+                ref={sigPadRef}
+                onSign={setSignature}
+                onClear={() => setSignature(null)}
+              />
+            </div>
+          </div>
+
+          {/* Terms Checkbox */}
+          <label className="vbf-terms-row">
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={e => setTerms(e.target.checked)}
+              className="vbf-terms-check"
+            />
+            <span className="vbf-terms-text">
+              {activeLang === 'am' ? (
+                <>የአገልግሎት <span className="vbf-terms-link">ውሎችንና ስምምነቶችን</span> አንብቤ ተስማምቻለሁ</>
+              ) : (
+                <>I have read and agree to the <span className="vbf-terms-link">terms and conditions</span></>
+              )}
+            </span>
+          </label>
+
+          {error && <p className="vbf-error">{error}</p>}
         </div>
 
-        {/* Terms */}
-        <label className="vbf-terms-row">
-          <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)} className="vbf-terms-check"/>
-          <span className="vbf-terms-text">
-            I have read and agree to the <span className="vbf-terms-link">terms and conditions</span>
-          </span>
-        </label>
-
-        {error && <p className="vbf-error">{error}</p>}
+        <div className="vbf-cta-wrap">
+          <button
+            type="button"
+            className="vbf-cta-btn"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            <span>{submitting ? 'Submitting…' : (activeLang === 'am' ? 'አረጋግጥ እና አስረክብ' : 'Confirm & Submit')}</span>
+            <ArrowRight size={18} />
+          </button>
+        </div>
       </div>
-
-      <div className="vbf-cta-wrap">
-        <button type="button" className="vbf-cta-btn" onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Submitting…' : 'Confirm & Submit'} <ArrowRight size={18}/>
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   // ── STEP 4: Confirmation ──
   const renderStep4 = () => (
@@ -1124,7 +1234,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
           <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Reference</span><span className="vbf-confirm-ref">{createdOrder?.id || orderId}</span></div>
         </div>
         <div className="vbf-confirm-actions">
-          {/* Primary Action: Continue into Payment & Receipt Flow */}
           <button
             type="button"
             className="vbf-cta-btn"
@@ -1150,44 +1259,40 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     </div>
   );
 
-  // ── STEP 5: Payment Method Selection ──
+  // ── STEP 5: Payment Method Selection matching Image 2 ──
   const renderStep5 = () => {
     const paymentMethods = [
       {
         id: 'telebirr',
         title: 'Telebirr (ቴሌብር)',
-        tag: activeLang === 'am' ? 'ፈጣን / ተመራጭ' : 'Recommended',
+        tag: activeLang === 'am' ? 'ፈጣን / ተመራጭ' : 'Fast / Recommended',
         accountNumber: '0995270894',
         accountName: 'Dagmawi Amare (HOPE Studio)',
-        color: '#0077b6',
         desc: activeLang === 'am' ? 'በቴሌብር መተግበሪያ ወይም በ *127# ይላኩ' : 'Send via Telebirr App or *127#'
       },
       {
         id: 'cbe',
         title: 'Commercial Bank of Ethiopia (CBE)',
-        tag: activeLang === 'am' ? 'የኢትዮጵያ ንግድ ባንክ' : 'CBE Birr & Mobile',
+        tag: activeLang === 'am' ? 'የኢትዮጵያ ንግድ ባንክ' : 'CBE Mobile',
         accountNumber: '1000123456789',
         accountName: 'HOPE Photo & Velo Studio',
-        color: '#772b7a',
-        desc: activeLang === 'am' ? 'በ CBE Birr ወይም በሞባይል ባንኪንግ' : 'Via CBE Mobile Banking or Branch'
+        desc: activeLang === 'am' ? 'በ CBE Birr ወይም በሞባይል ባንኪንግ' : 'Via CBE Birr or Mobile Banking'
       },
       {
         id: 'awash',
         title: 'Awash Bank (አዋሽ ባንክ)',
-        tag: activeLang === 'am' ? 'አዋሽ ባንክ' : 'Awash Mobile',
+        tag: activeLang === 'am' ? 'አዋሽ ባንክ' : 'Awash Bank',
         accountNumber: '0132087654321',
         accountName: 'HOPE Pictures Studio',
-        color: '#004b87',
         desc: activeLang === 'am' ? 'በአዋሽ ሞባይል ባንኪንግ' : 'Via Awash Mobile Banking'
       },
       {
         id: 'cash',
         title: activeLang === 'am' ? 'በአካል ስቱዲዮ መክፈል (Cash)' : 'Pay Cash at Studio',
-        tag: activeLang === 'am' ? 'ስቱዲዮ ቢሮ' : 'In-Person',
+        tag: activeLang === 'am' ? 'ስቱዲዮ ቢሮ' : 'Studio Office',
         accountNumber: 'Addis Ababa, Hayahulet',
         accountName: 'Tigat Building, 3rd Floor',
-        color: '#5c4b2a',
-        desc: activeLang === 'am' ? 'በስራ ሰዓት ወደ ስቱዲዮአችን በመምጣት መክፈል ይችላሉ' : 'Visit our Hayahulet Tigat studio during business hours'
+        desc: activeLang === 'am' ? 'በስራ ሰዓት ወደ ስቱዲዮአችን በመምጣት መክፈል ይችላሉ' : 'Visit our studio during business hours to pay in cash'
       }
     ];
 
@@ -1196,38 +1301,38 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         <div className="vbf-step5-body">
           <div className="vbf-step5-header">
             <h2 className="vbf-step5-title">
-              {activeLang === 'am' ? 'የክፍያ አማራጭ ይምረጡ' : activeLang === 'om' ? 'Filannoo Kaffaltii' : 'Select Payment Method'}
+              {activeLang === 'am' ? 'የክፍያ አማራጭ ይምረጡ' : 'Select Payment Method'}
             </h2>
             <p className="vbf-step5-sub">
               {activeLang === 'am'
-                ? 'የ 50% ቅድመ-ክፍያ በመፈጸም ቀንዎን ያረጋግጡ እና ይፋዊ ደረሰኝዎን ይውሰዱ።'
+                ? 'የ 50% ቅድመ-ክፍያ በመፈጸም ቀኑን ያረጋግጡ እና ይፋዊ ደረሰኝዎን ይውሰዱ።'
                 : 'Pay 50% deposit to secure your event date & generate your official receipt.'}
             </p>
           </div>
 
-          {/* Amount Due Summary Card */}
+          {/* Amount Due Summary Card matching Image 2 */}
           <div className="vbf-pay-amount-card">
             <div className="vbf-pay-amount-row">
               <span className="vbf-pay-amount-lbl">
-                {activeLang === 'am' ? 'የፓኬጁ ጠቅላላ ዋጋ' : 'Total Package Price'}
+                {activeLang === 'am' ? 'የጥቅሉ ጠቅላላ ዋጋ' : 'Total Package Price'}
               </span>
               <span className="vbf-pay-amount-val">{totalPrice.toLocaleString()} ETB</span>
             </div>
             <div className="vbf-pay-amount-row vbf-pay-deposit-row">
               <span className="vbf-pay-amount-lbl">
-                {activeLang === 'am' ? 'አሁን የሚከፈል 50% ቅድመ-ክፍያ' : '50% Advance Deposit Due'}
+                {activeLang === 'am' ? 'አሁን የሚከፈል 50% ቅድመ-ክፍያ' : '50% Upfront Deposit (Due Now)'}
               </span>
               <span className="vbf-pay-deposit-val">{deposit.toLocaleString()} ETB</span>
             </div>
             <div className="vbf-pay-amount-row">
               <span className="vbf-pay-amount-lbl">
-                {activeLang === 'am' ? 'ቀሪ ክፍያ (በቀረጻው ቀን)' : 'Balance Due on Event Day'}
+                {activeLang === 'am' ? 'ቀሪ ክፍያ (በቀረጻው ቀን)' : 'Remaining Balance (On Event Day)'}
               </span>
               <span className="vbf-pay-amount-val">{remaining.toLocaleString()} ETB</span>
             </div>
           </div>
 
-          {/* Payment Method Cards */}
+          {/* Payment Method Cards matching Image 2 */}
           <div className="vbf-pay-methods-list">
             {paymentMethods.map(m => {
               const isSelected = payMethod === m.id;
@@ -1267,12 +1372,12 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
                       >
                         {isCopied ? (
                           <>
-                            <Check size={13} />
+                            <Check size={14} />
                             <span>{activeLang === 'am' ? 'ተቀድቷል' : 'Copied'}</span>
                           </>
                         ) : (
                           <>
-                            <Copy size={13} />
+                            <Copy size={14} />
                             <span>{activeLang === 'am' ? 'ቅዳ' : 'Copy'}</span>
                           </>
                         )}
@@ -1284,32 +1389,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             })}
           </div>
 
-          {/* Transaction Reference / Note Input */}
-          <div className="vbf-pay-ref-section">
-            <label className="vbf-pay-ref-lbl">
-              {activeLang === 'am'
-                ? 'የክፍያ ማረጋገጫ ቁጥር / Transaction Reference (ከተከፈለ)'
-                : 'Transaction / Transfer Reference (Optional)'}
-            </label>
-            <input
-              type="text"
-              className="vbf-pay-ref-input"
-              value={payReference}
-              onChange={e => setPayReference(e.target.value)}
-              placeholder={activeLang === 'am' ? 'ምሳሌ: ቴሌብር Txn ID: 94827103...' : 'e.g. Telebirr Txn ID: 94827103...'}
-            />
-          </div>
-
-          <div className="vbf-pay-security-note">
-            <ShieldCheck size={16} />
-            <span>
-              {activeLang === 'am'
-                ? 'ክፍያዎ በስቱዲዮው ይፋዊ የባንክ እና የቴሌብር አካውንት የሚገባ ሲሆን ህጋዊ የዲጂታል ደረሰኝ ወዲያውኑ ይሰጥዎታል።'
-                : 'All payments are securely processed. An official verified receipt is immediately generated.'}
-            </span>
-          </div>
-
-          <div className="vbf-cta-wrap" style={{ padding: '4px 0 12px' }}>
+          <div className="vbf-cta-wrap" style={{ padding: '8px 0 16px' }}>
             <button
               type="button"
               className="vbf-cta-btn"

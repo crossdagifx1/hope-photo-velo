@@ -5060,23 +5060,6 @@ function PackagesSection({ lang, openBooking }) {
         </div>
       </div>
 
-      {/* ── Direct Booking Banner ── */}
-      <div className="pricing-telegram-bot-banner">
-        <div className="ptb-left">
-          <span className="ptb-badge">{lang === 'am' ? 'ይፋዊ የቀን ማስያዣ' : lang === 'om' ? 'Galmee Guyyaa' : 'Official Booking'}</span>
-          <h3>{lang === 'am' ? 'የመረጡትን ፓኬጅ በቀላሉ ያስይዙ፤ ቡድናችን ወዲያውኑ ያረጋግጥልዎታል!' : lang === 'om' ? 'Paakeejii filadhaa guyyaa keessan amma qabadhaa!' : 'Select your package & book your date directly online!'}</h3>
-          <p>{lang === 'am' ? 'የትኛውንም ፓኬጅ በመጫን የቀጠሮዎን መረጃ ያስገቡ፤ የሆፕ ባለሙያዎች ወዲያውኑ ደውለው ቀጠሮዎን ያረጋግጣሉ።' : lang === 'om' ? 'Paakeejii barbaaddan cuqaasuun beellama keessan guutaa; saffisaan isiniif bilbilla.' : 'Click on any package to customize deliverables and request your booking schedule directly.'}</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => openBooking(currentCards[0])}
-          className="ptb-direct-btn"
-        >
-          <CalendarDays size={16} />
-          <span>{lang === 'am' ? 'ቀንዎን ያስይዙ' : lang === 'om' ? 'Guyyaa Qabadhaa' : 'Book Now'}</span>
-        </button>
-      </div>
-
       {/* ── 3 Cards Grid (Categorized by 3) ── */}
       <div className="pricing-3cards-grid" key={activeCategory}>
         {currentCards.map((pkg) => {
