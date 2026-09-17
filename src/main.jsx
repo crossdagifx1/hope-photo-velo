@@ -5320,12 +5320,6 @@ function App() {
   const [lang, setLang]         = useState('am');
   const [menuOpen, setMenuOpen] = useState(false);
   const [langDropOpen, setLangDropOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    const saved = localStorage.getItem('hope_theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
   const [bookingPkg, setBookingPkg] = useState(null);
   const [bookingInitialStep, setBookingInitialStep] = useState(1);
   const [showAdmin, setShowAdmin] = useState(() => {
@@ -5368,13 +5362,13 @@ function App() {
 
   const t = T[lang];
 
-  // Apply dark mode to <html> and persist in localStorage
+  // Set permanent light mode & clear legacy theme preferences
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', 'light');
     try {
-      localStorage.setItem('hope_theme', darkMode ? 'dark' : 'light');
+      localStorage.removeItem('hope_theme');
     } catch {}
-  }, [darkMode]);
+  }, []);
 
   // Close lang dropdown on outside click
   useEffect(() => {
@@ -5559,16 +5553,6 @@ function App() {
               )}
             </div>
 
-            {/* Dark / Light Mode Toggle */}
-            <button
-              type="button"
-              className="dark-mode-toggle"
-              onClick={() => setDarkMode(d => !d)}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            >
-              {darkMode ? <Sun size={15} className="sun-icon" /> : <Moon size={15} className="moon-icon" />}
-            </button>
 
             <button type="button" className="header-book" onClick={() => openBooking()}>
               <span>{t.bookBtn}</span>
