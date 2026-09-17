@@ -7836,5 +7836,181 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   }
 }
 
+/* ── Multi-Event Calendar & Session Time Slot Styles ── */
+.vbf-slot-section {
+  margin-top: 14px;
+  background: #faf8f5;
+  border: 1px solid #ede8e1;
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: vbfFadeIn 0.25s ease-out;
+}
+
+@keyframes vbfFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vbf-slot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.vbf-slot-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1a1614;
+}
+
+.vbf-slot-capacity-pill {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #b45309;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.vbf-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .vbf-slot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vbf-slot-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1.5px solid #ede8e1;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  text-align: left;
+  position: relative;
+  width: 100%;
+}
+
+.vbf-slot-chip:hover:not(:disabled) {
+  border-color: #b89248;
+  background: #fffdf9;
+  transform: translateY(-1px);
+}
+
+.vbf-slot-chip.active {
+  border-color: #5c4b2a;
+  background: #fcf9f2;
+  box-shadow: 0 2px 10px rgba(92, 75, 42, 0.12);
+}
+
+.vbf-slot-chip.booked {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.vbf-slot-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.vbf-slot-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.vbf-slot-name {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1a1614;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vbf-slot-time {
+  font-size: 0.68rem;
+  color: #7a6e66;
+  font-weight: 500;
+}
+
+.vbf-slot-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.vbf-slot-tag.booked {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.vbf-slot-tag.selected {
+  background: #5c4b2a;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Standalone / Main Calendar Picker Multi-Event Indicators */
+.cal-cell.cal-partial {
+  border: 1.5px solid #d97706 !important;
+  background: #fffdf7 !important;
+  color: #92400e !important;
+  position: relative !important;
+}
+
+.cal-partial-dots {
+  display: flex;
+  gap: 2px;
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.cal-partial-dots .cal-dot {
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: #d97706;
+}
+
+.cal-leg-dot.cal-leg-partial {
+  background: #d97706;
+}
+
+
 
 

@@ -10,6 +10,7 @@ async function dispatchPaymentAlert(order) {
       `👤 <b>Client:</b> ${order.clientName}\n` +
       `📞 <b>Phone:</b> ${order.phone || 'Not provided'}\n` +
       `📅 <b>Event Date:</b> <b>${order.eventDate || 'TBD'}</b>\n` +
+      (order.timeSlot ? `⏰ <b>Shift / Session:</b> <b>${order.timeSlot}</b>\n` : '') +
       `📍 <b>Location:</b> ${order.location || 'Addis Ababa'}\n` +
       `📦 <b>Package:</b> ${order.packageName}\n` +
       `💰 <b>Total Investment:</b> ${Number(order.totalPrice || order.basePrice || 0).toLocaleString()} ETB\n` +
@@ -114,6 +115,7 @@ export default async function handler(req, res) {
         packageId: body.packageId || 'custom',
         packageName: body.packageName || 'Selected Package',
         eventDate: body.eventDate || '',
+        timeSlot: body.timeSlot || 'Full Day',
         location: body.location || 'Addis Ababa',
         basePrice: base,
         addons: body.addons || [],

@@ -153,8 +153,16 @@ const VeloSigPad = React.forwardRef(function VeloSigPad({ onSign, onClear }, ref
   );
 });
 
-/* ── Calendar Picker ── */
-function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] }) {
+/* ── Calendar Picker with Multi-Event Support ── */
+function VeloCalendar({
+  value,
+  onChange,
+  blackoutDates = [],
+  bookedDates = [],
+  eventsByDate = {},
+  maxEventsPerDay = 3,
+  lang = 'en'
+}) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [viewing, setViewing] = useState(() => {
@@ -179,11 +187,11 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
     <div style={{ background: '#fff', border: '1px solid #ede8e1', borderRadius: '18px', padding: '14px' }}>
       {/* Nav */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <button type="button" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3d3530', display: 'flex' }}>
+        <button type="button" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3d3530', display: 'flex', padding: '4px' }}>
           <ChevronLeft size={18}/>
         </button>
         <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1a1614' }}>{months[viewing.month]} {viewing.year}</span>
-        <button type="button" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3d3530', display: 'flex' }}>
+        <button type="button" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3d3530', display: 'flex', padding: '4px' }}>
           <ChevronRight size={18}/>
         </button>
       </div>
@@ -194,42 +202,95 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
         ))}
       </div>
       {/* Day cells */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
         {cells.map((day, idx) => {
           if (!day) return <span key={`e${idx}`} />;
           const dateStr = formatDate(viewing.year, viewing.month, day);
           const cellDate = new Date(viewing.year, viewing.month, day);
           const isPast = cellDate < today;
           const isBlackout = blackoutDates.includes(dateStr);
-          const isBooked = bookedDates.includes(dateStr);
+          
+          const dayEvents = eventsByDate[dateStr] || [];
+          const bookedMatches = bookedDates.filter(d => d === dateStr).length;
+          const eventCount = Math.max(dayEvents.length, bookedMatches);
+          const isFullyBooked = eventCount >= maxEventsPerDay;
+          const isPartial = eventCount > 0 && !isFullyBooked;
+
           const isSelected = value === dateStr;
           const isToday = cellDate.getTime() === today.getTime();
-          const isDisabled = isPast || isBlackout || isBooked;
+          const isDisabled = isPast || isBlackout || isFullyBooked;
+          const slotsLeft = Math.max(0, maxEventsPerDay - eventCount);
+
+          let bg = 'transparent';
+          let textColor = '#1a1614';
+          let border = 'none';
+
+          if (isSelected) {
+            bg = '#5c4b2a';
+            textColor = '#ffffff';
+          } else if (isBlackout) {
+            bg = '#fee2e2';
+            textColor = '#991b1b';
+          } else if (isFullyBooked) {
+            bg = '#f1f5f9';
+            textColor = '#94a3b8';
+          } else if (isPartial) {
+            bg = '#fffdf7';
+            border = '1.5px solid #d97706';
+            textColor = '#92400e';
+          } else if (isDisabled) {
+            textColor = '#c9c0b6';
+          } else if (isToday) {
+            textColor = '#b89248';
+          }
+
+          const cellTitle = isBlackout
+            ? 'Studio Unavailable'
+            : isFullyBooked
+            ? `Fully Booked (${eventCount}/${maxEventsPerDay} events)`
+            : isPartial
+            ? `${eventCount}/${maxEventsPerDay} events booked (${slotsLeft} slot${slotsLeft > 1 ? 's' : ''} left)`
+            : 'Available for booking';
+
           return (
             <button
               key={dateStr}
               type="button"
               disabled={isDisabled}
               onClick={() => !isDisabled && onChange(dateStr)}
+              title={cellTitle}
               style={{
                 aspectRatio: '1', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700,
-                cursor: isDisabled ? 'not-allowed' : 'pointer', border: 'none',
-                background: isSelected ? '#5c4b2a' : isBlackout ? '#fee2e2' : isBooked ? '#e2e8f0' : 'transparent',
-                color: isSelected ? '#fff' : isBooked ? '#64748b' : isBlackout ? '#991b1b' : isDisabled ? '#c9c0b6' : isToday ? '#b89248' : '#1a1614',
-                outline: isToday && !isSelected ? '1.5px solid #b89248' : 'none',
+                cursor: isDisabled ? 'not-allowed' : 'pointer', border: border,
+                background: bg,
+                color: textColor,
+                outline: isToday && !isSelected && !isPartial ? '1.5px solid #b89248' : 'none',
                 transition: 'all 0.15s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                position: 'relative',
+                padding: '2px'
               }}
-            >{day}</button>
+            >
+              <span style={{ lineHeight: 1 }}>{day}</span>
+              {/* Mini slot indicators for partial booked day */}
+              {isPartial && !isSelected && (
+                <div style={{ display: 'flex', gap: '2px', marginTop: '3px' }}>
+                  {Array.from({ length: Math.min(eventCount, 3) }).map((_, i) => (
+                    <span key={i} style={{ width: '3.5px', height: '3.5px', borderRadius: '50%', background: '#d97706' }} />
+                  ))}
+                </div>
+              )}
+            </button>
           );
         })}
       </div>
       {/* Legend */}
-      <div style={{ display: 'flex', gap: '14px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #f0ebe4' }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px 14px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #f0ebe4' }}>
         {[
-          { dot: '#5c4b2a', label: 'Available' },
-          { dot: '#f87171', label: 'Unavailable' },
-          { dot: '#d4c5b0', label: 'Booked' },
+          { dot: '#5c4b2a', label: lang === 'am' ? 'ክፍት' : 'Available' },
+          { dot: '#d97706', label: lang === 'am' ? 'ከፊል የተያዘ (ቀሪ ቦታ አለ)' : 'Partially Booked' },
+          { dot: '#94a3b8', label: lang === 'am' ? 'ሙሉ በሙሉ የተያዘ' : 'Fully Booked' },
+          { dot: '#f87171', label: lang === 'am' ? 'የተዘጋ' : 'Studio Closed' },
         ].map(({ dot, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.65rem', color: '#7a6e66', fontWeight: 600 }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0 }}/>
@@ -258,7 +319,17 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
 
   const [blackoutDates, setBlackout] = useState([]);
   const [bookedDates, setBooked]     = useState([]);
-  const [form, setForm]              = useState({ name: '', date: '', phone: '', email: '', location: 'Addis Ababa', note: '' });
+  const [eventsByDate, setEventsByDate] = useState({});
+  const MAX_EVENTS_PER_DAY = 3;
+  const [form, setForm]              = useState({
+    name: '',
+    date: '',
+    timeSlot: 'Morning Shift (8:00 AM – 1:00 PM)',
+    phone: '',
+    email: '',
+    location: 'Addis Ababa',
+    note: ''
+  });
   const [signature, setSignature]    = useState(null);
   const [termsAccepted, setTerms]    = useState(false);
   const [submitting, setSubmitting]  = useState(false);
@@ -375,10 +446,16 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       setBlackout(data.settings?.blackoutDates || []);
       return fetch(`${apiBase}/api/orders`);
     }).then(r => r.json()).then(data => {
-      const dates = (data.orders || [])
-        .filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status))
-        .map(o => o.eventDate);
-      setBooked(dates);
+      const confirmedOrders = (data.orders || [])
+        .filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status));
+      const map = {};
+      confirmedOrders.forEach(o => {
+        if (!map[o.eventDate]) map[o.eventDate] = [];
+        map[o.eventDate].push(o);
+      });
+      setEventsByDate(map);
+      const fullyBooked = Object.keys(map).filter(d => map[d].length >= MAX_EVENTS_PER_DAY);
+      setBooked(fullyBooked);
     }).catch(() => {});
   }, []);
 
@@ -386,7 +463,9 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   const activeAgreement = selectedAgrTemplate || resolveAgreementForPackage(selectedPackage, defaultAgreements9);
   const tokens = {
     clientName: form.name || '___________', phone: form.phone || '___________',
-    eventDate: form.date || '___________', location: form.location || 'Addis Ababa',
+    eventDate: form.date ? `${form.date} (${form.timeSlot || 'Full Day'})` : '___________',
+    eventTime: form.timeSlot || 'Full Day',
+    location: form.location || 'Addis Ababa',
     packageName: pkgName, deliverables: deliverables.slice(0, 5).join(', ') || pkgName,
     agreedPrice: totalPrice.toLocaleString() + ' ETB', depositAmount: deposit.toLocaleString() + ' ETB',
     remainingBalance: remaining.toLocaleString() + ' ETB', balance: remaining.toLocaleString() + ' ETB',
@@ -418,6 +497,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientName: form.name, phone: form.phone, eventDate: form.date,
+          timeSlot: form.timeSlot || 'Morning Shift (8:00 AM – 1:00 PM)',
           location: form.location, notes: form.note, packageName: pkgName,
           basePrice, addons: [], totalPrice, depositAmount: deposit, remainingBalance: remaining,
           signatureDataUrl: signature, termsAccepted: true,
@@ -427,7 +507,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       if (r.ok) { const data = await r.json(); orderObj = data?.order || null; }
     } catch(err) { console.warn('Backend push failed:', err); }
     if (!orderObj) {
-      orderObj = { id: orderId, clientName: form.name, phone: form.phone, eventDate: form.date, packageName: pkgName, depositAmount: deposit, remainingBalance: remaining };
+      orderObj = { id: orderId, clientName: form.name, phone: form.phone, eventDate: form.date, timeSlot: form.timeSlot || 'Morning Shift (8:00 AM – 1:00 PM)', packageName: pkgName, depositAmount: deposit, remainingBalance: remaining };
     }
     setCreatedOrder(orderObj); setStep(4); setSubmitting(false);
   };
@@ -477,8 +557,8 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       const trackingUrl = `${window.location.origin}/?order=${curRefId}`;
 
       const W = 640;
-      const H = 1060;
-      const scale = 2; // High DPI Retina (1280 x 2120)
+      const H = 1090;
+      const scale = 2; // High DPI Retina (1280 x 2180)
 
       const cv = document.createElement('canvas');
       cv.width = W * scale;
@@ -502,70 +582,82 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       };
 
       // Helper to load image
-      const loadImg = (url) => new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = url;
+      const loadImg = (src) => new Promise((resolve, reject) => {
+        const i = new Image();
+        i.crossOrigin = 'anonymous';
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = src;
       });
 
-      // 1. Background Card with soft subtle border
-      c.fillStyle = '#fdfbf7';
-      cRR(c, 0, 0, W, H, 24);
-      c.fill();
+      // 1. Background Fill (Clean Luxury Off-White / Pure White Canvas)
+      c.fillStyle = '#faf8f5';
+      c.fillRect(0, 0, W, H);
 
-      c.strokeStyle = '#ede5d8';
+      // Subtle Outer Gold Border
+      c.strokeStyle = '#e2dad0';
       c.lineWidth = 1.5;
-      cRR(c, 0, 0, W, H, 24);
+      cRR(c, 16, 16, W - 32, H - 32, 28);
       c.stroke();
 
-      // 2. Top Luxury Dark Header
-      c.fillStyle = '#1a1614';
+      // Top Gold Accent Bar
+      const goldGrad = c.createLinearGradient(16, 16, W - 16, 16);
+      goldGrad.addColorStop(0, '#93783a');
+      goldGrad.addColorStop(0.5, '#d4af37');
+      goldGrad.addColorStop(1, '#93783a');
+      c.fillStyle = goldGrad;
       c.beginPath();
-      c.moveTo(0, 24);
-      c.arcTo(0, 0, 24, 0, 24);
-      c.lineTo(W - 24, 0);
-      c.arcTo(W, 0, W, 24, 24);
-      c.lineTo(W, 136);
-      c.lineTo(0, 136);
-      c.closePath();
+      c.roundRect ? c.roundRect(16, 16, W - 32, 8, [28, 28, 0, 0]) : c.rect(16, 16, W - 32, 8);
       c.fill();
 
-      // Header Branding
-      c.fillStyle = '#bd2637';
-      c.font = '900 32px "Playfair Display", Georgia, serif';
-      c.fillText('HOPE', 40, 56);
+      // 2. Header Area
+      try {
+        const logoImg = await loadImg(`${window.location.origin}/assets/hope-logo.png`);
+        c.drawImage(logoImg, 40, 44, 52, 52);
+      } catch {
+        // Fallback logo circle
+        c.fillStyle = '#1a1614';
+        c.beginPath();
+        c.arc(66, 70, 24, 0, Math.PI * 2);
+        c.fill();
+        c.fillStyle = '#d4af37';
+        c.font = 'bold 20px serif';
+        c.fillText('H', 58, 77);
+      }
 
-      c.fillStyle = '#d4af37';
-      c.font = 'bold 12px Arial, sans-serif';
-      c.fillText('PHOTO & VELO STUDIO', 40, 80);
-
-      c.fillStyle = 'rgba(255, 255, 255, 0.75)';
-      c.font = '500 11px Arial, sans-serif';
-      c.fillText('Tigat Building, Hayahulet, Addis Ababa  \u00B7  +251 910 52 69 62', 40, 102);
-
-      // Status Pill on top-right
-      c.fillStyle = '#ffffff';
-      cRR(c, W - 220, 36, 180, 36, 18);
-      c.fill();
+      c.fillStyle = '#1a1614';
+      c.font = 'bold 22px "Cinzel", "Times New Roman", serif';
+      c.fillText('HOPE', 104, 66);
 
       c.fillStyle = '#b89248';
-      c.font = '800 11px Arial, sans-serif';
+      c.font = 'bold 10px Arial, sans-serif';
+      c.fillText('PHOTO & VELO  \u00B7  LUXURY STUDIO ADDIS ABABA', 104, 82);
+
+      // Status Badge Top-Right
+      c.fillStyle = '#fef3c7';
+      cRR(c, W - 200, 42, 160, 26, 13);
+      c.fill();
+      c.strokeStyle = '#d97706';
+      c.lineWidth = 1;
+      cRR(c, W - 200, 42, 160, 26, 13);
+      c.stroke();
+
+      c.fillStyle = '#b45309';
+      c.font = 'bold 10px Arial, sans-serif';
       c.textAlign = 'center';
-      c.fillText('DATE RESERVED', W - 130, 58);
+      c.fillText('DATE RESERVED', W - 120, 58);
       c.textAlign = 'left';
 
       // 3. Sub-header & Title
       c.fillStyle = '#1a1614';
       c.font = 'bold 12px Arial, sans-serif';
-      c.fillText('OFFICIAL CLIENT DIGITAL RECEIPT & BOOKING PASS', 40, 172);
+      c.fillText('OFFICIAL CLIENT DIGITAL RECEIPT & BOOKING PASS', 40, 142);
 
       c.strokeStyle = '#e2dad0';
       c.lineWidth = 1.5;
       c.beginPath();
-      c.moveTo(40, 184);
-      c.lineTo(W - 40, 184);
+      c.moveTo(40, 154);
+      c.lineTo(W - 40, 154);
       c.stroke();
 
       // 4. Detail Rows Table
@@ -574,6 +666,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         ['CLIENT NAME', form.name || createdOrder?.clientName || 'Valued Client', false],
         ['PHONE NUMBER', form.phone || createdOrder?.phone || '—', false],
         ['EVENT DATE', form.date || createdOrder?.eventDate || '—', false],
+        ['SESSION / SHIFT', form.timeSlot || createdOrder?.timeSlot || 'Morning Shift (8:00 AM – 1:00 PM)', 'gold'],
         ['SERVICE PACKAGE', createdOrder?.packageName || pkgName || '—', false],
         ['PAYMENT METHOD', (payMethod === 'telebirr' ? 'Telebirr (ቴሌብር)' : payMethod === 'cbe' ? 'CBE (Commercial Bank)' : payMethod === 'awash' ? 'Awash Bank' : 'Cash at Studio'), false],
         ['TOTAL INVESTMENT', `${totalPrice.toLocaleString()} ETB`, false],
@@ -582,7 +675,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         ['ISSUED DATE', new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }), false],
       ];
 
-      let ry = 212;
+      let ry = 180;
       rows.forEach(([label, val, accent], i) => {
         if (i % 2 === 0) {
           c.fillStyle = '#ffffff';
@@ -920,7 +1013,82 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
           onChange={(d) => setForm(f => ({ ...f, date: d }))}
           blackoutDates={blackoutDates}
           bookedDates={bookedDates}
+          eventsByDate={eventsByDate}
+          maxEventsPerDay={MAX_EVENTS_PER_DAY}
+          lang={activeLang}
         />
+
+        {/* Time Slot / Session Selection (Multiple Events per Day Support) */}
+        {form.date && (
+          <div className="vbf-slot-section">
+            <div className="vbf-slot-header">
+              <div className="vbf-slot-title">
+                <Clock size={15} style={{ color: '#b89248' }} />
+                <span>
+                  {activeLang === 'am'
+                    ? 'የቀረጻ ሰዓት / ፈረቃ ይምረጡ'
+                    : activeLang === 'om'
+                    ? 'Yeroo / Sagantaa Filadhaa'
+                    : 'Select Session / Time Slot'}
+                </span>
+              </div>
+              <div className="vbf-slot-capacity-pill">
+                {(() => {
+                  const dayEvents = eventsByDate[form.date] || [];
+                  const count = dayEvents.length;
+                  const left = Math.max(0, MAX_EVENTS_PER_DAY - count);
+                  if (count === 0) {
+                    return activeLang === 'am' ? '3 ክፍት ፈረቃዎች አሉ' : '3 slots available';
+                  }
+                  return activeLang === 'am'
+                    ? `${count}/3 ተይዟል (${left} ቀሪ)`
+                    : `${count}/3 booked (${left} open)`;
+                })()}
+              </div>
+            </div>
+
+            <div className="vbf-slot-grid">
+              {[
+                { id: 'morning', labelEn: 'Morning Shift', labelAm: 'የጠዋት ፈረቃ', labelOm: 'Ganama', time: '8:00 AM – 1:00 PM', icon: '🌅' },
+                { id: 'afternoon', labelEn: 'Afternoon Shift', labelAm: 'የከሰዓት ፈረቃ', labelOm: 'Waaree Booda', time: '1:00 PM – 6:00 PM', icon: '☀️' },
+                { id: 'evening', labelEn: 'Evening Shift', labelAm: 'የማታ ፈረቃ', labelOm: 'Galgala', time: '6:00 PM – 10:00 PM', icon: '🌙' },
+                { id: 'fullday', labelEn: 'Full Day Session', labelAm: 'ሙሉ ቀን', labelOm: 'Guyyaa Guutuu', time: '8:00 AM – 10:00 PM', icon: '🌟' },
+              ].map(slot => {
+                const dayEvents = eventsByDate[form.date] || [];
+                const isSlotBooked = dayEvents.some(o => (o.timeSlot || '').toLowerCase().includes(slot.id));
+                const fullLabel = `${slot.labelEn} (${slot.time})`;
+                const isSelected = form.timeSlot === fullLabel;
+
+                return (
+                  <button
+                    key={slot.id}
+                    type="button"
+                    disabled={isSlotBooked}
+                    onClick={() => setForm(f => ({ ...f, timeSlot: fullLabel }))}
+                    className={`vbf-slot-chip ${isSelected ? 'active' : ''} ${isSlotBooked ? 'booked' : ''}`}
+                  >
+                    <span className="vbf-slot-icon">{slot.icon}</span>
+                    <div className="vbf-slot-info">
+                      <div className="vbf-slot-name">
+                        {activeLang === 'am' ? slot.labelAm : activeLang === 'om' ? slot.labelOm : slot.labelEn}
+                      </div>
+                      <div className="vbf-slot-time">{slot.time}</div>
+                    </div>
+                    {isSlotBooked ? (
+                      <span className="vbf-slot-tag booked">
+                        {activeLang === 'am' ? 'የተያዘ' : 'Booked'}
+                      </span>
+                    ) : isSelected ? (
+                      <span className="vbf-slot-tag selected">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Contact Details */}
         <div className="vbf-contact-section">

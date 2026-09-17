@@ -807,8 +807,8 @@ function PageLoader({ onDone }) {
   );
 }
 
-/* ── INTERACTIVE CALENDAR DATE PICKER ──────────────────────────────────── */
-function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [] }) {
+/* ── INTERACTIVE CALENDAR DATE PICKER (MULTI-EVENT READY) ──────────────────────────────────── */
+function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [], eventsByDate = {}, maxEventsPerDay = 3 }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [viewing, setViewing] = useState(() => {
@@ -857,36 +857,61 @@ function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [] 
           const cellDate = new Date(viewing.year, viewing.month, day);
           const isPast = cellDate < today;
           const isBlackout = blackoutDates.includes(dateStr);
-          const isBooked = bookedDates.includes(dateStr);
+          
+          const dayEvents = eventsByDate[dateStr] || [];
+          const countFromBooked = bookedDates.filter(d => d === dateStr).length;
+          const totalEvents = Math.max(dayEvents.length, countFromBooked);
+          const isFullyBooked = totalEvents >= maxEventsPerDay;
+          const isPartial = totalEvents > 0 && !isFullyBooked;
+
           const isSelected = value === dateStr;
           const isToday = cellDate.getTime() === today.getTime();
-          const isDisabled = isPast || isBlackout || isBooked;
+          const isDisabled = isPast || isBlackout || isFullyBooked;
+          const slotsLeft = Math.max(0, maxEventsPerDay - totalEvents);
+
           const cls = [
             'cal-cell',
             isSelected ? 'cal-selected' : '',
             isToday && !isSelected ? 'cal-today' : '',
-            isDisabled ? 'cal-disabled' : 'cal-available',
+            isDisabled ? 'cal-disabled' : isPartial ? 'cal-partial' : 'cal-available',
             isBlackout ? 'cal-blackout' : '',
-            isBooked ? 'cal-booked' : '',
+            isFullyBooked ? 'cal-booked' : '',
           ].filter(Boolean).join(' ');
+
+          const titleText = isBlackout
+            ? 'Studio Unavailable'
+            : isFullyBooked
+            ? `Fully Booked (${totalEvents}/${maxEventsPerDay} events)`
+            : isPartial
+            ? `${totalEvents}/${maxEventsPerDay} booked (${slotsLeft} slot${slotsLeft > 1 ? 's' : ''} left)`
+            : 'Available';
+
           return (
             <button
               key={dateStr}
               type="button"
               className={cls}
               disabled={isDisabled}
-              title={isBlackout ? 'Studio Unavailable' : isBooked ? 'Already Booked' : ''}
+              title={titleText}
               onClick={() => !isDisabled && onChange(dateStr)}
             >
-              {day}
+              <span>{day}</span>
+              {isPartial && !isSelected && (
+                <span className="cal-partial-dots">
+                  {Array.from({ length: Math.min(totalEvents, 3) }).map((_, i) => (
+                    <span key={i} className="cal-dot" />
+                  ))}
+                </span>
+              )}
             </button>
           );
         })}
       </div>
       <div className="cal-legend">
         <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-available"/>Available</span>
+        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-partial"/>Partially Booked</span>
+        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-booked"/>Fully Booked</span>
         <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-blackout"/>Unavailable</span>
-        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-booked"/>Booked</span>
       </div>
     </div>
   );
