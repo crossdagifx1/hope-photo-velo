@@ -337,11 +337,12 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   }, [selectedPackage?.id]);
   const touchStartY = useRef(null);
   const handleTouchStart = (e) => {
+    if (!e.touches || !e.touches[0]) return;
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
   };
   const handleTouchEnd = (e) => {
-    if (touchStartX.current === null) return;
+    if (!e.changedTouches || !e.changedTouches[0] || touchStartX.current === null) return;
     const deltaX = e.changedTouches[0].clientX - touchStartX.current;
     const deltaY = e.changedTouches[0].clientY - touchStartY.current;
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
@@ -741,8 +742,11 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         <ChevronLeft size={20}/>
       </button>
       <div className="vbf-brand">
-        <div className="vbf-brand-name">Velo</div>
-        <div className="vbf-brand-sub">PHOTO &amp; EVENT STUDIO</div>
+        <img
+          src="/assets/hope-logo.png"
+          alt="HOPE Photo &amp; Velo Studio"
+          className="vbf-brand-logo-img"
+        />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         {step >= 2 && step <= 3 ? (

@@ -1939,9 +1939,15 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   display: flex; align-items: center; justify-content: center;
   color: #3d3530; cursor: pointer; transition: background 0.2s;
 }
-.vbf-back-icon:hover, .vbf-menu-icon:hover { background: #ebe5dc; }
 .vbf-brand {
-  display: flex; flex-direction: column; align-items: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.vbf-brand-logo-img {
+  height: 38px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  display: block;
 }
 .vbf-brand-name {
   font-family: 'Playfair Display', serif;
@@ -1957,6 +1963,128 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   border-radius: 999px; padding: 0.3rem 0.75rem;
   font-size: 0.78rem; font-weight: 800; color: #3d3530;
   min-width: 40px; text-align: center;
+}
+
+/* ── Hamburger Menu Overlay & Drawer ── */
+.vbf-menu-overlay {
+  position: absolute; inset: 0; z-index: 60;
+  background: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex; flex-direction: column; justify-content: flex-start;
+  animation: vbf-fade-in 0.2s ease-out;
+}
+@keyframes vbf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.vbf-menu-drawer {
+  background: #ffffff;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  padding: 18px 20px 22px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+  display: flex; flex-direction: column; gap: 16px;
+  border-bottom: 1px solid #ede8e1;
+  animation: vbf-drawer-drop 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes vbf-drawer-drop {
+  from { transform: translateY(-30px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.vbf-menu-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 12px; border-bottom: 1px solid #f0ebe4;
+}
+.vbf-menu-title {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 1rem; font-weight: 800; color: #1a1614;
+}
+.vbf-menu-close-btn {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #f4f1ec; border: none;
+  display: flex; align-items: center; justify-content: center;
+  color: #3d3530; cursor: pointer; transition: background 0.2s;
+}
+.vbf-menu-close-btn:hover { background: #ebe5dc; }
+
+/* Language Selector */
+.vbf-menu-section { display: flex; flex-direction: column; gap: 8px; }
+.vbf-menu-section-lbl {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.72rem; font-weight: 800; color: #7a6e66;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.vbf-lang-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+}
+.vbf-lang-opt {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; padding: 10px 6px; border-radius: 12px;
+  background: #fafaf9; border: 1.5px solid #ede8e1;
+  cursor: pointer; transition: all 0.2s ease; text-align: center;
+  color: #1a1614;
+}
+.vbf-lang-opt:hover {
+  background: #fff; border-color: #b89248;
+}
+.vbf-lang-opt-active {
+  background: #1a1614 !important;
+  border-color: #1a1614 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(26,22,20,0.18);
+}
+.vbf-lang-flag { font-size: 1.15rem; line-height: 1; }
+.vbf-lang-name {
+  font-size: 0.76rem; font-weight: 700; color: inherit;
+}
+.vbf-lang-check {
+  margin-top: 2px; color: #f0e6c8;
+}
+
+/* Chat Bot Button */
+.vbf-chatbot-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border-radius: 14px;
+  background: linear-gradient(135deg, #1a1614 0%, #2e2621 100%);
+  color: #ffffff; text-decoration: none;
+  border: 1px solid rgba(184, 146, 72, 0.4);
+  box-shadow: 0 6px 18px rgba(26,22,20,0.18);
+  cursor: pointer; transition: all 0.22s ease;
+}
+.vbf-chatbot-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(26,22,20,0.26);
+  border-color: #b89248;
+}
+.vbf-chatbot-icon-wrap {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(184, 146, 72, 0.2);
+  border: 1px solid rgba(184, 146, 72, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  color: #f0e6c8; flex-shrink: 0;
+}
+.vbf-chatbot-text { flex: 1; min-width: 0; }
+.vbf-chatbot-main {
+  font-size: 0.92rem; font-weight: 800; color: #ffffff; line-height: 1.25;
+}
+.vbf-chatbot-sub {
+  font-size: 0.72rem; color: #b5aba0; margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vbf-chatbot-arrow { color: #b89248; flex-shrink: 0; }
+
+.vbf-menu-footer {
+  display: flex; gap: 10px; margin-top: 4px;
+}
+.vbf-menu-exit-btn {
+  width: 100%; padding: 11px; border-radius: 10px;
+  background: #f4f1ec; border: 1px solid #e0d8d0;
+  color: #5c4b2a; font-size: 0.82rem; font-weight: 700;
+  cursor: pointer; transition: all 0.15s;
+}
+.vbf-menu-exit-btn:hover {
+  background: #ebe5dc; color: #1a1614;
 }
 
 /* ── Scrollable Step Content ── */
@@ -7679,17 +7807,34 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
 /* ══════════════════════════════════════════════════════════════════
    VELO BOOKING FLOW — DESKTOP VIEWPORT LAYOUT (min-width: 860px)
    ══════════════════════════════════════════════════════════════════ */
+@keyframes vbf-slide-left {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
 @media (min-width: 860px) {
+  .vbf-overlay {
+    justify-content: flex-end !important;
+    align-items: stretch !important;
+    padding: 0 !important;
+  }
   .vbf-modal {
-    max-width: 1060px !important;
-    width: 92vw !important;
-    height: min(88dvh, 840px) !important;
-    max-height: 840px !important;
-    border-radius: 28px !important;
-    box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+    max-width: 980px !important;
+    width: 62vw !important;
+    min-width: 580px !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 28px 0 0 28px !important;
+    box-shadow: -20px 0 70px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+    margin: 0 !important;
+    animation: vbf-slide-left 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
   .vbf-header {
-    padding: 18px 32px 14px !important;
+    padding: 16px 32px 14px !important;
+  }
+  .vbf-brand-logo-img {
+    height: 42px !important;
+    max-width: 160px !important;
   }
   .vbf-header--hero-overlay {
     position: relative !important;
