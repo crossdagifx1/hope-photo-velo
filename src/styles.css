@@ -7249,6 +7249,47 @@ footer { padding:4rem 8vw 2rem; display:grid; grid-template-columns:1.3fr 1fr .8
   border-radius: 12px; font-size: 0.74rem; color: #7a6e66; line-height: 1.4;
 }
 
+/* ── Payment Proof / Screenshot Upload ── */
+.vbf-proof-upload-wrap {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 0 4px;
+}
+.vbf-proof-upload-lbl {
+  font-size: 0.78rem; font-weight: 700; color: #4b4139;
+}
+.vbf-proof-upload-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 12px;
+  border: 1.5px dashed #c5b9ae; background: #fdfbf7;
+  color: #5c4b2a; font-size: 0.84rem; font-weight: 600;
+  cursor: pointer; transition: all 0.18s;
+  width: 100%; justify-content: center;
+}
+.vbf-proof-upload-btn:hover {
+  border-color: #b89248; background: #fffbf4; color: #8a6a1e;
+}
+.vbf-proof-preview-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 12px;
+  border: 1.5px solid #ede8e1; background: #fdfbf7;
+}
+.vbf-proof-thumb {
+  width: 48px; height: 48px; border-radius: 8px;
+  object-fit: cover; flex-shrink: 0;
+  border: 1px solid #ede8e1;
+}
+.vbf-proof-file-name {
+  flex: 1; font-size: 0.78rem; font-weight: 600; color: #3d3530;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vbf-proof-remove-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: none; background: #f4f1ec; color: #7a6e66;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: background 0.15s;
+}
+.vbf-proof-remove-btn:hover { background: #f0ebe4; color: #1a1614; }
+
 /* ══════════════════════════════════════════════════════════════════════════
    STEP 6: OFFICIAL RECEIPT CARD WITH QR CODE
    ══════════════════════════════════════════════════════════════════════════ */

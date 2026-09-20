@@ -273,9 +273,12 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   // Payment & Receipt States (Step 5 & 6)
   const [payMethod, setPayMethod]       = useState('telebirr');
   const [payReference, setPayReference] = useState('');
+  const [paymentProof, setPaymentProof] = useState(null);  // base64 dataURL
+  const [proofFileName, setProofFileName] = useState('');
   const [copyFeedback, setCopyFeedback] = useState(null);
   const [updatingPay, setUpdatingPay]   = useState(false);
   const [downloadingCard, setDownloadingCard] = useState(false);
+  const proofInputRef = useRef(null);
 
   const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
 
@@ -446,6 +449,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
       id: orderIdToUpdate,
       paymentMethod: payMethod,
       paymentReference: payReference,
+      paymentProof: paymentProof || null,
       status: 'PENDING_VERIFICATION',
       paymentStatus: 'PENDING_VERIFICATION',
       jobStatus: 'SCHEDULED'
@@ -459,16 +463,25 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     } catch (e) {
       console.warn('Backend payment patch failed:', e);
     }
-    // Update local createdOrder state
     setCreatedOrder(prev => ({
       ...(prev || {}),
       paymentMethod: payMethod,
       paymentReference: payReference,
+      paymentProof: paymentProof || null,
       paymentStatus: 'PENDING_VERIFICATION',
       jobStatus: 'SCHEDULED'
     }));
     setUpdatingPay(false);
     setStep(6);
+  };
+
+  const handleProofFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setProofFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (ev) => setPaymentProof(ev.target.result);
+    reader.readAsDataURL(file);
   };
 
   const handleDownloadReceiptCard = async () => {
@@ -1393,6 +1406,42 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             })}
           </div>
 
+          {/* Payment Screenshot Upload */}
+          <div className="vbf-proof-upload-wrap">
+            <div className="vbf-proof-upload-lbl">
+              {activeLang === 'am' ? 'የክፍያ ስክሪን ሾት አያይዙ (አማራጭ)' : 'Attach Payment Screenshot (Optional)'}
+            </div>
+            <input
+              ref={proofInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleProofFileChange}
+            />
+            {paymentProof ? (
+              <div className="vbf-proof-preview-row">
+                <img src={paymentProof} alt="proof" className="vbf-proof-thumb" />
+                <div className="vbf-proof-file-name">{proofFileName}</div>
+                <button
+                  type="button"
+                  className="vbf-proof-remove-btn"
+                  onClick={() => { setPaymentProof(null); setProofFileName(''); if (proofInputRef.current) proofInputRef.current.value = ''; }}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="vbf-proof-upload-btn"
+                onClick={() => proofInputRef.current?.click()}
+              >
+                <Download size={16} style={{ transform: 'rotate(180deg)' }} />
+                <span>{activeLang === 'am' ? 'ፋይል ይምረጡ' : 'Choose File'}</span>
+              </button>
+            )}
+          </div>
+
           <div className="vbf-cta-wrap" style={{ padding: '8px 0 16px' }}>
             <button
               type="button"
@@ -1404,13 +1453,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
                 <span>{activeLang === 'am' ? 'ደረሰኝ በማዘጋጀት ላይ…' : 'Generating Receipt…'}</span>
               ) : (
                 <>
-                  <span>
-                    {activeLang === 'am'
-                      ? 'ክፍያውን አረጋግጥ እና ይፋዊ ደረሰኝ ውሰድ'
-                      : activeLang === 'om'
-                      ? 'Kaffaltii Mirkaneessi Nagahee Fudhadhu'
-                      : 'Confirm Payment & Generate Receipt'}
-                  </span>
+                  <span>{activeLang === 'am' ? 'ክፍያውን አረጋግጥ እና ይፋዊ ደረሰኝ ውሰድ' : 'Confirm Payment & Generate Receipt'}</span>
                   <ArrowRight size={18} />
                 </>
               )}
@@ -1589,7 +1632,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <div className="vbf-menu-header">
                 <div className="vbf-menu-title">
                   <Menu size={18} />
-                  <span>{activeLang === 'am' ? 'ምናሌ' : activeLang === 'om' ? 'Baafata' : 'Menu'}</span>
+                  <span>{activeLang === 'am' ? 'ምናሌ' : 'Menu'}</span>
                 </div>
                 <button
                   type="button"
@@ -1605,13 +1648,12 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <div className="vbf-menu-section">
                 <div className="vbf-menu-section-lbl">
                   <Globe size={15} />
-                  <span>{activeLang === 'am' ? 'ቋንቋ ይምረጡ' : activeLang === 'om' ? 'Afaan Filadhaa' : 'Change Language'}</span>
+                  <span>{activeLang === 'am' ? 'ቋንቋ ይምረጡ' : 'Change Language'}</span>
                 </div>
                 <div className="vbf-lang-grid">
                   {[
                     { code: 'am', label: 'አማርኛ', flag: '🇪🇹' },
                     { code: 'en', label: 'English', flag: '🇬🇧' },
-                    { code: 'om', label: 'Afaan Oromoo', flag: '🇪🇹' },
                   ].map(opt => {
                     const isSel = activeLang === opt.code;
                     return (
@@ -1637,7 +1679,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <div className="vbf-menu-section">
                 <div className="vbf-menu-section-lbl">
                   <MessageCircle size={15} />
-                  <span>{activeLang === 'am' ? 'የቀጥታ እርዳታ እና ቦት' : activeLang === 'om' ? 'Deeggarsa fi Botii' : 'Support & Assistant'}</span>
+                  <span>{activeLang === 'am' ? 'የቀጥታ እርዳታ እና ቦት' : 'Support & Assistant'}</span>
                 </div>
                 <a
                   href={`https://t.me/HoopStudioSystemBot?start=inquire_${selectedPackage?.id || 'studio'}`}
@@ -1651,7 +1693,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
                   </div>
                   <div className="vbf-chatbot-text">
                     <div className="vbf-chatbot-main">
-                      {activeLang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ' : activeLang === 'om' ? 'Gara Botii Telegram Dhaqaa' : 'Go to Chat Bot'}
+                      {activeLang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ' : 'Go to Chat Bot'}
                     </div>
                     <div className="vbf-chatbot-sub">
                       @HoopStudioSystemBot • Instant Replies
@@ -1668,7 +1710,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
                   className="vbf-menu-exit-btn"
                   onClick={() => { setMenuOpen(false); onClose(); }}
                 >
-                  {activeLang === 'am' ? 'ወደ ድረ-ገጽ ተመለስ (Exit Booking)' : activeLang === 'om' ? 'Gara Fuulaatti Deebi\'aa' : 'Exit Booking'}
+                  {activeLang === 'am' ? 'ወደ ድረ-ገጽ ተመለስ (Exit Booking)' : 'Exit Booking'}
                 </button>
               </div>
             </div>
