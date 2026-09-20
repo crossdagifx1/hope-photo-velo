@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import {
   CheckCircle2, Clock, AlertCircle, MessageSquare, Send, Calendar,
   User, Phone, MapPin, Package, ShieldCheck, ChevronLeft, RefreshCw,
-  Sparkles, Camera, Film, ArrowRight, Share2, Check, ExternalLink, HelpCircle
+  Sparkles, Camera, Film, ArrowRight, Share2, Check, ExternalLink, HelpCircle,
+  FileText
 } from 'lucide-react';
 import QRCode from './QRCode.jsx';
+import DocumentStyleAgreement from './DocumentStyleAgreement.jsx';
+import { resolveAgreementForPackage, DEFAULT_AGREEMENTS_9 } from './agreementsData.js';
 
 export default function OrderStatusPage({ orderId, lang = 'am', onBack }) {
   const [activeLang, setActiveLang] = useState(lang);
@@ -13,6 +16,14 @@ export default function OrderStatusPage({ orderId, lang = 'am', onBack }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
+  // Agreement & Signature state
+  const [agreementData, setAgreementData] = useState(null);
+  const [clientSig, setClientSig] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [signingContract, setSigningContract] = useState(false);
+  const [signedSuccess, setSignedSuccess] = useState(false);
+  const [signError, setSignError] = useState('');
+
   // Comment Form state
   const [authorName, setAuthorName] = useState('');
   const [commentText, setCommentText] = useState('');
@@ -97,12 +108,59 @@ export default function OrderStatusPage({ orderId, lang = 'am', onBack }) {
     if (fetchedOrder?.clientName && !authorName) {
       setAuthorName(fetchedOrder.clientName);
     }
+
+    // Try fetching official contract if exists
+    try {
+      const aRes = await fetch(`${apiBase}/api/agreements?order_id=${encodeURIComponent(orderId)}`);
+      if (aRes.ok) {
+        const ad = await aRes.json();
+        if (ad?.agreement) setAgreementData(ad.agreement);
+      }
+    } catch {}
+
     setLoading(false);
   };
 
   useEffect(() => {
     fetchOrderData();
   }, [orderId]);
+
+  const handleSignAgreement = async () => {
+    if (!clientSig) { setSignError(activeLang === 'am' ? 'እባክዎ ፊርማዎን ያስቀምጡ' : 'Please provide your signature'); return; }
+    if (!termsAccepted) { setSignError(activeLang === 'am' ? 'እባክዎ ውሎችን ይቀበሉ' : 'Please accept the agreement terms'); return; }
+    setSigningContract(true);
+    setSignError('');
+    try {
+      const price = order?.totalPrice || order?.basePrice || 0;
+      const deposit = order?.depositAmount || Math.round(price * 0.5);
+      const res = await fetch(`${apiBase}/api/agreements`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'sign',
+          orderId,
+          clientName: order?.clientName || authorName || 'Client',
+          signatureDataUrl: clientSig,
+          termsAccepted: true,
+          agreedPrice: price,
+          depositAmount: deposit,
+          eventDate: order?.eventDate || new Date().toISOString().slice(0, 10),
+          location: order?.location || 'Addis Ababa'
+        })
+      });
+      const d = await res.json();
+      if (d.success) {
+        setSignedSuccess(true);
+        setAgreementData(d.agreement);
+        fetchOrderData();
+      } else {
+        setSignError(d.error || 'Signing failed');
+      }
+    } catch {
+      setSignError('Network error. Please try again.');
+    }
+    setSigningContract(false);
+  };
 
   // Handle new comment submission
   const handleCommentSubmit = async (e) => {
@@ -360,6 +418,113 @@ export default function OrderStatusPage({ orderId, lang = 'am', onBack }) {
             </div>
           </div>
         </section>
+
+        {/* ── OFFICIAL DOCUMENT-STYLE LEGAL AGREEMENT (Continuous Scroll & PDF Download) ── */}
+        {(() => {
+          const matchedAgr = agreementData || resolveAgreementForPackage({ id: order?.packageName, price: order?.totalPrice || order?.basePrice }, DEFAULT_AGREEMENTS_9);
+          const isSigned = !!(order?.signatureDataUrl || agreementData?.signatureDataUrl || signedSuccess);
+          const currentSig = order?.signatureDataUrl || agreementData?.signatureDataUrl || clientSig;
+
+          return (
+            <section className="vop-card vop-agreement-card" style={{ padding: 0, overflow: 'hidden', border: '1px solid #e2d9cf' }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid #ede8e1', background: '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#5c4b2a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <FileText size={18} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#1a1614' }}>
+                      {activeLang === 'am' ? 'ይፋዊ የስምምነት ሰነድ (Official Document)' : 'Official Service Agreement'}
+                    </h3>
+                    <span style={{ fontSize: '0.75rem', color: '#7a6e66' }}>
+                      {isSigned
+                        ? (activeLang === 'am' ? 'በዲጂታል ፊርማ የጸደቀ • PDF ማውረድ ይችላሉ' : 'Digitally Signed & Validated • Downloadable PDF')
+                        : (activeLang === 'am' ? 'እባክዎ ውሉን ፈርመው ያጽድቁ' : 'Awaiting Client Digital Signature')}
+                    </span>
+                  </div>
+                </div>
+                {isSigned && (
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '999px', background: '#ecfdf5', color: '#059669', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <CheckCircle2 size={13} /> {activeLang === 'am' ? 'ውል ተፈርሟል' : 'CONTRACT SIGNED'}
+                  </span>
+                )}
+              </div>
+
+              <div style={{ maxHeight: '550px', overflowY: 'auto', background: '#fff' }}>
+                <DocumentStyleAgreement
+                  agreement={matchedAgr}
+                  clientName={order?.clientName || 'Client'}
+                  phone={order?.phone || ''}
+                  eventDate={order?.eventDate || ''}
+                  location={order?.location || 'Addis Ababa'}
+                  totalPrice={order?.totalPrice || order?.basePrice || 0}
+                  depositAmount={order?.depositAmount || Math.round((order?.totalPrice || 0) * 0.5)}
+                  remainingBalance={order?.remainingBalance || ((order?.totalPrice || 0) - (order?.depositAmount || Math.round((order?.totalPrice || 0) * 0.5)))}
+                  signature={currentSig}
+                  onSign={setClientSig}
+                  onClearSignature={() => setClientSig(null)}
+                  readOnly={isSigned}
+                  lang={activeLang === 'om' ? 'en' : activeLang}
+                  orderId={order?.id || orderId}
+                />
+              </div>
+
+              {!isSigned && (
+                <div style={{ padding: '16px 20px', background: '#fffbf5', borderTop: '1px solid #f0e6d6' }}>
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={e => setTermsAccepted(e.target.checked)}
+                      style={{ marginTop: '3px', accentColor: '#5c4b2a' }}
+                    />
+                    <span style={{ fontSize: '0.85rem', color: '#3d3530', lineHeight: 1.5, fontWeight: 600 }}>
+                      {activeLang === 'am'
+                        ? 'ከላይ በሰነዱ የተዘረዘሩትን የአገልግሎት ውሎችና ስምምነቶች አንብቤ ተቀብያለሁ። የ 50% ቅድመ-ክፍያ ሁኔታን አረጋግጣለሁ።'
+                        : 'I have read and agree to all terms and deliverables in this official agreement. I agree to the 50% deposit requirement.'}
+                    </span>
+                  </label>
+
+                  {signError && (
+                    <div style={{ color: '#dc2626', fontSize: '0.8rem', fontWeight: 600, marginTop: '8px' }}>
+                      {signError}
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleSignAgreement}
+                    disabled={signingContract || !clientSig || !termsAccepted}
+                    style={{
+                      marginTop: '12px',
+                      width: '100%',
+                      padding: '12px 20px',
+                      borderRadius: '12px',
+                      border: 'none',
+                      background: 'linear-gradient(135deg, #5c4b2a, #3d3019)',
+                      color: '#fff',
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                      cursor: (signingContract || !clientSig || !termsAccepted) ? 'not-allowed' : 'pointer',
+                      opacity: (signingContract || !clientSig || !termsAccepted) ? 0.5 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Check size={16} />
+                    <span>
+                      {signingContract
+                        ? (activeLang === 'am' ? 'በማረጋገጥ ላይ…' : 'Submitting Signature…')
+                        : (activeLang === 'am' ? 'ስምምነቱን በዲጂታል ፊርማ አጽድቅ (Accept & Sign)' : 'Accept & Sign Agreement')}
+                    </span>
+                  </button>
+                </div>
+              )}
+            </section>
+          );
+        })()}
 
         {/* ── QUESTION 1: "IS PAYMENT VERIFIED?" ── */}
         <section className="vop-card vop-payment-card">

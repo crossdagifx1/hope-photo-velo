@@ -175,8 +175,17 @@ export default async function handler(req, res) {
         return res.status(404).json({ error: 'Order not found' });
       }
 
-      // General settings update
-      const updated = db.updateSettings(payload || {});
+      // General settings update & payment accounts
+      const updateData = payload ? { ...payload } : {};
+      if (body.paymentAccounts) updateData.paymentAccounts = body.paymentAccounts;
+      if (body.action === 'update_settings') {
+        const { action, adminPin, payload: p, ...rest } = body;
+        Object.assign(updateData, rest);
+      }
+      if (updateData.paymentAccounts) {
+        db.updatePaymentAccounts(updateData.paymentAccounts);
+      }
+      const updated = db.updateSettings(updateData);
       return res.status(200).json({ success: true, settings: updated });
     } catch (e) {
       console.error('Settings error:', e);

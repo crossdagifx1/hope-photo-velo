@@ -857,17 +857,15 @@ function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [] 
           const cellDate = new Date(viewing.year, viewing.month, day);
           const isPast = cellDate < today;
           const isBlackout = blackoutDates.includes(dateStr);
-          const isBooked = bookedDates.includes(dateStr);
           const isSelected = value === dateStr;
           const isToday = cellDate.getTime() === today.getTime();
-          const isDisabled = isPast || isBlackout || isBooked;
+          const isDisabled = isPast || isBlackout;
           const cls = [
             'cal-cell',
             isSelected ? 'cal-selected' : '',
             isToday && !isSelected ? 'cal-today' : '',
             isDisabled ? 'cal-disabled' : 'cal-available',
             isBlackout ? 'cal-blackout' : '',
-            isBooked ? 'cal-booked' : '',
           ].filter(Boolean).join(' ');
           return (
             <button
@@ -875,7 +873,7 @@ function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [] 
               type="button"
               className={cls}
               disabled={isDisabled}
-              title={isBlackout ? 'Studio Unavailable' : isBooked ? 'Already Booked' : ''}
+              title={isBlackout ? 'Studio Unavailable' : ''}
               onClick={() => !isDisabled && onChange(dateStr)}
             >
               {day}
@@ -886,7 +884,6 @@ function CalendarPicker({ value, onChange, blackoutDates = [], bookedDates = [] 
       <div className="cal-legend">
         <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-available"/>Available</span>
         <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-blackout"/>Unavailable</span>
-        <span className="cal-leg-item"><span className="cal-leg-dot cal-leg-booked"/>Booked</span>
       </div>
     </div>
   );
@@ -1919,6 +1916,10 @@ function AdminControlPanel({ onClose, lang }) {
   const [signedAgrs, setSignedAgrs]       = useState([]);
   const [editingAgr, setEditingAgr]       = useState(null);
   const [sendingAgrLink, setSendingAgrLink] = useState(false);
+  const [adminScanModal, setAdminScanModal] = useState(false);
+  const [scannedInput, setScannedInput]     = useState('');
+  const [scannedOrder, setScannedOrder]     = useState(null);
+  const [savedLinkModal, setSavedLinkModal] = useState(null);
 
   // Edit states
   const [editPkg, setEditPkg]             = useState(null);
@@ -2091,15 +2092,18 @@ function AdminControlPanel({ onClose, lang }) {
       });
       const d = await r.json();
       if (d.success) {
+        const clientUrl = `${window.location.origin}/?sign=${d.agreement.id}`;
+        const updatedAgr = { ...d.agreement, signingUrl: clientUrl };
         setCustomAgrs(prev => {
           const idx = prev.findIndex(a => a.id === d.agreement.id);
-          if (idx >= 0) { const n = [...prev]; n[idx] = d.agreement; return n; }
-          return [d.agreement, ...prev];
+          if (idx >= 0) { const n = [...prev]; n[idx] = updatedAgr; return n; }
+          return [updatedAgr, ...prev];
         });
         setEditingAgr(null);
-        setStatus('Agreement saved');
-        setTimeout(() => setStatus(''), 2000);
-        return d.agreement;
+        setSavedLinkModal({ agreement: updatedAgr, url: clientUrl });
+        setStatus('Agreement saved & client link generated!');
+        setTimeout(() => setStatus(''), 2500);
+        return updatedAgr;
       }
     } catch(e) { setStatus('Save failed'); }
   };
@@ -2109,8 +2113,8 @@ function AdminControlPanel({ onClose, lang }) {
     try {
       const r = await fetch(`${apiBase}/api/settings`, {
         method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ action: 'update_settings', ...patch })
+        headers: { 'Content-Type': 'application/json', 'x-admin-pin': 'HOPE2026' },
+        body: JSON.stringify({ action: 'update_settings', adminPin: 'HOPE2026', ...patch })
       });
       const data = await r.json();
       setSettings(data.settings || settings);
@@ -2965,6 +2969,17 @@ function AdminControlPanel({ onClose, lang }) {
                   </button>
                 ))}
               </div>
+
+              {/* Instant QR Scanner / Payment Verification Button */}
+              <button
+                type="button"
+                className="apt-btn-primary"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '8px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: 700, background: '#16a34a', border: 'none', color: '#fff', cursor: 'pointer', whiteSpace: 'nowrap', boxShadow: '0 2px 8px rgba(22,163,74,0.3)' }}
+                onClick={() => { setAdminScanModal(true); setScannedOrder(null); setScannedInput(''); }}
+              >
+                <Camera size={15} />
+                <span>Scan / Verify Payment</span>
+              </button>
             </div>
 
             {/* Orders Cards Grid */}
@@ -2977,7 +2992,7 @@ function AdminControlPanel({ onClose, lang }) {
             ) : (
               <div className="apt-orders-grid">
                 {filteredOrders.map(o => {
-                  const depositAmt = o.depositAmount || Math.round((o.totalPrice || o.basePrice || 0) * 0.3);
+                  const depositAmt = o.depositAmount || Math.round((o.totalPrice || o.basePrice || 0) * 0.5);
                   const remainingAmt = (o.totalPrice || o.basePrice || 0) - depositAmt;
                   return (
                     <article key={o.id} className="apt-order-card">
@@ -3029,7 +3044,7 @@ function AdminControlPanel({ onClose, lang }) {
                               <strong>{Number(o.totalPrice || o.basePrice || 0).toLocaleString()} ETB</strong>
                             </div>
                             <div className="aoc-fin-row aoc-deposit-row">
-                              <span>30% Deposit Paid:</span>
+                              <span>50% Deposit:</span>
                               <strong className="text-green">{depositAmt.toLocaleString()} ETB</strong>
                             </div>
                             <div className="aoc-fin-row">
@@ -4782,6 +4797,297 @@ function AdminControlPanel({ onClose, lang }) {
           </div>
         </div>
       )}
+
+      {/* ── ADMIN QR SCANNER & INSTANT PAYMENT VERIFICATION MODAL ── */}
+      {adminScanModal && (
+        <div className="aoc-modal-backdrop" onClick={() => setAdminScanModal(false)}>
+          <div className="aoc-edit-modal-card" style={{ maxWidth: '600px', borderRadius: '20px' }} onClick={e => e.stopPropagation()}>
+            <div className="aoc-modal-head" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#16a34a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Camera size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Payment QR Scanner</h3>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Scan or paste QR / Order link to instantly check payment verification</p>
+                </div>
+              </div>
+              <button type="button" className="aoc-modal-close" onClick={() => setAdminScanModal(false)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '16px 0', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Search / Scan Input */}
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+                  Scan Barcode / Camera or Enter Order ID / URL:
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    autoFocus
+                    placeholder="e.g. HOPE-12345 or paste http://.../?order=..."
+                    value={scannedInput}
+                    onChange={e => {
+                      const val = e.target.value;
+                      setScannedInput(val);
+                      const cleanId = val.replace(/.*[?&]order=/, '').split('&')[0].trim();
+                      const found = orders.find(o => o.id === cleanId || o.id === val.trim() || (cleanId && o.id && o.id.includes(cleanId)));
+                      if (found) setScannedOrder(found);
+                    }}
+                    style={{
+                      flex: 1, padding: '10px 14px', borderRadius: '10px',
+                      border: '2px solid #cbd5e1', fontSize: '14px', fontWeight: 600
+                    }}
+                  />
+                  {scannedInput && (
+                    <button
+                      type="button"
+                      className="apt-btn-secondary"
+                      onClick={() => { setScannedInput(''); setScannedOrder(null); }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Select list if nothing searched yet */}
+              {!scannedOrder && !scannedInput && (
+                <div>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b' }}>Or select an order waiting for verification:</span>
+                  <div style={{ maxHeight: '180px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
+                    {orders.slice(0, 6).map(o => (
+                      <button
+                        key={o.id}
+                        type="button"
+                        onClick={() => { setScannedOrder(o); setScannedInput(o.id); }}
+                        style={{
+                          textAlign: 'left', padding: '8px 12px', borderRadius: '8px',
+                          border: '1px solid #e2e8f0', background: '#f8fafc', cursor: 'pointer',
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                        }}
+                      >
+                        <div>
+                          <strong style={{ fontSize: '13px', color: '#0f172a' }}>{o.clientName}</strong>
+                          <span style={{ fontSize: '11px', color: '#64748b', marginLeft: '6px' }}>({o.id})</span>
+                        </div>
+                        <span style={{
+                          fontSize: '11px', fontWeight: 700, padding: '2px 6px', borderRadius: '6px',
+                          background: o.paymentStatus === 'VERIFIED' ? '#dcfce7' : '#fef3c7',
+                          color: o.paymentStatus === 'VERIFIED' ? '#15803d' : '#b45309'
+                        }}>
+                          {o.paymentStatus === 'VERIFIED' ? 'VERIFIED' : 'PENDING'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Scanned Order Details & "IS PAYMENT VERIFIED?" */}
+              {scannedOrder && (() => {
+                const isVerified = scannedOrder.paymentStatus === 'VERIFIED' || scannedOrder.status === 'CONFIRMED';
+                const total = Number(scannedOrder.totalPrice || scannedOrder.basePrice || 0);
+                const dep = Number(scannedOrder.depositAmount || Math.round(total * 0.5));
+                const rem = total - dep;
+
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', borderTop: '1px solid #f1f5f9', paddingTop: '14px' }}>
+                    {/* GIANT "IS PAYMENT VERIFIED?" BANNER */}
+                    <div style={{
+                      padding: '16px 20px', borderRadius: '16px',
+                      background: isVerified ? '#ecfdf5' : '#fffbeb',
+                      border: isVerified ? '2px solid #10b981' : '2px solid #f59e0b',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {isVerified ? (
+                          <CheckCircle2 size={32} color="#059669" />
+                        ) : (
+                          <Clock size={32} color="#d97706" />
+                        )}
+                        <div>
+                          <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.05em', color: isVerified ? '#047857' : '#b45309' }}>
+                            IS PAYMENT VERIFIED?
+                          </div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 900, color: isVerified ? '#065f46' : '#92400e' }}>
+                            {isVerified ? '✅ YES — PAYMENT VERIFIED' : '⏳ PENDING VERIFICATION'}
+                          </div>
+                          <div style={{ fontSize: '12px', color: isVerified ? '#047857' : '#b45309' }}>
+                            {isVerified ? '50% Advance deposit locked and verified' : 'Payment receipt uploaded — awaiting verification'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      {!isVerified ? (
+                        <button
+                          type="button"
+                          className="aoc-btn-approve"
+                          style={{ padding: '10px 18px', fontSize: '13px', fontWeight: 800, background: '#16a34a' }}
+                          onClick={async () => {
+                            await updateOrderPaymentStatus(scannedOrder.id, 'VERIFIED');
+                            setScannedOrder(prev => ({ ...prev, paymentStatus: 'VERIFIED', status: 'CONFIRMED' }));
+                          }}
+                        >
+                          <Check size={16} /> Verify &amp; Confirm Payment
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="aoc-btn-reject"
+                          style={{ padding: '8px 14px', fontSize: '12px' }}
+                          onClick={async () => {
+                            await updateOrderPaymentStatus(scannedOrder.id, 'PENDING_VERIFICATION');
+                            setScannedOrder(prev => ({ ...prev, paymentStatus: 'PENDING_VERIFICATION', status: 'PENDING_VERIFICATION' }));
+                          }}
+                        >
+                          Mark as Pending
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Financial Summary */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#64748b' }}>Total Package</div>
+                        <strong style={{ fontSize: '14px', color: '#0f172a' }}>{total.toLocaleString()} ETB</strong>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#64748b' }}>50% Deposit Due</div>
+                        <strong style={{ fontSize: '14px', color: '#16a34a' }}>{dep.toLocaleString()} ETB</strong>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '11px', color: '#64748b' }}>Remaining Balance</div>
+                        <strong style={{ fontSize: '14px', color: '#64748b' }}>{rem.toLocaleString()} ETB</strong>
+                      </div>
+                    </div>
+
+                    {/* Client & Proof Details */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <div><strong>Client:</strong> {scannedOrder.clientName}</div>
+                        <div><strong>Phone:</strong> <a href={`tel:${scannedOrder.phone}`}>{scannedOrder.phone}</a></div>
+                        <div><strong>Date:</strong> {scannedOrder.eventDate || '—'}</div>
+                        <div><strong>Package:</strong> {scannedOrder.packageName}</div>
+                        <div><strong>Method:</strong> {(scannedOrder.paymentMethod || 'Telebirr').toUpperCase()}</div>
+                        {scannedOrder.paymentReference && (
+                          <div><strong>Ref #:</strong> <code>{scannedOrder.paymentReference}</code></div>
+                        )}
+                      </div>
+
+                      {/* Payment Proof Preview */}
+                      <div>
+                        <div style={{ fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>Receipt Screenshot:</div>
+                        {scannedOrder.paymentProof ? (
+                          <div
+                            onClick={() => setReceiptModalImg(scannedOrder.paymentProof)}
+                            style={{ cursor: 'pointer', borderRadius: '8px', overflow: 'hidden', border: '1px solid #cbd5e1', height: '90px' }}
+                          >
+                            <img src={scannedOrder.paymentProof} alt="Proof" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        ) : (
+                          <div style={{ height: '90px', borderRadius: '8px', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', color: '#94a3b8' }}>
+                            No Screenshot Attached
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Portal link */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #e2e8f0', paddingTop: '10px' }}>
+                      <a
+                        href={`/?order=${scannedOrder.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="aoc-btn-portal"
+                        style={{ fontSize: '12px', padding: '6px 12px' }}
+                      >
+                        <ExternalLink size={13} /> Open Order Status Page
+                      </a>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── NEW CUSTOM AGREEMENT LINK GENERATED MODAL ── */}
+      {savedLinkModal && (
+        <div className="aoc-modal-backdrop" onClick={() => setSavedLinkModal(null)}>
+          <div className="aoc-edit-modal-card" style={{ maxWidth: '540px', borderRadius: '20px' }} onClick={e => e.stopPropagation()}>
+            <div className="aoc-modal-head" style={{ borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#5c4b2a', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Agreement Ready for Client</h3>
+                  <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Custom contract saved. Send this link for client to review and sign.</p>
+                </div>
+              </div>
+              <button type="button" className="aoc-modal-close" onClick={() => setSavedLinkModal(null)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ padding: '16px 0', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '13px' }}>
+                <div><strong>Client:</strong> {savedLinkModal.agreement.clientName || 'Valued Client'}</div>
+                <div><strong>Package:</strong> {savedLinkModal.agreement.packageTitle || savedLinkModal.agreement.name}</div>
+                <div><strong>Agreed Price:</strong> {(savedLinkModal.agreement.price || 0).toLocaleString()} ETB (50% Deposit: {Math.round((savedLinkModal.agreement.price || 0) * 0.5).toLocaleString()} ETB)</div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#334155', display: 'block', marginBottom: '6px' }}>
+                  Official Client Review &amp; Signing URL:
+                </label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input
+                    readOnly
+                    value={savedLinkModal.url}
+                    onFocus={e => e.target.select()}
+                    style={{ flex: 1, padding: '10px 12px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', background: '#fff' }}
+                  />
+                  <button
+                    type="button"
+                    className="aoc-btn-approve"
+                    style={{ padding: '8px 14px', whiteSpace: 'nowrap' }}
+                    onClick={() => copyAgreementLink(savedLinkModal.url)}
+                  >
+                    <Copy size={14} /> Copy
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '6px', flexWrap: 'wrap' }}>
+                <a
+                  href={savedLinkModal.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="aoc-btn-discuss"
+                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 14px' }}
+                >
+                  <ExternalLink size={14} /> Preview Client View
+                </a>
+                <a
+                  href={`https://t.me/share/url?url=${encodeURIComponent(savedLinkModal.url)}&text=${encodeURIComponent(`Hello ${savedLinkModal.agreement.clientName || ''}, here is your customized HOPE Photo & Velo agreement to review and digitally sign:`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="vop-tg-pill-btn"
+                  style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 14px', borderRadius: '8px' }}
+                >
+                  <Send size={14} /> Share on Telegram
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -5001,15 +5307,37 @@ const PKG_CARD_IMAGE = {
   'special-23k':       `${ASSET}/gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg`,
 };
 
-function PackageCardImage({ pkgId }) {
-  const src = PKG_CARD_IMAGE[pkgId];
-  if (!src) return null;
+function PackageCardImage({ pkgId, pkg }) {
+  let src = PKG_CARD_IMAGE[pkgId];
+  if (!src && pkg) {
+    const pid = (pkg.id || pkgId || '').toLowerCase();
+    if (pid.includes('10k')) src = PKG_CARD_IMAGE['studio-10k'];
+    else if (pid.includes('145k') || pid.includes('14k')) src = PKG_CARD_IMAGE['studio-145k'];
+    else if (pid.includes('185k') || pid.includes('18k')) src = PKG_CARD_IMAGE['studio-185k'];
+    else if (pid.includes('bronze') || pid.includes('45k') || pid.includes('34k')) src = PKG_CARD_IMAGE['wedding-bronze'];
+    else if (pid.includes('silver') || pid.includes('60k') || pid.includes('40k') || pid.includes('50k')) src = PKG_CARD_IMAGE['wedding-silver'];
+    else if (pid.includes('golden') || pid.includes('75k') || pid.includes('70k')) src = PKG_CARD_IMAGE['wedding-golden-75'];
+    else if (pid.includes('16k')) src = PKG_CARD_IMAGE['mesk-16k'];
+    else if (pid.includes('20k')) src = PKG_CARD_IMAGE['mesk-20k'];
+    else if (pid.includes('23k') || pid.includes('special')) src = PKG_CARD_IMAGE['special-23k'];
+    else {
+      const p = parseInt((pkg.price || '0').toString().replace(/[^0-9]/g, ''), 10);
+      if (p <= 12000) src = PKG_CARD_IMAGE['studio-10k'];
+      else if (p <= 15000) src = PKG_CARD_IMAGE['studio-145k'];
+      else if (p <= 19000) src = PKG_CARD_IMAGE['studio-185k'];
+      else if (p <= 48000) src = PKG_CARD_IMAGE['wedding-bronze'];
+      else if (p <= 65000) src = PKG_CARD_IMAGE['wedding-silver'];
+      else if (p > 65000) src = PKG_CARD_IMAGE['wedding-golden-75'];
+    }
+  }
+  if (!src) src = `${ASSET}/hero-card-1.jpg`;
   return (
     <div className="pkg-card-carousel">
       <img
         src={src}
         alt="Package preview"
         className="pkg-carousel-img pkg-carousel-active"
+        loading="lazy"
       />
     </div>
   );
@@ -5115,7 +5443,7 @@ function PackagesSection({ lang, openBooking }) {
               </ul>
 
               {/* Package Hero Image Carousel */}
-              <PackageCardImage pkgId={pkg.id} />
+              <PackageCardImage pkgId={pkg.id} pkg={pkg} />
 
               {/* Action Button: Opens Booking modal */}
               <div className="card-v2-cta-wrap">

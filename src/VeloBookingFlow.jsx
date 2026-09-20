@@ -6,6 +6,7 @@ import {
   Download, ShieldCheck, Clock, Sparkles, Share2, Crown, Maximize2, Users, Image as ImageIcon
 } from 'lucide-react';
 import { resolveAgreementForPackage, DEFAULT_AGREEMENTS_9 } from './agreementsData.js';
+import DocumentStyleAgreement from './DocumentStyleAgreement.jsx';
 import QRCode from './QRCode.jsx';
 import QRCodeLib from 'qrcode';
 
@@ -63,16 +64,52 @@ const PACKAGE_HERO_IMAGES = {
 
 function getPackageHeroImages(pkg) {
   const cameraHero = `${ASSET}/camera-hero.jpg`;
-  if (!pkg) return [cameraHero, `${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`];
-  if (pkg.id && PACKAGE_HERO_IMAGES[pkg.id]) {
-    return [cameraHero, ...PACKAGE_HERO_IMAGES[pkg.id].slice(0, 2)];
+  if (!pkg) return [`${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`, cameraHero];
+
+  const pid = (pkg.id || '').toLowerCase();
+  let pool = null;
+
+  if (PACKAGE_HERO_IMAGES[pid]) {
+    pool = PACKAGE_HERO_IMAGES[pid];
+  } else if (pid.includes('10k') || pid.includes('studio-session')) {
+    pool = PACKAGE_HERO_IMAGES['studio-10k'];
+  } else if (pid.includes('145k') || pid.includes('14k') || pid.includes('studio-event')) {
+    pool = PACKAGE_HERO_IMAGES['studio-145k'];
+  } else if (pid.includes('185k') || pid.includes('18k') || pid.includes('studio-production')) {
+    pool = PACKAGE_HERO_IMAGES['studio-185k'];
+  } else if (pid.includes('bronze') || pid.includes('45k') || pid.includes('34k')) {
+    pool = PACKAGE_HERO_IMAGES['wedding-bronze'];
+  } else if (pid.includes('silver') || pid.includes('60k') || pid.includes('40k') || pid.includes('50k')) {
+    pool = PACKAGE_HERO_IMAGES['wedding-silver'];
+  } else if (pid.includes('golden') || pid.includes('75k') || pid.includes('70k')) {
+    pool = PACKAGE_HERO_IMAGES['wedding-golden-75'];
+  } else if (pid.includes('16k') || pid.includes('mesk-session')) {
+    pool = PACKAGE_HERO_IMAGES['mesk-16k'];
+  } else if (pid.includes('20k') || pid.includes('mesk-album')) {
+    pool = PACKAGE_HERO_IMAGES['mesk-20k'];
+  } else if (pid.includes('23k') || pid.includes('special')) {
+    pool = PACKAGE_HERO_IMAGES['special-23k'];
   }
-  const price = parseInt((pkg.price || '0').toString().replace(/[^0-9]/g, ''), 10);
-  if (price === 10000) return [cameraHero, ...PACKAGE_HERO_IMAGES['studio-10k'].slice(0, 2)];
-  if (price === 14500) return [cameraHero, ...PACKAGE_HERO_IMAGES['studio-145k'].slice(0, 2)];
-  if (price === 18500) return [cameraHero, ...PACKAGE_HERO_IMAGES['studio-185k'].slice(0, 2)];
-  if (price === 45000) return [cameraHero, ...PACKAGE_HERO_IMAGES['wedding-bronze'].slice(0, 2)];
-  return [cameraHero, `${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`];
+
+  // Price match fallback
+  if (!pool) {
+    const price = parseInt((pkg.price || '0').toString().replace(/[^0-9]/g, ''), 10);
+    if (price === 10000) pool = PACKAGE_HERO_IMAGES['studio-10k'];
+    else if (price === 14500) pool = PACKAGE_HERO_IMAGES['studio-145k'];
+    else if (price === 18500) pool = PACKAGE_HERO_IMAGES['studio-185k'];
+    else if (price === 16000) pool = PACKAGE_HERO_IMAGES['mesk-16k'];
+    else if (price === 20000) pool = PACKAGE_HERO_IMAGES['mesk-20k'];
+    else if (price === 23000) pool = PACKAGE_HERO_IMAGES['special-23k'];
+    else if (price === 45000 || price === 34000) pool = PACKAGE_HERO_IMAGES['wedding-bronze'];
+    else if (price === 60000 || price === 40000 || price === 50000) pool = PACKAGE_HERO_IMAGES['wedding-silver'];
+    else if (price === 75000 || price === 70000) pool = PACKAGE_HERO_IMAGES['wedding-golden-75'];
+  }
+
+  if (pool && pool.length > 0) {
+    return [...pool];
+  }
+
+  return [`${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`, cameraHero];
 }
 
 /* ── Inline Signature Pad matching Image 1 ── */
@@ -201,10 +238,9 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
           const cellDate = new Date(viewing.year, viewing.month, day);
           const isPast = cellDate < today;
           const isBlackout = blackoutDates.includes(dateStr);
-          const isBooked = bookedDates.includes(dateStr);
           const isSelected = value === dateStr;
           const isToday = cellDate.getTime() === today.getTime();
-          const isDisabled = isPast || isBlackout || isBooked;
+          const isDisabled = isPast || isBlackout;
           return (
             <button
               key={dateStr}
@@ -214,8 +250,8 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
               style={{
                 aspectRatio: '1', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700,
                 cursor: isDisabled ? 'not-allowed' : 'pointer', border: 'none',
-                background: isSelected ? '#5c4b2a' : isBlackout ? '#fee2e2' : isBooked ? '#e2e8f0' : 'transparent',
-                color: isSelected ? '#fff' : isBooked ? '#64748b' : isBlackout ? '#991b1b' : isDisabled ? '#c9c0b6' : isToday ? '#b89248' : '#1a1614',
+                background: isSelected ? '#5c4b2a' : isBlackout ? '#fee2e2' : 'transparent',
+                color: isSelected ? '#fff' : isBlackout ? '#991b1b' : isDisabled ? '#c9c0b6' : isToday ? '#b89248' : '#1a1614',
                 outline: isToday && !isSelected ? '1.5px solid #b89248' : 'none',
                 transition: 'all 0.15s',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -229,7 +265,6 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
         {[
           { dot: '#5c4b2a', label: 'Available' },
           { dot: '#f87171', label: 'Unavailable' },
-          { dot: '#d4c5b0', label: 'Booked' },
         ].map(({ dot, label }) => (
           <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.65rem', color: '#7a6e66', fontWeight: 600 }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0 }}/>
@@ -278,6 +313,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   const [copyFeedback, setCopyFeedback] = useState(null);
   const [updatingPay, setUpdatingPay]   = useState(false);
   const [downloadingCard, setDownloadingCard] = useState(false);
+  const [serverPaymentAccounts, setServerPaymentAccounts] = useState(null);
   const proofInputRef = useRef(null);
 
   const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
@@ -377,6 +413,9 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   useEffect(() => {
     fetch(`${apiBase}/api/settings`).then(r => r.json()).then(data => {
       setBlackout(data.settings?.blackoutDates || []);
+      if (data.settings?.paymentAccounts) {
+        setServerPaymentAccounts(data.settings.paymentAccounts);
+      }
       return fetch(`${apiBase}/api/orders`);
     }).then(r => r.json()).then(data => {
       const dates = (data.orders || [])
@@ -993,214 +1032,43 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     </form>
   );
 
-  // ── STEP 3: Agreement + Signature matching Image 1 ──
+  // ── STEP 3: Agreement + Signature (Official continuous scrollable doc with PDF download) ──
   const renderStep3 = () => {
-    const formattedDate = form.date
-      ? new Date(form.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-      : '13 Sept 2026';
-
-    const clientPhone = form.phone || '0987654324';
-    const clientLocation = form.location || 'Addis Ababa';
-    const curOrderId = createdOrder?.id || `HOPE-AGR-STUDIO-${basePrice || 14500}`;
-
-    const contractDeliverables = (deliverables && deliverables.length > 0)
-      ? deliverables
-      : [
-        '200 Thank-You Cards',
-        '40×60 Board Photo',
-        'Professional Makeup',
-        '10 Post Photos',
-        '150 Soft Copies'
-      ];
-
     return (
       <div className="vbf-step-scroll">
-        <div className="vbf-step3-body">
-          <div className="vbf-step3-header">
+        <div className="vbf-step3-body" style={{ padding: '16px 20px' }}>
+          <div className="vbf-step3-header" style={{ marginBottom: '16px' }}>
             <h2 className="vbf-step3-title">
-              {activeLang === 'am' ? 'ስምምነቱን ይፈርሙ' : 'Sign the Agreement'}
+              {activeLang === 'am' ? 'ይፋዊ የስምምነት ሰነድ እና ፊርማ' : 'Official Agreement Document'}
             </h2>
             <p className="vbf-step3-sub">
               {activeLang === 'am'
-                ? 'እባክዎ ውሉን ገምግመው ፊርማዎን ያኑሩ።'
-                : 'Please review the contract and provide your signature.'}
+                ? 'ውሉን በሙሉ ወደ ታች በማንሸራተት ያንብቡ፣ ፊርማዎን ያስቀምጡ እና PDF ያውርዱ።'
+                : 'Scroll through the full legal contract, provide your digital signature, and download PDF.'}
             </p>
           </div>
 
-          {/* Contract Document Card */}
-          <div className="vbf-contract-card">
-            <div className="vbf-contract-card-header">
-              <div className="vbf-contract-pdf-badge">
-                <FileText size={18} strokeWidth={2.4} />
-              </div>
-              <div className="vbf-contract-meta">
-                <div className="vbf-contract-doc-name">
-                  {activeLang === 'am' ? 'የውል ሰነድ' : 'Contract Document'}
-                </div>
-                <div className="vbf-contract-doc-id">{curOrderId}</div>
-              </div>
-              <button
-                type="button"
-                className="vbf-contract-expand"
-                onClick={() => setContractFullscreen(prev => !prev)}
-                title="Expand Document"
-              >
-                <Maximize2 size={16} />
-              </button>
-            </div>
-
-            {/* Contract Viewer */}
-            <div className="vbf-contract-viewer">
-              {/* Page 1: Official Executive Contract Sheet matching Image 1 */}
-              {contractPage === 1 && (
-                <div className="vbf-contract-page vbf-contract-sheet-p1">
-                  <div className="vbf-doc-hope-header">
-                    <div className="vbf-doc-hope-logo">HOPE</div>
-                    <div className="vbf-doc-studio-name">HOPE PHOTO &amp; VELO STUDIO</div>
-                    <div className="vbf-doc-studio-contact">+251 9 10 52 69 62 | +251 9 95 27 08 94 | Addis Ababa</div>
-                    <div className="vbf-doc-divider-full" />
-                    <div className="vbf-doc-contract-title">OFFICIAL CLIENT SERVICE &amp; PRODUCTION CONTRACT</div>
-                    <div className="vbf-doc-divider-full" />
-                  </div>
-
-                  {/* 1. Contracting Parties */}
-                  <div className="vbf-doc-section">
-                    <div className="vbf-doc-section-num">1. CONTRACTING PARTIES</div>
-                    <div className="vbf-doc-parties-grid">
-                      <div className="vbf-doc-party">
-                        <div className="vbf-doc-party-label">• Service Provider:</div>
-                        <div>HOPE Photo &amp; Velo</div>
-                        <div>Addis Ababa, Ethiopia</div>
-                      </div>
-                      <div className="vbf-doc-party">
-                        <div className="vbf-doc-party-label">• Client:</div>
-                        <div>{clientLocation}</div>
-                        <div>Phone: {clientPhone}</div>
-                        <div>Date: {formattedDate}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 2. Package & Deliverables */}
-                  <div className="vbf-doc-section">
-                    <div className="vbf-doc-section-num">2. PACKAGE &amp; DELIVERABLES</div>
-                    <div className="vbf-doc-pkg-title">• {pkgName} (Official Package)</div>
-                    <ul className="vbf-doc-deliv-list">
-                      {contractDeliverables.map((d, i) => (
-                        <li key={i}>• {d.replace(/^•\s*/, '')}</li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* 3. Payment Terms */}
-                  <div className="vbf-doc-section">
-                    <div className="vbf-doc-section-num">3. PAYMENT TERMS</div>
-                    <ul className="vbf-doc-deliv-list">
-                      <li>• 50% upfront — 50% after delivery</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* Page 2: Copyright & Usage Rights */}
-              {contractPage === 2 && (
-                <div className="vbf-contract-page">
-                  <div className="vbf-doc-section">
-                    <div className="vbf-doc-section-num">4. COPYRIGHT &amp; USAGE RIGHTS</div>
-                    <p className="vbf-doc-clause-body">
-                      The studio retains artistic copyright for all original captured media. The client receives full, perpetual, non-exclusive rights for personal reproduction, printing, and digital sharing.
-                    </p>
-                    <p className="vbf-doc-clause-body">
-                      High-resolution soft copies are delivered free of watermarks upon final balance settlement.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Page 3: Production & Timeline */}
-              {contractPage === 3 && (
-                <div className="vbf-contract-page">
-                  <div className="vbf-doc-section">
-                    <div className="vbf-doc-section-num">5. TIMELINE &amp; DELIVERY</div>
-                    <ul className="vbf-doc-deliv-list">
-                      <li>• Retouched photography gallery: 7 to 14 working days</li>
-                      <li>• Cinematic highlight video teaser: 10 working days</li>
-                      <li>• Full documentary film &amp; printed deliverables: 21 to 30 days</li>
-                      <li>• Safe cloud archive backup maintained for 90 days post-event</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* Page 4: Rescheduling & Guarantee */}
-              {contractPage === 4 && (
-                <div className="vbf-contract-page">
-                  <div className="vbf-doc-section">
-                    <div className="vbf-doc-section-num">6. RESCHEDULING &amp; GUARANTEE</div>
-                    <p className="vbf-doc-clause-body">
-                      Date rescheduling is permitted without penalty when requested at least 7 days in advance, subject to studio calendar availability.
-                    </p>
-                    <p className="vbf-doc-clause-body">
-                      The advance deposit legally secures production personnel, cameras, lighting equipment, and vehicle logistics exclusively for your event.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Pagination matching Image 1: < 1/4 > */}
-              <div className="vbf-contract-pagination">
-                <button
-                  type="button"
-                  className="vbf-page-arrow-btn"
-                  onClick={() => setContractPage(p => Math.max(1, p - 1))}
-                  disabled={contractPage === 1}
-                  aria-label="Previous page"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="vbf-page-label">{contractPage} / {TOTAL_CONTRACT_PAGES}</span>
-                <button
-                  type="button"
-                  className="vbf-page-arrow-btn"
-                  onClick={() => setContractPage(p => Math.min(TOTAL_CONTRACT_PAGES, p + 1))}
-                  disabled={contractPage === TOTAL_CONTRACT_PAGES}
-                  aria-label="Next page"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Signature Section matching Image 1 */}
-          <div className="vbf-sig-section">
-            <div className="vbf-sig-header">
-              <div className="vbf-sig-title">
-                <Edit2 size={16} />
-                <span>{activeLang === 'am' ? 'የእርስዎ ፊርማ' : 'Your Signature'}</span>
-              </div>
-              <button
-                type="button"
-                className="vbf-sig-clear"
-                onClick={() => {
-                  setSignature(null);
-                  sigPadRef.current?.clear?.();
-                }}
-              >
-                {activeLang === 'am' ? 'አጥፋ' : 'Clear'}
-              </button>
-            </div>
-            <div className="vbf-sig-canvas-container">
-              <VeloSigPad
-                ref={sigPadRef}
-                onSign={setSignature}
-                onClear={() => setSignature(null)}
-              />
-            </div>
+          {/* Continuous Scrollable Real Legal Document */}
+          <div style={{ maxHeight: '480px', overflowY: 'auto', borderRadius: '16px', border: '1px solid #e2d9cf', background: '#fff' }}>
+            <DocumentStyleAgreement
+              agreement={activeAgreement}
+              clientName={form.name}
+              phone={form.phone}
+              eventDate={form.date}
+              location={form.location || 'Addis Ababa'}
+              totalPrice={totalPrice}
+              depositAmount={deposit}
+              remainingBalance={remaining}
+              signature={signature}
+              onSign={setSignature}
+              onClearSignature={() => setSignature(null)}
+              lang={activeLang === 'om' ? 'en' : activeLang}
+              orderId={createdOrder?.id || orderId}
+            />
           </div>
 
           {/* Terms Checkbox */}
-          <label className="vbf-terms-row">
+          <label className="vbf-terms-row" style={{ marginTop: '16px' }}>
             <input
               type="checkbox"
               checked={termsAccepted}
@@ -1278,29 +1146,41 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
 
   // ── STEP 5: Payment Method Selection matching Image 2 ──
   const renderStep5 = () => {
+    const telePhone = serverPaymentAccounts?.telebirr?.phone || serverPaymentAccounts?.telebirr?.accountNumber || '0995270894';
+    const teleName = serverPaymentAccounts?.telebirr?.accountName || 'Dagmawi Amare (HOPE Studio)';
+    const teleDesc = activeLang === 'am'
+      ? (serverPaymentAccounts?.telebirr?.instructionsAm || 'በቴሌብር መተግበሪያ ወይም በ *127# ይላኩ')
+      : (serverPaymentAccounts?.telebirr?.instructionsEn || 'Send via Telebirr App or *127#');
+
+    const cbeAcc = serverPaymentAccounts?.cbe?.accountNumber || '1000123456789';
+    const cbeName = serverPaymentAccounts?.cbe?.accountName || 'HOPE Photo & Velo Studio';
+    const cbeDesc = activeLang === 'am'
+      ? (serverPaymentAccounts?.cbe?.instructionsAm || 'በ CBE Birr ወይም በሞባይል ባንኪንግ')
+      : (serverPaymentAccounts?.cbe?.instructionsEn || 'Via CBE Birr or Mobile Banking');
+
     const paymentMethods = [
       {
         id: 'telebirr',
         title: 'Telebirr (ቴሌብር)',
         tag: activeLang === 'am' ? 'ፈጣን / ተመራጭ' : 'Fast / Recommended',
-        accountNumber: '0995270894',
-        accountName: 'Dagmawi Amare (HOPE Studio)',
-        desc: activeLang === 'am' ? 'በቴሌብር መተግበሪያ ወይም በ *127# ይላኩ' : 'Send via Telebirr App or *127#'
+        accountNumber: telePhone,
+        accountName: teleName,
+        desc: teleDesc
       },
       {
         id: 'cbe',
         title: 'Commercial Bank of Ethiopia (CBE)',
         tag: activeLang === 'am' ? 'የኢትዮጵያ ንግድ ባንክ' : 'CBE Mobile',
-        accountNumber: '1000123456789',
-        accountName: 'HOPE Photo & Velo Studio',
-        desc: activeLang === 'am' ? 'በ CBE Birr ወይም በሞባይል ባንኪንግ' : 'Via CBE Birr or Mobile Banking'
+        accountNumber: cbeAcc,
+        accountName: cbeName,
+        desc: cbeDesc
       },
       {
         id: 'awash',
         title: 'Awash Bank (አዋሽ ባንክ)',
         tag: activeLang === 'am' ? 'አዋሽ ባንክ' : 'Awash Bank',
-        accountNumber: '0132087654321',
-        accountName: 'HOPE Pictures Studio',
+        accountNumber: serverPaymentAccounts?.awash?.accountNumber || '0132087654321',
+        accountName: serverPaymentAccounts?.awash?.accountName || 'HOPE Pictures Studio',
         desc: activeLang === 'am' ? 'በአዋሽ ሞባይል ባንኪንግ' : 'Via Awash Mobile Banking'
       },
       {
@@ -1553,13 +1433,10 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
                   sublabel={activeLang === 'am' ? 'ይፋዊ የዲጂታል ፓስፖርት QR' : 'HOPE Studio Official Pass'}
                 />
               </div>
-              <div className="vbf-rc-qr-instructions">
-                <strong>{activeLang === 'am' ? 'የቀጥታ መከታተያ እና አስተያየት መስጫ QR' : 'Live Order & Comment QR Pass'}</strong>
-                <p>
-                  {activeLang === 'am'
-                    ? 'በስልክዎ ካሜራ ይህንን QR ኮድ ስካን በማድረግ የሥራውን ሂደት (Is it done?)፣ የክፍያ ማረጋገጫ (Payment verified?) መመልከት እና አስተያየት መተው ይችላሉ።'
-                    : 'Scan with any smartphone camera to check job completion status, payment verification, and submit comments.'}
-                </p>
+              <div className="vbf-rc-qr-instructions" style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1a1614', letterSpacing: '0.05em' }}>
+                  {activeLang === 'am' ? 'ይፋዊ ዲጂታል ፓስፖርት QR' : 'OFFICIAL DIGITAL PASS QR'}
+                </div>
               </div>
             </div>
 
