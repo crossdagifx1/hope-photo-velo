@@ -260,18 +260,7 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
           );
         })}
       </div>
-      {/* Legend */}
-      <div style={{ display: 'flex', gap: '14px', marginTop: '12px', paddingTop: '10px', borderTop: '1px solid #f0ebe4' }}>
-        {[
-          { dot: '#5c4b2a', label: 'Available' },
-          { dot: '#f87171', label: 'Unavailable' },
-        ].map(({ dot, label }) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.65rem', color: '#7a6e66', fontWeight: 600 }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0 }}/>
-            {label}
-          </div>
-        ))}
-      </div>
+
     </div>
   );
 }
@@ -1032,24 +1021,25 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     </form>
   );
 
-  // ── STEP 3: Agreement + Signature (Official continuous scrollable doc with PDF download) ──
+  // ── STEP 3: Agreement + Signature (Official doc left, dedicated sig pad right) ──
   const renderStep3 = () => {
     return (
       <div className="vbf-step-scroll">
         <div className="vbf-step3-body" style={{ padding: '16px 20px' }}>
+          {/* Header spans both columns */}
           <div className="vbf-step3-header" style={{ marginBottom: '16px' }}>
             <h2 className="vbf-step3-title">
               {activeLang === 'am' ? 'ይፋዊ የስምምነት ሰነድ እና ፊርማ' : 'Official Agreement Document'}
             </h2>
             <p className="vbf-step3-sub">
               {activeLang === 'am'
-                ? 'ውሉን በሙሉ ወደ ታች በማንሸራተት ያንብቡ፣ ፊርማዎን ያስቀምጡ እና PDF ያውርዱ።'
-                : 'Scroll through the full legal contract, provide your digital signature, and download PDF.'}
+                ? 'ውሉን ወደ ታች ያንሸራትቱ ያንብቡ — ከዚያ በቀኝ ያለው ሳጥን ውስጥ ፊርማዎን ይሳሉ።'
+                : 'Scroll through the contract on the left — then draw your signature in the box on the right.'}
             </p>
           </div>
 
-          {/* Continuous Scrollable Real Legal Document */}
-          <div style={{ maxHeight: '480px', overflowY: 'auto', borderRadius: '16px', border: '1px solid #e2d9cf', background: '#fff' }}>
+          {/* ── Column 1: Scrollable Official Legal Document (readOnly, no internal sig pad) ── */}
+          <div style={{ maxHeight: '560px', overflowY: 'auto', borderRadius: '16px', border: '1px solid #e2d9cf', background: '#fff' }}>
             <DocumentStyleAgreement
               agreement={activeAgreement}
               clientName={form.name}
@@ -1064,28 +1054,85 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               onClearSignature={() => setSignature(null)}
               lang={activeLang === 'om' ? 'en' : activeLang}
               orderId={createdOrder?.id || orderId}
+              readOnly={true}
             />
           </div>
 
-          {/* Terms Checkbox */}
-          <label className="vbf-terms-row" style={{ marginTop: '16px' }}>
-            <input
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={e => setTerms(e.target.checked)}
-              className="vbf-terms-check"
-            />
-            <span className="vbf-terms-text">
-              {activeLang === 'am' ? (
-                <>የአገልግሎት <span className="vbf-terms-link">ውሎችንና ስምምነቶችን</span> አንብቤ ተስማምቻለሁ</>
-              ) : (
-                <>I have read and agree to the <span className="vbf-terms-link">terms and conditions</span></>
+          {/* ── Column 2: Dedicated Signature & Acceptance Box ── */}
+          <div className="vbf-sig-section">
+            {/* Sig header with clear button */}
+            <div className="vbf-sig-header">
+              <div className="vbf-sig-title">
+                <Edit2 size={15} />
+                <span>{activeLang === 'am' ? '✍️ የእርስዎ ፊርማ (Your Signature)' : '✍️ Your Digital Signature'}</span>
+              </div>
+              {signature && (
+                <button
+                  type="button"
+                  className="vbf-sig-clear"
+                  onClick={() => { sigPadRef.current?.clear(); setSignature(null); }}
+                >
+                  {activeLang === 'am' ? 'አጥፋ' : 'Clear'}
+                </button>
               )}
-            </span>
-          </label>
+            </div>
 
-          {error && <p className="vbf-error">{error}</p>}
+            {/* Signature Canvas */}
+            <div className="vbf-sig-canvas-container">
+              <VeloSigPad
+                ref={sigPadRef}
+                onSign={setSignature}
+                onClear={() => setSignature(null)}
+              />
+            </div>
+
+            {/* Signed / Hint feedback */}
+            {signature ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: '#f0fdf4', borderTop: '1px solid #bbf7d0' }}>
+                <Check size={13} style={{ color: '#16a34a', flexShrink: 0 }} />
+                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#16a34a' }}>
+                  {activeLang === 'am' ? 'ፊርማ ተቀባይነት አለው ✓' : 'Signature captured ✓'}
+                </span>
+              </div>
+            ) : (
+              <p style={{ margin: 0, padding: '4px 16px 8px', fontSize: '0.74rem', color: '#b5aba0', fontStyle: 'italic' }}>
+                {activeLang === 'am' ? 'ከላይ ባለው ሳጥን ውስጥ ፊርማዎን ይሳሉ' : 'Draw your signature in the pad above'}
+              </p>
+            )}
+
+            {/* 50% Deposit Reminder */}
+            <div style={{ margin: '8px 16px', padding: '10px 12px', background: '#fef9ef', borderRadius: '10px', border: '1px solid #f0e0aa' }}>
+              <p style={{ fontSize: '0.78rem', margin: 0, lineHeight: 1.5, color: '#5a4e3a' }}>
+                <span style={{ fontWeight: 700, color: '#b89248' }}>
+                  {activeLang === 'am' ? '50% ቅድሚያ ክፍያ:' : '50% Advance Deposit:'}
+                </span>{' '}
+                <strong style={{ fontFamily: 'DM Mono, monospace', color: '#1a1614' }}>{deposit.toLocaleString()} ETB</strong>
+                {'  ·  '}
+                <span style={{ color: '#7a6e66' }}>{activeLang === 'am' ? 'ቀሪ:' : 'Balance:'}</span>{' '}
+                <strong>{remaining.toLocaleString()} ETB</strong>
+              </p>
+            </div>
+
+            {/* Terms Checkbox */}
+            <label className="vbf-terms-row" style={{ padding: '6px 16px 14px' }}>
+              <input
+                type="checkbox"
+                checked={termsAccepted}
+                onChange={e => setTerms(e.target.checked)}
+                className="vbf-terms-check"
+              />
+              <span className="vbf-terms-text">
+                {activeLang === 'am' ? (
+                  <>የአገልግሎት <span className="vbf-terms-link">ውሎችንና ስምምነቶችን</span> አንብቤ ተስማምቻለሁ</>
+                ) : (
+                  <>I have read and agree to the <span className="vbf-terms-link">terms and conditions</span></>
+                )}
+              </span>
+            </label>
+          </div>
         </div>
+
+        {error && <p className="vbf-error" style={{ padding: '0 20px 8px', marginTop: 0 }}>{error}</p>}
 
         <div className="vbf-cta-wrap">
           <button

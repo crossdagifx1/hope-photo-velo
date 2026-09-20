@@ -5288,23 +5288,33 @@ function _OldBookingPanel({ selectedPackage, onClose, lang }) {
 // Unique single hero image per package ID — hand-picked after viewing all photos
 const PKG_CARD_IMAGE = {
   // Studio: daytime park couple on railing (green trees)
-  'studio-10k':        `${ASSET}/hero-card-2.jpg`,
+  'studio-10k':           `${ASSET}/hero-card-2.jpg`,
   // Studio mid: solo bride with bouquet, urban park
-  'studio-145k':       `${ASSET}/gallery/photo_2026-07-03_20-34-45_7668160982247493632.jpg`,
+  'studio-145k':          `${ASSET}/gallery/photo_2026-07-03_20-34-45_7668160982247493632.jpg`,
   // Studio premium: solo bride over-shoulder lush green
-  'studio-185k':       `${ASSET}/gallery/photo_2026-07-03_20-34-55_7668161038802964480.jpg`,
+  'studio-185k':          `${ASSET}/gallery/photo_2026-07-03_20-34-55_7668161038802964480.jpg`,
   // Wedding bronze: face-to-face laughing couple, forest
-  'wedding-bronze':    `${ASSET}/hero-card-1.jpg`,
+  'wedding-bronze':       `${ASSET}/hero-card-1.jpg`,
   // Wedding silver: different couple at golden sunset, crown
-  'wedding-silver':    `${ASSET}/gallery/photo_2026-07-03_20-31-17_7668160925976699904.jpg`,
-  // Wedding golden: couple with long veil, dramatic dusk
-  'wedding-golden-75': `${ASSET}/gallery/photo_2026-07-03_20-31-27_7668160963138437120.jpg`,
+  'wedding-silver':       `${ASSET}/gallery/photo_2026-07-03_20-31-17_7668160925976699904.jpg`,
+  // Wedding golden 75k: couple with long veil, dramatic dusk
+  'wedding-golden-75':    `${ASSET}/gallery/photo_2026-07-03_20-31-27_7668160963138437120.jpg`,
+  // Wedding golden plus (fallback tier)
+  'wedding-golden-plus':  `${ASSET}/gallery/photo_2026-07-03_20-31-22_7668160935271833600.jpg`,
   // Mesk: lady in black gown, city nightscape
-  'mesk-16k':          `${ASSET}/gallery/photo_2026-07-03_20-37-48_7668161057622723584.jpg`,
+  'mesk-16k':             `${ASSET}/gallery/photo_2026-07-03_20-37-48_7668161057622723584.jpg`,
   // Mesk premium: romantic close moment, dark blue night
-  'mesk-20k':          `${ASSET}/gallery/photo_2026-07-03_20-37-56_7668161066939796480.jpg`,
+  'mesk-20k':             `${ASSET}/gallery/photo_2026-07-03_20-37-56_7668161066939796480.jpg`,
+  // Mesk grand keepsake: couple in white daisy field
+  'mesk-grand-keepsake':  `${ASSET}/gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg`,
   // Special: couple in white daisy field, dramatic dark forest
-  'special-23k':       `${ASSET}/gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg`,
+  'special-23k':          `${ASSET}/gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg`,
+  // Admin panel package IDs
+  'studio-session':       `${ASSET}/hero-card-2.jpg`,
+  'studio-event':         `${ASSET}/gallery/photo_2026-07-03_20-34-45_7668160982247493632.jpg`,
+  'studio-production':    `${ASSET}/gallery/photo_2026-07-03_20-34-55_7668161038802964480.jpg`,
+  'mesk-session':         `${ASSET}/gallery/photo_2026-07-03_20-37-48_7668161057622723584.jpg`,
+  'mesk-album':           `${ASSET}/gallery/photo_2026-07-03_20-37-56_7668161066939796480.jpg`,
 };
 
 function PackageCardImage({ pkgId, pkg }) {
@@ -5404,6 +5414,9 @@ function PackagesSection({ lang, openBooking }) {
               onClick={() => handlePackageClick(pkg)}
               style={{ cursor: 'pointer' }}
             >
+              {/* Package Hero Image — always top of card */}
+              <PackageCardImage pkgId={pkg.id} pkg={pkg} />
+
               {/* Card Header: Tier Label & Pill Badge */}
               <div className="card-v2-top-bar">
                 <span className="card-v2-tier-tag">{tier}</span>
@@ -5441,9 +5454,6 @@ function PackagesSection({ lang, openBooking }) {
                   </li>
                 ))}
               </ul>
-
-              {/* Package Hero Image Carousel */}
-              <PackageCardImage pkgId={pkg.id} pkg={pkg} />
 
               {/* Action Button: Opens Booking modal */}
               <div className="card-v2-cta-wrap">

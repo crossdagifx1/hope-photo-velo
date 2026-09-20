@@ -9,7 +9,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 10000,
     category: 'studio',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-52.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-34-45_7668160982247493632.jpg',
     deliverables: [
       '1 ቤሎ በመረጡት ዓይነት (1 Gown of your choice)',
       '1 ሱፍ በመረጡት ዓይነት (1 Suit of your choice)',
@@ -38,7 +38,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 14500,
     category: 'studio',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-31.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-34-55_7668161038802964480.jpg',
     deliverables: [
       '2 ቤሎ በመረጡት ዓይነት (2 Gowns)',
       '2 ሱፍ በመረጡት ዓይነት (2 Suits)',
@@ -67,7 +67,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 18500,
     category: 'studio',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-47.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg',
     deliverables: [
       '2 ቤሎ በመረጡት ዓይነት (2 Gowns of choice)',
       '2 ሱፍ በመረጡት ዓይነት (2 Suits of choice)',
@@ -97,7 +97,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 23000,
     category: 'mesk',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-41.jpg',
+    photoRef: 'gallery/photo_2026-07-03_14-14-19_7668160916678053888.jpg',
     deliverables: [
       'Laminate Album 30×45 — 10(20) Page',
       '50×80 Wall Board (የሳሎን ግድግዳ ቦርድ)',
@@ -129,7 +129,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 27000,
     category: 'mesk',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-36.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-31-22_7668160935271833600.jpg',
     deliverables: [
       'Laminate Album 30×90 — 10(20) Page (ትልቅ አልበም)',
       '50×80 Wall Board (የሳሎን ግድግዳ ቦርድ)',
@@ -161,7 +161,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 34000,
     category: 'wedding',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-26.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-37-56_7668161066939796480.jpg',
     deliverables: [
       'Mesk Video Coverage (የመስክ ቪዲዮ ቀረጻ)',
       'Laminate Album 30×90 — 10(20) Page',
@@ -191,7 +191,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 40000,
     category: 'wedding',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-15.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-31-17_7668160925976699904.jpg',
     deliverables: [
       'Mesk Video Coverage (ሲኒማቲክ የመስክ ቪዲዮ)',
       'Laminate Album 30×90 — 10(20) Page',
@@ -221,7 +221,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 50000,
     category: 'wedding',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-21.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-31-27_7668160963138437120.jpg',
     deliverables: [
       'Mesk Video Coverage (ሲኒማቲክ የመስክ ቪዲዮ)',
       'Laminate Album 30×90 — 10(20) Page',
@@ -252,7 +252,7 @@ export const DEFAULT_AGREEMENTS_9 = [
     price: 70000,
     category: 'wedding',
     depositRate: 0.5,
-    photoRef: 'photo_2026-09-10_05-43-10.jpg',
+    photoRef: 'gallery/photo_2026-07-03_20-37-48_7668161057622723584.jpg',
     deliverables: [
       'Full Cinema Mesk & Wedding Video Coverage',
       'Laminate Album 30×90 — 10(20) Page Masterpiece',
