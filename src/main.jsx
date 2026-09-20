@@ -5892,7 +5892,15 @@ function App() {
             </div>
 
 
-            <button type="button" className="header-book" onClick={() => openBooking()}>
+            <button
+              type="button"
+              className="header-book"
+              onClick={() => {
+                scrollToSection('pricing');
+                setMenuOpen(false);
+                setLangDropOpen(false);
+              }}
+            >
               <span>{t.bookBtn}</span>
               <CalendarDays size={14} />
             </button>
