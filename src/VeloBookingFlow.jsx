@@ -1,9 +1,11 @@
+// src/VeloBookingFlow.jsx — Main Booking Flow fully integrated with Hope UI & real backend
 import React, { useCallback, useEffect, useRef, useState, useImperativeHandle } from 'react';
 import {
-  ArrowRight, Camera, Check, ChevronLeft, ChevronRight, Edit2,
+  ArrowRight, Camera, Check, CheckCircle, ChevronLeft, ChevronRight, Edit2,
   ExternalLink, FileText, Film, Globe, MapPin, Menu, MessageCircle,
   Phone, Plus, Send, Star, User, X, CreditCard, Copy, Printer,
-  Download, ShieldCheck, Clock, Sparkles, Share2, Crown, Maximize2, Users, Image as ImageIcon
+  Download, ShieldCheck, Clock, Sparkles, Share2, Crown, Maximize2, Users, Image as ImageIcon,
+  AlertCircle, Home, Upload, QrCode
 } from 'lucide-react';
 import { resolveAgreementForPackage, DEFAULT_AGREEMENTS_9 } from './agreementsData.js';
 import DocumentStyleAgreement from './DocumentStyleAgreement.jsx';
@@ -13,106 +15,105 @@ import QRCodeLib from 'qrcode';
 const ASSET = '/assets';
 const PHONE_LINK = '+251910526962';
 
-/* ── Tailored 3 Hero Images per Package (Slidable Carousel) ── */
+/* ── I18N Dictionary from Hope UI ── */
+const I18N = {
+  en: {
+    createBooking: "Create Event Booking", evtDetails: "Event Details", studioPackage: "Studio Package",
+    bestValue: "BEST VALUE", eventCoverage: "Event Coverage",
+    pkgDesc: "Professional photo and video coverage for your special event.",
+    photography: "Photography", videography: "Videography", proTeam: "Professional Team", hiOutput: "High-Quality Output",
+    whatsIncluded: "What's Included", pkgIncludedTitle: "Package Deliverables & Details",
+    incBoardCards: "40×60 Board Photo & 200 Thank-You Cards",
+    continueDate: "Continue to Date Selection", selectDate: "Select Your Date", chooseDate: "Choose a date for your event.",
+    contactDetails: "Contact Details", fullName: "Full Name", phonePh: "Phone Number", emailPh: "Email (Optional)",
+    notesLbl: "Additional Notes", optLbl: "(Optional)", notesPh: "Any special requests or details...",
+    reviewSign: "Review & Sign Agreement", signTitle: "Sign the Agreement", signSub: "Please review the contract and provide your signature.",
+    contractDocument: "Contract Document", contractDetails: "Contract Details", rowDoc: "Document Name",
+    rowClient: "Client", rowPhone: "Phone", rowDate: "Date", yourSignature: "Your Signature",
+    clear: "Clear", tapSign: "Tap to sign here", agreePre: "I have read and agree to the ", agreeTerms: "Terms and Conditions",
+    confirmSubmit: "Confirm & Submit", cancel: "Cancel", selDate: "Selected Date",
+    lgAvail: "Available", lgUn: "Unavailable", lgBooked: "Booked",
+    stPay: "Confirm Payment", stUp: "Upload Screenshot", stWait: "Waiting for Approval",
+    payTitle: "Confirm Payment", paySub: "Please review your order details and complete the payment to proceed.",
+    bookingSummary: "Booking Summary", pkgLbl: "Package", clientLbl: "Client", dateLbl: "Event Date",
+    depositLbl: "Deposit (50%)", balanceLbl: "Balance Due", refLbl: "Reference", totalLbl: "Total Amount",
+    payNote: "After you make the payment, upload the screenshot in the next step.", continuePayment: "Continue to Payment",
+    uploadTitle: "Upload Payment Screenshot", uploadSub: "Please upload a clear screenshot of your payment for verification.",
+    tapUpload: "Tap to upload", dragText: "or drag and drop your screenshot here", fileHint: "PNG, JPG (Max 5MB)",
+    uploadNote: "Make sure the screenshot clearly shows the amount, date and transaction details.",
+    submitShot: "Submit Screenshot", payMTitle: "Choose Payment Method",
+    payMSub: "Select how you'd like to pay. Account details appear after selection.",
+    payVia: "Paying via", toUpload: "Continue to Upload",
+    pendingTitle: "Payment Under Verification",
+    pendingSub: "Your payment screenshot has been received and is now being verified. Please wait up to 24 hours for final approval.",
+    wait24hNote: "Expected approval time: Within 24 hours",
+    verifiedTitle: "Payment Verified",
+    verifiedSub: "The payment has been received and is now verified. Your booking details are shown below.",
+    trackTitle: "Track Your Booking", trackDesc: "Scan this QR code anytime to check your booking status and updates.",
+    openAgreement: "Open Agreement", viewReceipt: "View Official Receipt", backHome: "Back to Home",
+    liveOrderPage: "Open Live Order Page", downloadCard: "Download Receipt Card",
+    viewDoc: "View Fullscreen Contract", doneReview: "Done Reviewing",
+  },
+  am: {
+    createBooking: "የዝግጅት ቦታ ማስያዣ ይፍጠሩ", evtDetails: "የዝግጅት ዝርዝሮች", studioPackage: "የስቱዲዮ ጥቅል",
+    bestValue: "ምርጥ ዋጋ", eventCoverage: "የዝግጅት ሽፋን",
+    pkgDesc: "ለልዩ ዝግጅትዎ ፕሮፌሽናል የፎቶና ቪዲዮ ሽፋን።",
+    photography: "ፎቶግራፊ", videography: "ቪዲዮግራፊ", proTeam: "ፕሮፌሽናል ቡድን", hiOutput: "ከፍተኛ ጥራት ውጤት",
+    whatsIncluded: "የሚካተቱ ነገሮች", pkgIncludedTitle: "የጥቅሉ ዝርዝሮችና የሚረከቧቸው ነገሮች",
+    incBoardCards: "40×60 ሰሌዳ ፎቶ እና 200 የምስጋና ካርዶች",
+    continueDate: "ቀን ወደመምረጥ ይቀጥሉ", selectDate: "ቀንዎን ይምረጡ", chooseDate: "ለዝግጅትዎ ቀን ይምረጡ።",
+    contactDetails: "የዕውቂያ ዝርዝሮች", fullName: "ሙሉ ስም", phonePh: "ስልክ ቁጥር", emailPh: "ኢሜይል (አማራጭ)",
+    notesLbl: "ተጨማሪ ማስታወሻዎች", optLbl: "(አማራጭ)", notesPh: "ማንኛውም ልዩ ጥያቄዎች ወይም ዝርዝሮች...",
+    reviewSign: "ውሉን ይመልከቱና ይፈርሙ", signTitle: "ስምምነቱን ይፈርሙ", signSub: "እባክዎ ውሉን ይመልከቱና ፊርማዎን ይስጡ።",
+    contractDocument: "የውል ሰነድ", contractDetails: "የውል ዝርዝሮች", rowDoc: "የሰነድ ስም",
+    rowClient: "ደንበኛ", rowPhone: "ስልክ", rowDate: "ቀን", yourSignature: "ፊርማዎ",
+    clear: "አጽዳ", tapSign: "ለመፈረም ይንኩ", agreePre: "አንብቤ ", agreeTerms: "የቃል ኪዳን መመሪያዎችን አጽድቄያለሁ",
+    confirmSubmit: "አረጋግጥና አስገባ", cancel: "ሰርዝ", selDate: "የተመረጠ ቀን",
+    lgAvail: "ክፍት", lgUn: "የማይሰራ", lgBooked: "የተያዘ",
+    stPay: "ክፍያ ያረጋግጡ", stUp: "ስክሪን ሾት ያስገቡ", stWait: "ማረጋገጫ እየተጠበቀ ነው",
+    payTitle: "ክፍያ ያረጋግጡ", paySub: "እባክዎ የትዕዛዝዎን ዝርዝር ይመልከቱና ክፍያውን ይክፈሉ።",
+    bookingSummary: "የቦታ ማስያዣ ማጠቃለያ", pkgLbl: "ፓኬጅ", clientLbl: "ደንበኛ", dateLbl: "የዝግጅት ቀን",
+    depositLbl: "ቅድሚያ ክፍያ (50%)", balanceLbl: "ቀሪ ክፍያ", refLbl: "ማጣቀሻ", totalLbl: "ጠቅላላ መጠን",
+    payNote: "ክፍያውን ከከፈሉ በኋላ ስክሪን ሾቱን በሚቀጥለው ደረጃ ያስገቡ።", continuePayment: "ወደ ክፍያ ይቀጥሉ",
+    uploadTitle: "የክፍያ ስክሪን ሾት ያስገቡ", uploadSub: "ለማረጋገጫ እባክዎ ግልጽ የክፍያ ስክሪን ሾት ያስገቡ።",
+    tapUpload: "ለመስቀል ይንኩ", dragText: "ወይም ስክሪን ሾትዎን እዚህ ይጎትቱ", fileHint: "PNG፣ JPG (እስከ 5MB)",
+    uploadNote: "ስክሪን ሾቱ መጠኑን፣ ቀኑንና የግብይቱን ዝርዝር በግልጽ እንደሚያሳይ ያረጋግጡ።",
+    submitShot: "ስክሪን ሾት አስገባ", payMTitle: "የክፍያ መንገድ ይምረጡ",
+    payMSub: "እንዴት እንደሚከፍሉ ይምረጡ። የሂሳብ ቁጥር ከምርጫ በኋላ ይታያል።",
+    payVia: "የተመረጠ ክፍያ", toUpload: "ወደ ስክሪን ሾት ይቀጥሉ",
+    pendingTitle: "ክፍያ በማረጋገጥ ላይ",
+    pendingSub: "የክፍያ ስክሪን ሾትዎ ደርሶን በመረጋገጥ ላይ ነው። እባክዎ ለውሳኔ እስከ 24 ሰዓታት ይጠብቁ።",
+    wait24hNote: "የሚፈጀው ጊዜ፡ በ24 ሰዓታት ውስጥ",
+    verifiedTitle: "ክፍያ ተረጋግጧል",
+    verifiedSub: "ክፍያው ተቀብሎ ተረጋግጧል። የቦታ ማስያዣዎ ዝርዝር ከታች ቀርቧል።",
+    trackTitle: "ቦታ ማስያዣዎን ይከታተሉ", trackDesc: "የቦታ ማስያዣዎን ሁኔታ በማንኛውም ጊዜ ለማረጋገጥ ይህን QR ኮድ ይቃኙ።",
+    openAgreement: "ውሉን ይክፈቱ", viewReceipt: "ይፋዊ ደረሰኝ ይመልከቱ", backHome: "ወደ ዋናው ገጽ",
+    liveOrderPage: "ቀጥታ ሁኔታ ገጽ", downloadCard: "ደረሰኙን አውርድ",
+    viewDoc: "ሙሉ ውሉን በሙሉ ስክሪን ይመልከቱ", doneReview: "ተመልክቼ ጨርሻለሁ",
+  }
+};
+
+/* ── Tailored Hero Images per Package ── */
 const PACKAGE_HERO_IMAGES = {
-  'studio-10k': [
-    `${ASSET}/hero_bg_tight.jpg`,
-    `${ASSET}/couple-closeup-desktop.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-31-18_7668160944615066624.jpg`,
-  ],
-  'studio-145k': [
-    `${ASSET}/hero-bg.jpg`,
-    `${ASSET}/couple-hd-closeup.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-34-45_7668160982247493632.jpg`,
-  ],
-  'studio-185k': [
-    `${ASSET}/hero_forehead_kiss.jpg`,
-    `${ASSET}/hero_tight_closeup.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-37-55_7668161085785812992.jpg`,
-  ],
-  'wedding-bronze': [
-    `${ASSET}/hero-wedding.jpg`,
-    `${ASSET}/weee.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-35-01_7668161048338929664.jpg`,
-  ],
-  'wedding-silver': [
-    `${ASSET}/hero_bg_couple.jpg`,
-    `${ASSET}/weww.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-34-57_7668161010354493440.jpg`,
-  ],
-  'wedding-golden-75': [
-    `${ASSET}/couple-exact-closeup.jpg`,
-    `${ASSET}/hero-card-1.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-37-48_7668161057622723584.jpg`,
-  ],
-  'mesk-16k': [
-    `${ASSET}/gallery/photo_2026-07-03_20-31-22_7668160935271833600.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-35-00_7668161019770662912.jpg`,
-    `${ASSET}/hero-card-2.jpg`,
-  ],
-  'mesk-20k': [
-    `${ASSET}/gallery/photo_2026-07-03_20-37-56_7668161066939796480.jpg`,
-    `${ASSET}/hero-card-3.jpg`,
-    `${ASSET}/gallery/photo_2026-07-03_20-34-55_7668161038802964480.jpg`,
-  ],
-  'special-23k': [
-    `${ASSET}/gallery/photo_2026-07-03_14-14-19_7668160916678053888.jpg`,
-    `${ASSET}/hero_forehead_kiss.jpg`,
-    `${ASSET}/couple-closeup-desktop.jpg`,
-  ],
+  'studio-10k': [`${ASSET}/hero-banner.jpg`, `${ASSET}/couple-closeup-desktop.jpg`],
+  'studio-145k': [`${ASSET}/hero-banner.jpg`, `${ASSET}/hero-bg.jpg`, `${ASSET}/couple-hd-closeup.jpg`],
+  'studio-185k': [`${ASSET}/hero-banner.jpg`, `${ASSET}/hero_forehead_kiss.jpg`, `${ASSET}/hero_tight_closeup.jpg`],
+  'wedding-bronze': [`${ASSET}/hero-wedding.jpg`, `${ASSET}/hero-banner.jpg`],
+  'wedding-silver': [`${ASSET}/hero_bg_couple.jpg`, `${ASSET}/hero-banner.jpg`],
+  'wedding-golden-75': [`${ASSET}/couple-exact-closeup.jpg`, `${ASSET}/hero-banner.jpg`],
+  'mesk-16k': [`${ASSET}/hero-card-2.jpg`, `${ASSET}/hero-banner.jpg`],
+  'mesk-20k': [`${ASSET}/hero-card-3.jpg`, `${ASSET}/hero-banner.jpg`],
+  'special-23k': [`${ASSET}/hero_forehead_kiss.jpg`, `${ASSET}/hero-banner.jpg`],
 };
 
 function getPackageHeroImages(pkg) {
-  const cameraHero = `${ASSET}/camera-hero.jpg`;
-  if (!pkg) return [`${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`, cameraHero];
-
+  if (!pkg) return [`${ASSET}/hero-banner.jpg`, `${ASSET}/hero-wedding.jpg`];
   const pid = (pkg.id || '').toLowerCase();
-  let pool = null;
-
-  if (PACKAGE_HERO_IMAGES[pid]) {
-    pool = PACKAGE_HERO_IMAGES[pid];
-  } else if (pid.includes('10k') || pid.includes('studio-session')) {
-    pool = PACKAGE_HERO_IMAGES['studio-10k'];
-  } else if (pid.includes('145k') || pid.includes('14k') || pid.includes('studio-event')) {
-    pool = PACKAGE_HERO_IMAGES['studio-145k'];
-  } else if (pid.includes('185k') || pid.includes('18k') || pid.includes('studio-production')) {
-    pool = PACKAGE_HERO_IMAGES['studio-185k'];
-  } else if (pid.includes('bronze') || pid.includes('45k') || pid.includes('34k')) {
-    pool = PACKAGE_HERO_IMAGES['wedding-bronze'];
-  } else if (pid.includes('silver') || pid.includes('60k') || pid.includes('40k') || pid.includes('50k')) {
-    pool = PACKAGE_HERO_IMAGES['wedding-silver'];
-  } else if (pid.includes('golden') || pid.includes('75k') || pid.includes('70k')) {
-    pool = PACKAGE_HERO_IMAGES['wedding-golden-75'];
-  } else if (pid.includes('16k') || pid.includes('mesk-session')) {
-    pool = PACKAGE_HERO_IMAGES['mesk-16k'];
-  } else if (pid.includes('20k') || pid.includes('mesk-album')) {
-    pool = PACKAGE_HERO_IMAGES['mesk-20k'];
-  } else if (pid.includes('23k') || pid.includes('special')) {
-    pool = PACKAGE_HERO_IMAGES['special-23k'];
-  }
-
-  // Price match fallback
-  if (!pool) {
-    const price = parseInt((pkg.price || '0').toString().replace(/[^0-9]/g, ''), 10);
-    if (price === 10000) pool = PACKAGE_HERO_IMAGES['studio-10k'];
-    else if (price === 14500) pool = PACKAGE_HERO_IMAGES['studio-145k'];
-    else if (price === 18500) pool = PACKAGE_HERO_IMAGES['studio-185k'];
-    else if (price === 16000) pool = PACKAGE_HERO_IMAGES['mesk-16k'];
-    else if (price === 20000) pool = PACKAGE_HERO_IMAGES['mesk-20k'];
-    else if (price === 23000) pool = PACKAGE_HERO_IMAGES['special-23k'];
-    else if (price === 45000 || price === 34000) pool = PACKAGE_HERO_IMAGES['wedding-bronze'];
-    else if (price === 60000 || price === 40000 || price === 50000) pool = PACKAGE_HERO_IMAGES['wedding-silver'];
-    else if (price === 75000 || price === 70000) pool = PACKAGE_HERO_IMAGES['wedding-golden-75'];
-  }
-
-  if (pool && pool.length > 0) {
-    return [...pool];
-  }
-
-  return [`${ASSET}/hero-wedding.jpg`, `${ASSET}/couple-hd-closeup.jpg`, cameraHero];
+  if (PACKAGE_HERO_IMAGES[pid]) return PACKAGE_HERO_IMAGES[pid];
+  return [`${ASSET}/hero-banner.jpg`, `${ASSET}/hero-wedding.jpg`];
 }
 
-/* ── Inline Signature Pad matching Image 1 ── */
+/* ── Inline Canvas Signature Pad ── */
 const VeloSigPad = React.forwardRef(function VeloSigPad({ onSign, onClear }, ref) {
   const canvasRef = useRef(null);
   const drawing = useRef(false);
@@ -120,19 +121,17 @@ const VeloSigPad = React.forwardRef(function VeloSigPad({ onSign, onClear }, ref
 
   useImperativeHandle(ref, () => ({
     clear: () => {
-      const canvas = canvasRef.current;
-      if (canvas) {
-        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-      }
+      const cv = canvasRef.current;
+      if (cv) cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
       setHasDrawn(false);
       onClear();
     }
   }));
 
-  const getPos = (e, canvas) => {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+  const getPos = (e, cv) => {
+    const rect = cv.getBoundingClientRect();
+    const scaleX = cv.width / rect.width;
+    const scaleY = cv.height / rect.height;
     const src = e.touches ? e.touches[0] : e;
     return { x: (src.clientX - rect.left) * scaleX, y: (src.clientY - rect.top) * scaleY };
   };
@@ -140,24 +139,24 @@ const VeloSigPad = React.forwardRef(function VeloSigPad({ onSign, onClear }, ref
   const start = (e) => {
     e.preventDefault();
     drawing.current = true;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const pos = getPos(e, canvas);
+    const cv = canvasRef.current;
+    const ctx = cv.getContext('2d');
+    const p = getPos(e, cv);
     ctx.beginPath();
-    ctx.moveTo(pos.x, pos.y);
+    ctx.moveTo(p.x, p.y);
   };
 
   const draw = (e) => {
     e.preventDefault();
     if (!drawing.current) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    ctx.strokeStyle = '#1a1614';
-    ctx.lineWidth = 2.8;
+    const cv = canvasRef.current;
+    const ctx = cv.getContext('2d');
+    ctx.strokeStyle = '#17181c';
+    ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    const pos = getPos(e, canvas);
-    ctx.lineTo(pos.x, pos.y);
+    const p = getPos(e, cv);
+    ctx.lineTo(p.x, p.y);
     ctx.stroke();
     if (!hasDrawn) setHasDrawn(true);
   };
@@ -171,27 +170,26 @@ const VeloSigPad = React.forwardRef(function VeloSigPad({ onSign, onClear }, ref
   };
 
   return (
-    <div className="vbf-sig-pad-box">
+    <div className={`sig-box${hasDrawn ? ' has-ink' : ''}`}>
       <canvas
         ref={canvasRef}
-        width={480}
-        height={140}
-        className="vbf-sig-canvas"
+        width={460}
+        height={210}
         onMouseDown={start} onMouseMove={draw} onMouseUp={stop} onMouseLeave={stop}
         onTouchStart={start} onTouchMove={draw} onTouchEnd={stop}
       />
       {!hasDrawn && (
-        <div className="vbf-sig-watermark">
-          <Edit2 size={24} style={{ color: '#b5aba0' }} />
-          <span>Tap to sign here</span>
+        <div className="sig-placeholder">
+          <Edit2 size={24} color="#9aa7b8"/>
+          <p>Tap to sign here</p>
         </div>
       )}
     </div>
   );
 });
 
-/* ── Calendar Picker ── */
-function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] }) {
+/* ── Calendar Component Matching Hope UI ── */
+function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [], lang = 'en' }) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [viewing, setViewing] = useState(() => {
@@ -204,306 +202,278 @@ function VeloCalendar({ value, onChange, blackoutDates = [], bookedDates = [] })
   const prevMonth = () => setViewing(v => { const d = new Date(v.year, v.month - 1, 1); return { year: d.getFullYear(), month: d.getMonth() }; });
   const nextMonth = () => setViewing(v => { const d = new Date(v.year, v.month + 1, 1); return { year: d.getFullYear(), month: d.getMonth() }; });
   const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const monthsAm = ['ጥር','የካቲት','መጋቢት','ሚያዝያ','ግንቦት','ሰኔ','ሐምሌ','ነሐሴ','መስከረም','ጥቅምት','ኅዳር','ታኅሣሥ'];
   const days = ['SU','MO','TU','WE','TH','FR','SA'];
   const numDays = daysInMonth(viewing.year, viewing.month);
   const startDay = firstDayOfMonth(viewing.year, viewing.month);
   const formatDate = (y, m, d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
   const cells = [];
   for (let i = 0; i < startDay; i++) cells.push(null);
   for (let d = 1; d <= numDays; d++) cells.push(d);
 
   return (
-    <div style={{ background: '#fff', border: '1px solid #ede8e1', borderRadius: '18px', padding: '14px' }}>
-      {/* Nav */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <button type="button" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3d3530', display: 'flex' }}>
-          <ChevronLeft size={18}/>
+    <div className="cal-card">
+      <div className="cal-nav">
+        <button type="button" className="cal-btn" onClick={prevMonth} aria-label="Previous month">
+          <ChevronLeft size={16}/>
         </button>
-        <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#1a1614' }}>{months[viewing.month]} {viewing.year}</span>
-        <button type="button" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#3d3530', display: 'flex' }}>
-          <ChevronRight size={18}/>
+        <b style={{ fontSize: '15px', color: '#17181c' }}>
+          {lang === 'am' ? monthsAm[viewing.month] : months[viewing.month]} {viewing.year}
+        </b>
+        <button type="button" className="cal-btn" onClick={nextMonth} aria-label="Next month">
+          <ChevronRight size={16}/>
         </button>
       </div>
-      {/* Day headers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
-        {days.map(d => (
-          <div key={d} style={{ textAlign: 'center', fontSize: '0.62rem', fontWeight: 800, color: '#7a6e66', padding: '3px 0' }}>{d}</div>
-        ))}
+      <div className="cal-week">
+        {days.map(d => <span key={d}>{d}</span>)}
       </div>
-      {/* Day cells */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+      <div className="cal-grid">
         {cells.map((day, idx) => {
-          if (!day) return <span key={`e${idx}`} />;
+          if (!day) return <span key={`blank-${idx}`} className="cal-blank"/>;
           const dateStr = formatDate(viewing.year, viewing.month, day);
           const cellDate = new Date(viewing.year, viewing.month, day);
           const isPast = cellDate < today;
           const isBlackout = blackoutDates.includes(dateStr);
+          const isBooked = bookedDates.includes(dateStr);
           const isSelected = value === dateStr;
-          const isToday = cellDate.getTime() === today.getTime();
           const isDisabled = isPast || isBlackout;
+
+          let cls = 'cal-day';
+          if (isSelected) cls += ' sel';
+          else if (isBooked) cls += ' booked';
+          else if (isBlackout || isPast) cls += ' un';
+          else cls += ' hl';
+
           return (
             <button
               key={dateStr}
               type="button"
               disabled={isDisabled}
+              className={cls}
               onClick={() => !isDisabled && onChange(dateStr)}
-              style={{
-                aspectRatio: '1', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700,
-                cursor: isDisabled ? 'not-allowed' : 'pointer', border: 'none',
-                background: isSelected ? '#5c4b2a' : isBlackout ? '#fee2e2' : 'transparent',
-                color: isSelected ? '#fff' : isBlackout ? '#991b1b' : isDisabled ? '#c9c0b6' : isToday ? '#b89248' : '#1a1614',
-                outline: isToday && !isSelected ? '1.5px solid #b89248' : 'none',
-                transition: 'all 0.15s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >{day}</button>
+            >
+              {day}
+            </button>
           );
         })}
       </div>
-
+      <div className="legend">
+        <span><i className="d-gold"></i><span>{lang === 'am' ? 'የተመረጠ' : 'Selected'}</span></span>
+        <span><i className="d-pink"></i><span>{lang === 'am' ? 'ክፍት' : 'Available'}</span></span>
+        <span><i className="d-gray"></i><span>{lang === 'am' ? 'የተያዘ / ያለፈ' : 'Booked / Past'}</span></span>
+      </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   VELO BOOKING FLOW MODAL — Exact Cloned Design
+   MAIN BOOKING FLOW — 100% FAITHFUL TO HOPE UI (Desktop + Mobile)
    ══════════════════════════════════════════════════════════════════════════ */
 export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en', onLangChange, initialStep = 1 }) {
-  const [step, setStep] = useState(initialStep);
-  useEffect(() => { if (initialStep) setStep(initialStep); }, [initialStep]);
-
   const [activeLang, setActiveLang] = useState(lang);
   useEffect(() => { setActiveLang(lang); }, [lang]);
+  const t = (k) => I18N[activeLang]?.[k] || I18N.en?.[k] || k;
+
+  // Viewport detection: > 900px is Desktop 2-column modal, <= 900px is Mobile app
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.innerWidth > 900);
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth > 900);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Steps:
+  // Mobile: 1..8
+  // Desktop: 'scrBooking' (steps 1-2) | 'scrSign' (step 3) | 'dPay1' (step 4) | 'dPay2' (steps 5-6) | 'dPayPending' (step 7) | 'dPayVerified' (step 8)
+  const [step, setStep] = useState(initialStep);
+  const [dScreen, setDScreen] = useState(() => {
+    if (initialStep === 3) return 'scrSign';
+    if (initialStep === 4) return 'dPay1';
+    if (initialStep === 5 || initialStep === 6) return 'dPay2';
+    if (initialStep === 7) return 'dPayPending';
+    if (initialStep === 8) return 'dPayVerified';
+    return 'scrBooking';
+  });
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [slideIdx, setSlideIdx] = useState(0);
 
-  useEffect(() => { setSlideIdx(0); }, [selectedPackage?.id]);
+  // Form & Client state
+  const [form, setForm] = useState({
+    name: '', phone: '', email: '', location: 'Addis Ababa',
+    date: new Date(Date.now() + 86400000 * 3).toISOString().split('T')[0],
+    note: ''
+  });
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [signature, setSignature] = useState(null);
+  const [termsAccepted, setTerms] = useState(false);
 
+  // Server state
   const [blackoutDates, setBlackout] = useState([]);
-  const [bookedDates, setBooked]     = useState([]);
-  const [form, setForm]              = useState({ name: '', date: '', phone: '', email: '', location: 'Addis Ababa', note: '' });
-  const [signature, setSignature]    = useState(null);
-  const [termsAccepted, setTerms]    = useState(false);
-  const [submitting, setSubmitting]  = useState(false);
-  const [createdOrder, setCreatedOrder] = useState(null);
-  const [error, setError]            = useState('');
-  const [contractPage, setContractPage] = useState(1);
+  const [bookedDates, setBooked] = useState([]);
+  const [serverPaymentAccounts, setServerPaymentAccounts] = useState(null);
+
+  // Contract state
   const [defaultAgreements9, setDefaultAgreements9] = useState(DEFAULT_AGREEMENTS_9);
   const [selectedAgrTemplate, setSelectedAgrTemplate] = useState(() => resolveAgreementForPackage(selectedPackage, DEFAULT_AGREEMENTS_9));
-  const sigPadRef = useRef(null);
+  const [contractPage, setContractPage] = useState(1);
   const [contractFullscreen, setContractFullscreen] = useState(false);
+  const sigPadRef = useRef(null);
 
-  // Payment & Receipt States (Step 5 & 6)
-  const [payMethod, setPayMethod]       = useState('telebirr');
+  // Payment state
+  const [orderId, setOrderId] = useState(() => `HOPE-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [payMethod, setPayMethod] = useState('telebirr');
   const [payReference, setPayReference] = useState('');
-  const [paymentProof, setPaymentProof] = useState(null);  // base64 dataURL
+  const [paymentProof, setPaymentProof] = useState(null);
   const [proofFileName, setProofFileName] = useState('');
+  const [submitProofLoading, setSubmitProofLoading] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState(null);
-  const [updatingPay, setUpdatingPay]   = useState(false);
   const [downloadingCard, setDownloadingCard] = useState(false);
-  const [serverPaymentAccounts, setServerPaymentAccounts] = useState(null);
   const proofInputRef = useRef(null);
 
   const apiBase = window.location.hostname === 'localhost' ? 'https://hope-photo-velo-jade.vercel.app' : '';
 
-  const pkgName = activeLang === 'en'
-    ? (selectedPackage?.titleEn ?? selectedPackage?.name ?? 'HOPE Package')
-    : activeLang === 'om'
-    ? (selectedPackage?.titleOm ?? selectedPackage?.name ?? 'Paakeejii HOPE')
-    : (selectedPackage?.titleAm ?? selectedPackage?.name ?? 'የ HOPE ፓኬጅ');
-
-  const deliverables = activeLang === 'en'
-    ? (selectedPackage?.deliverablesEn ?? [])
-    : activeLang === 'om'
-    ? (selectedPackage?.deliverablesOm ?? [])
-    : (selectedPackage?.deliverablesAm ?? []);
-
-  const badgeText = activeLang === 'en'
-    ? (selectedPackage?.badgeEn || 'BEST VALUE')
-    : activeLang === 'om'
-    ? (selectedPackage?.badgeOm || 'GATII GAARII')
-    : (selectedPackage?.badgeAm || 'ምርጥ ዋጋ');
-
-  const descText = activeLang === 'en'
-    ? (selectedPackage?.descEn || 'Professional photo and video coverage for your special event.')
-    : activeLang === 'om'
-    ? (selectedPackage?.descOm || 'Tajaajila waraabsa suuraa fi viidiyoo sadarkaa ol\'aanaa.')
-    : (selectedPackage?.descAm || 'ለልዩ በዓላት፣ ለፓርቲዎች እና ለፎቶ ቀረጻዎች ተመራጭ።');
-
-  const basePrice = parseInt((selectedPackage?.price || '0').toString().replace(/[^0-9]/g, ''), 10) || 0;
-  const totalPrice = basePrice;
+  // Pricing & Deliverables
+  const pkgName = selectedPackage?.name || selectedPackage?.title || 'Event Coverage';
+  const rawPrice = (selectedPackage?.price || '14,500').toString().replace(/[^0-9]/g, '');
+  const totalPrice = parseInt(rawPrice, 10) || 14500;
   const deposit = Math.round(totalPrice * 0.5);
   const remaining = totalPrice - deposit;
+  const deliverables = selectedPackage?.deliverables || [
+    '8-Hour Comprehensive Event Coverage (Photo & Video)',
+    'Professional Event & Bridal Makeup Artist Included',
+    '15–30s Cinematic Teaser Reels for Social Media',
+    '40×60 Board Photo & 200 Thank-You Cards',
+    '150+ Edited Soft Copies & Lifetime Cloud Gallery',
+    'Full Commercial & Personal Image Usage Rights'
+  ];
 
-  const orderId = `HOPE-AGR-STUDIO-${basePrice}`;
-
-  const update = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
-  // Hero carousel slides & swipe
   const images = getPackageHeroImages(selectedPackage);
-  const nextSlide = (e) => {
-    if (e) e.stopPropagation();
-    setSlideIdx(prev => (prev + 1) % images.length);
-  };
-  const prevSlide = (e) => {
-    if (e) e.stopPropagation();
-    setSlideIdx(prev => (prev - 1 + images.length) % images.length);
-  };
 
-  // Auto-slide every 3.5 seconds
-  useEffect(() => {
-    if (!images || images.length <= 1) return;
-    const timer = setInterval(() => {
-      setSlideIdx(prev => (prev + 1) % images.length);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [selectedPackage?.id, images.length]);
-
-  useEffect(() => {
-    setSlideIdx(0);
-  }, [selectedPackage?.id]);
-  const touchStartY = useRef(null);
-  const handleTouchStart = (e) => {
-    if (!e.touches || !e.touches[0]) return;
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-  const handleTouchEnd = (e) => {
-    if (!e.changedTouches || !e.changedTouches[0] || touchStartX.current === null) return;
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
-      if (deltaX > 0) prevSlide();
-      else nextSlide();
-    }
-    touchStartX.current = null;
-    touchStartY.current = null;
-  };
-
-  const handleSelectLang = (newCode) => {
-    setActiveLang(newCode);
-    if (onLangChange) onLangChange(newCode);
-  };
-
-  // Load data
-  useEffect(() => {
-    const matched = resolveAgreementForPackage(selectedPackage, defaultAgreements9);
-    setSelectedAgrTemplate(matched);
-    fetch(`${apiBase}/api/agreements?defaults=1`)
-      .then(r => r.json()).then(d => {
-        if (d.agreements?.length > 0) {
-          setDefaultAgreements9(d.agreements);
-          setSelectedAgrTemplate(resolveAgreementForPackage(selectedPackage, d.agreements));
-        }
-      }).catch(() => {});
-  }, [selectedPackage]);
-
+  // Load server settings & booked orders
   useEffect(() => {
     fetch(`${apiBase}/api/settings`).then(r => r.json()).then(data => {
-      setBlackout(data.settings?.blackoutDates || []);
-      if (data.settings?.paymentAccounts) {
-        setServerPaymentAccounts(data.settings.paymentAccounts);
-      }
+      if (data.settings?.blackoutDates) setBlackout(data.settings.blackoutDates);
+      if (data.settings?.paymentAccounts) setServerPaymentAccounts(data.settings.paymentAccounts);
       return fetch(`${apiBase}/api/orders`);
     }).then(r => r.json()).then(data => {
-      const dates = (data.orders || [])
-        .filter(o => o.eventDate && ['CONFIRMED','PENDING_VERIFICATION'].includes(o.status))
-        .map(o => o.eventDate);
+      const dates = (data.orders || []).filter(o => o.eventDate && ['CONFIRMED', 'PENDING_VERIFICATION'].includes(o.status)).map(o => o.eventDate);
       setBooked(dates);
     }).catch(() => {});
   }, []);
 
-  // Agreement pages
   const activeAgreement = selectedAgrTemplate || resolveAgreementForPackage(selectedPackage, defaultAgreements9);
-  const tokens = {
-    clientName: form.name || '___________', phone: form.phone || '___________',
-    eventDate: form.date || '___________', location: form.location || 'Addis Ababa',
-    packageName: pkgName, deliverables: deliverables.slice(0, 5).join(', ') || pkgName,
-    agreedPrice: totalPrice.toLocaleString() + ' ETB', depositAmount: deposit.toLocaleString() + ' ETB',
-    remainingBalance: remaining.toLocaleString() + ' ETB', balance: remaining.toLocaleString() + ' ETB',
-  };
-  const resolvedClauses = (activeAgreement?.clauses || []).map(c => {
-    const heading = activeLang === 'am' ? c.headingAm : c.headingEn;
-    let body = activeLang === 'am' ? c.bodyAm : c.bodyEn;
-    Object.entries(tokens).forEach(([k, v]) => { body = body?.replaceAll?.(`{${k}}`, v) ?? body; });
-    return { heading, body };
-  });
-  const TOTAL_CONTRACT_PAGES = 4;
 
-  // Handlers
-  const handleStep1Next = () => { setError(''); setStep(2); };
-  const handleStep2Next = (e) => {
-    e.preventDefault();
-    if (!form.name?.trim()) { setError('Please enter your full name'); return; }
-    if (!form.phone?.trim()) { setError('Please enter your phone number'); return; }
-    if (!form.date) { setError('Please select a date'); return; }
-    setError(''); setContractPage(1); setStep(3);
-  };
-  const handleSubmit = async () => {
-    if (!signature) { setError('Please provide your signature'); return; }
-    if (!termsAccepted) { setError('Please accept the terms and conditions'); return; }
-    setSubmitting(true); setError('');
-    let orderObj = null;
-    try {
-      const r = await fetch(`${apiBase}/api/orders`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientName: form.name, phone: form.phone, eventDate: form.date,
-          location: form.location, notes: form.note, packageName: pkgName,
-          basePrice, addons: [], totalPrice, depositAmount: deposit, remainingBalance: remaining,
-          signatureDataUrl: signature, termsAccepted: true,
-          category: selectedPackage?.category || 'custom', status: 'PENDING_VERIFICATION'
-        })
-      });
-      if (r.ok) { const data = await r.json(); orderObj = data?.order || null; }
-    } catch(err) { console.warn('Backend push failed:', err); }
-    if (!orderObj) {
-      orderObj = { id: orderId, clientName: form.name, phone: form.phone, eventDate: form.date, packageName: pkgName, depositAmount: deposit, remainingBalance: remaining };
-    }
-    setCreatedOrder(orderObj); setStep(4); setSubmitting(false);
+  // Form field update
+  const update = (e) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
   };
 
-  const handleCopyAccount = (accNum, key) => {
-    navigator.clipboard?.writeText?.(accNum);
-    setCopyFeedback(key);
+  // Copy helper
+  const handleCopy = (text, id) => {
+    if (navigator.clipboard) navigator.clipboard.writeText(text);
+    setCopyFeedback(id);
     setTimeout(() => setCopyFeedback(null), 2500);
   };
 
-  const handleConfirmPayment = async () => {
-    setUpdatingPay(true);
+  // Switch language
+  const handleSelectLang = (code) => {
+    setActiveLang(code);
+    if (onLangChange) onLangChange(code);
+  };
+
+  // Step 1 / 2 -> Step 3: Proceed to contract sign
+  const handleProceedToSign = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!form.name?.trim()) { setError(activeLang === 'am' ? 'እባክዎ ሙሉ ስምዎን ያስገቡ' : 'Please enter your full name'); return; }
+    if (!form.phone?.trim()) { setError(activeLang === 'am' ? 'እባክዎ ስልክ ቁጥርዎን ያስገቡ' : 'Please enter your phone number'); return; }
+    if (!form.date) { setError(activeLang === 'am' ? 'እባክዎ ቀን ይምረጡ' : 'Please select an event date'); return; }
+    setError('');
+    setStep(3);
+    setDScreen('scrSign');
+  };
+
+  // Step 3 -> Step 4 / dPay1: Submit real booking
+  const handleSubmitBooking = async () => {
+    if (!signature) { setError(activeLang === 'am' ? 'እባክዎ ፊርማዎን ይስጡ' : 'Please provide your signature'); return; }
+    if (!termsAccepted) { setError(activeLang === 'am' ? 'እባክዎ ውሎችንና ደንቦችን ይቀበሉ' : 'Please accept the terms and conditions'); return; }
+    setSubmitting(true);
+    setError('');
+
+    const curId = orderId;
+    const newOrder = {
+      id: curId,
+      packageName: pkgName,
+      packageId: selectedPackage?.id || 'studio-package',
+      totalPrice,
+      depositAmount: deposit,
+      remainingBalance: remaining,
+      clientName: form.name,
+      phone: form.phone,
+      email: form.email,
+      location: form.location || 'Addis Ababa',
+      eventDate: form.date,
+      notes: form.note,
+      signature,
+      status: 'PENDING_PAYMENT',
+      paymentStatus: 'UNPAID',
+      createdAt: new Date().toISOString(),
+      agreementId: activeAgreement?.id || 'agr-studio-10k'
+    };
+
+    setCreatedOrder(newOrder);
+
+    try {
+      await fetch(`${apiBase}/api/booking`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder),
+      });
+    } catch (err) {
+      console.warn('Booking API error:', err);
+    }
+
+    setSubmitting(false);
+    setStep(4);
+    setDScreen('dPay1');
+  };
+
+  // Step 6 -> Step 7 / dPayPending: Submit proof screenshot
+  const handleSubmitProof = async () => {
+    setSubmitProofLoading(true);
     const orderIdToUpdate = createdOrder?.id || orderId;
     const patchData = {
       id: orderIdToUpdate,
       paymentMethod: payMethod,
-      paymentReference: payReference,
+      paymentReference: payReference || `REF-${Date.now().toString().slice(-4)}`,
       paymentProof: paymentProof || null,
-      status: 'PENDING_VERIFICATION',
       paymentStatus: 'PENDING_VERIFICATION',
+      status: 'PENDING_VERIFICATION',
       jobStatus: 'SCHEDULED'
     };
+
     try {
       await fetch(`${apiBase}/api/orders`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patchData)
       });
-    } catch (e) {
-      console.warn('Backend payment patch failed:', e);
+    } catch (err) {
+      console.warn('Payment proof patch error:', err);
     }
-    setCreatedOrder(prev => ({
-      ...(prev || {}),
-      paymentMethod: payMethod,
-      paymentReference: payReference,
-      paymentProof: paymentProof || null,
-      paymentStatus: 'PENDING_VERIFICATION',
-      jobStatus: 'SCHEDULED'
-    }));
-    setUpdatingPay(false);
-    setStep(6);
+
+    setCreatedOrder(prev => ({ ...(prev || {}), ...patchData }));
+    setSubmitProofLoading(false);
+    setStep(7);
+    setDScreen('dPayPending');
   };
 
-  const handleProofFileChange = (e) => {
+  // Proof file upload handler
+  const handleProofChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setProofFileName(file.name);
@@ -512,23 +482,19 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     reader.readAsDataURL(file);
   };
 
+  // Download high-resolution receipt card
   const handleDownloadReceiptCard = async () => {
     setDownloadingCard(true);
     try {
       const curRefId = createdOrder?.id || orderId;
       const trackingUrl = `${window.location.origin}/?order=${curRefId}`;
-
-      const W = 640;
-      const H = 1060;
-      const scale = 2; // High DPI Retina (1280 x 2120)
-
+      const W = 640, H = 1060, scale = 2;
       const cv = document.createElement('canvas');
       cv.width = W * scale;
       cv.height = H * scale;
       const c = cv.getContext('2d');
       c.scale(scale, scale);
 
-      // Helper for rounded rectangle
       const cRR = (ctx, x, y, w, h, r) => {
         ctx.beginPath();
         ctx.moveTo(x + r, y);
@@ -543,1111 +509,1224 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
         ctx.closePath();
       };
 
-      // Helper to load image
-      const loadImg = (url) => new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = url;
-      });
-
-      // 1. Background Card with soft subtle border
+      // Background
       c.fillStyle = '#fdfbf7';
       cRR(c, 0, 0, W, H, 24);
       c.fill();
-
       c.strokeStyle = '#ede5d8';
       c.lineWidth = 1.5;
       cRR(c, 0, 0, W, H, 24);
       c.stroke();
 
-      // 2. Top Luxury Dark Header
-      c.fillStyle = '#1a1614';
+      // Top dark header
+      c.fillStyle = '#17181c';
       c.beginPath();
-      c.moveTo(0, 24);
-      c.arcTo(0, 0, 24, 0, 24);
-      c.lineTo(W - 24, 0);
-      c.arcTo(W, 0, W, 24, 24);
-      c.lineTo(W, 136);
-      c.lineTo(0, 136);
+      c.moveTo(0, 24); c.arcTo(0, 0, 24, 0, 24);
+      c.lineTo(W - 24, 0); c.arcTo(W, 0, W, 24, 24);
+      c.lineTo(W, 136); c.lineTo(0, 136);
       c.closePath();
       c.fill();
 
-      // Header Branding
-      c.fillStyle = '#bd2637';
-      c.font = '900 32px "Playfair Display", Georgia, serif';
+      // Branding
+      c.fillStyle = '#e31e24';
+      c.font = '900 32px "Inter", sans-serif';
       c.fillText('HOPE', 40, 56);
-
       c.fillStyle = '#d4af37';
-      c.font = 'bold 12px Arial, sans-serif';
-      c.fillText('PHOTO & VELO STUDIO', 40, 80);
-
-      c.fillStyle = 'rgba(255, 255, 255, 0.75)';
-      c.font = '500 11px Arial, sans-serif';
-      c.fillText('Tigat Building, Hayahulet, Addis Ababa  \u00B7  +251 910 52 69 62', 40, 102);
-
-      // Status Pill on top-right
+      c.font = 'bold 12px "Inter", sans-serif';
+      c.fillText('PHOTO & EVENT STUDIO', 40, 80);
       c.fillStyle = '#ffffff';
-      cRR(c, W - 220, 36, 180, 36, 18);
+      c.font = '800 16px "Inter", sans-serif';
+      c.fillText('OFFICIAL DIGITAL RECEIPT PASS', 40, 112);
+
+      // Order Reference Box
+      c.fillStyle = '#ffffff';
+      cRR(c, 40, 160, W - 80, 80, 16);
       c.fill();
-
-      c.fillStyle = '#b89248';
-      c.font = '800 11px Arial, sans-serif';
-      c.textAlign = 'center';
-      c.fillText('DATE RESERVED', W - 130, 58);
-      c.textAlign = 'left';
-
-      // 3. Sub-header & Title
-      c.fillStyle = '#1a1614';
-      c.font = 'bold 12px Arial, sans-serif';
-      c.fillText('OFFICIAL CLIENT DIGITAL RECEIPT & BOOKING PASS', 40, 172);
-
-      c.strokeStyle = '#e2dad0';
-      c.lineWidth = 1.5;
-      c.beginPath();
-      c.moveTo(40, 184);
-      c.lineTo(W - 40, 184);
+      c.strokeStyle = '#e7e5e1';
       c.stroke();
+      c.fillStyle = '#6b7280';
+      c.font = '600 12px "Inter", sans-serif';
+      c.fillText('BOOKING REFERENCE', 60, 192);
+      c.fillStyle = '#e31e24';
+      c.font = '900 24px "Inter", sans-serif';
+      c.fillText(curRefId, 60, 222);
 
-      // 4. Detail Rows Table
+      // Status pill
+      c.fillStyle = createdOrder?.status === 'CONFIRMED' ? '#dcfce7' : '#fef3c7';
+      cRR(c, W - 220, 182, 160, 36, 18);
+      c.fill();
+      c.fillStyle = createdOrder?.status === 'CONFIRMED' ? '#15803d' : '#b45309';
+      c.font = 'bold 12px "Inter", sans-serif';
+      c.fillText(createdOrder?.status === 'CONFIRMED' ? 'VERIFIED' : 'PENDING REVIEW', W - 200, 205);
+
+      // Client & Event rows
       const rows = [
-        ['RECEIPT / REF #', curRefId, 'gold'],
-        ['CLIENT NAME', form.name || createdOrder?.clientName || 'Valued Client', false],
-        ['PHONE NUMBER', form.phone || createdOrder?.phone || '—', false],
-        ['EVENT DATE', form.date || createdOrder?.eventDate || '—', false],
-        ['SERVICE PACKAGE', createdOrder?.packageName || pkgName || '—', false],
-        ['PAYMENT METHOD', (payMethod === 'telebirr' ? 'Telebirr (ቴሌብር)' : payMethod === 'cbe' ? 'CBE (Commercial Bank)' : payMethod === 'awash' ? 'Awash Bank' : 'Cash at Studio'), false],
-        ['TOTAL INVESTMENT', `${totalPrice.toLocaleString()} ETB`, false],
-        ['50% ADVANCE DEPOSIT', `${deposit.toLocaleString()} ETB`, 'green'],
-        ['BALANCE DUE ON EVENT', `${remaining.toLocaleString()} ETB`, false],
-        ['ISSUED DATE', new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }), false],
+        ['Client Name', form.name || 'Client'],
+        ['Phone Number', form.phone || PHONE_LINK],
+        ['Event Date', form.date || 'TBD'],
+        ['Selected Package', pkgName],
+        ['Total Amount', `${totalPrice.toLocaleString()} ETB`],
+        ['Deposit (50%)', `${deposit.toLocaleString()} ETB`],
+        ['Balance Due', `${remaining.toLocaleString()} ETB`],
       ];
 
-      let ry = 212;
-      rows.forEach(([label, val, accent], i) => {
-        if (i % 2 === 0) {
-          c.fillStyle = '#ffffff';
-          c.fillRect(36, ry - 14, W - 72, 28);
-        }
-        c.fillStyle = '#7a6e66';
-        c.font = 'bold 10px Arial, sans-serif';
-        c.fillText(label, 48, ry + 4);
-
-        c.font = accent === 'green' ? 'bold 13px Arial, sans-serif' : accent === 'gold' ? 'bold 13px "DM Mono", monospace' : 'bold 12px Arial, sans-serif';
-        c.fillStyle = accent === 'green' ? '#16a34a' : accent === 'gold' ? '#b89248' : '#1a1614';
-        c.textAlign = 'right';
-        c.fillText(val, W - 48, ry + 4);
-        c.textAlign = 'left';
-        ry += 30;
+      let ry = 280;
+      rows.forEach(([k, v]) => {
+        c.fillStyle = '#6b7280';
+        c.font = '500 13px "Inter", sans-serif';
+        c.fillText(k, 50, ry);
+        c.fillStyle = '#17181c';
+        c.font = '700 13.5px "Inter", sans-serif';
+        c.fillText(v, W - 50 - c.measureText(v).width, ry);
+        c.strokeStyle = '#f2f0ec';
+        c.beginPath(); c.moveTo(50, ry + 10); c.lineTo(W - 50, ry + 10); c.stroke();
+        ry += 38;
       });
 
-      // 5. Minimalist Luxury Hero QR Pass (Bigger, High-Contrast & Viewfinder Accents)
-      const qrBoxY = ry + 16;
-      const QS = 220; // Expanded to 220px! (over 70% larger for instant detection)
-      const qrBoxW = QS + 48; // 268px wide container
-      const qrBoxH = QS + 94; // 314px tall container
-      const qrBoxX = (W - qrBoxW) / 2;
-
-      // Card container background
+      // Scannable Optical QR Code
+      const qrDataUrl = await QRCodeLib.toDataURL(trackingUrl, {
+        width: 320, margin: 1, color: { dark: '#17181c', light: '#ffffff' }
+      });
+      const qrImg = new Image();
+      qrImg.src = qrDataUrl;
+      await new Promise(res => { qrImg.onload = res; });
       c.fillStyle = '#ffffff';
-      cRR(c, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 20);
+      cRR(c, (W - 200) / 2, ry + 30, 200, 200, 16);
       c.fill();
-      c.strokeStyle = '#e8dfd3';
-      c.lineWidth = 1.5;
-      cRR(c, qrBoxX, qrBoxY, qrBoxW, qrBoxH, 20);
+      c.strokeStyle = '#e7e5e1';
       c.stroke();
+      c.drawImage(qrImg, (W - 170) / 2, ry + 45, 170, 170);
 
-      // Top Tag
-      c.fillStyle = '#b89248';
-      c.font = 'bold 10px Arial, sans-serif';
-      c.textAlign = 'center';
-      c.fillText('✦  OFFICIAL DIGITAL VERIFICATION PASS  ✦', W / 2, qrBoxY + 22);
+      c.fillStyle = '#6b7280';
+      c.font = '600 11px "Inter", sans-serif';
+      const scanTxt = 'Scan anytime to track your booking live';
+      c.fillText(scanTxt, (W - c.measureText(scanTxt).width) / 2, ry + 255);
 
-      // Frame position
-      const qrFrameX = (W - QS) / 2;
-      const qrFrameY = qrBoxY + 34;
-
-      // Viewfinder Corner Accents (Luxury minimalist aesthetic - offset for clear quiet zone)
-      const mkLen = 14;
-      const mkOffset = 12; // 12px clear offset outside QR quiet zone
-      c.strokeStyle = '#b89248';
-      c.lineWidth = 2.5;
-      c.lineCap = 'round';
-      // Top-Left
-      c.beginPath(); c.moveTo(qrFrameX - mkOffset, qrFrameY - mkOffset + mkLen); c.lineTo(qrFrameX - mkOffset, qrFrameY - mkOffset); c.lineTo(qrFrameX - mkOffset + mkLen, qrFrameY - mkOffset); c.stroke();
-      // Top-Right
-      c.beginPath(); c.moveTo(qrFrameX + QS + mkOffset - mkLen, qrFrameY - mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY - mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY - mkOffset + mkLen); c.stroke();
-      // Bottom-Left
-      c.beginPath(); c.moveTo(qrFrameX - mkOffset, qrFrameY + QS + mkOffset - mkLen); c.lineTo(qrFrameX - mkOffset, qrFrameY + QS + mkOffset); c.lineTo(qrFrameX - mkOffset + mkLen, qrFrameY + QS + mkOffset); c.stroke();
-      // Bottom-Right
-      c.beginPath(); c.moveTo(qrFrameX + QS + mkOffset - mkLen, qrFrameY + QS + mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY + QS + mkOffset); c.lineTo(qrFrameX + QS + mkOffset, qrFrameY + QS + mkOffset - mkLen); c.stroke();
-
-      // Generate ultra-crisp local QR code data URL (Pure deep obsidian on pure white with proper quiet zone)
-      let qrDataUrl = '';
-      try {
-        qrDataUrl = await QRCodeLib.toDataURL(trackingUrl, {
-          width: 500,
-          margin: 4,
-          errorCorrectionLevel: 'M',
-          color: { dark: '#0a0a0f', light: '#ffffff' }
-        });
-      } catch {
-        qrDataUrl = `https://api.qrserver.com/v1/create-qr-code/?size=480x480&color=0a0a0f&bgcolor=ffffff&margin=4&ecc=M&data=${encodeURIComponent(trackingUrl)}`;
-      }
-
-      try {
-        const qrImg = await loadImg(qrDataUrl);
-        c.drawImage(qrImg, qrFrameX, qrFrameY, QS, QS);
-      } catch {
-        c.fillStyle = '#0a0a0f';
-        c.fillRect(qrFrameX, qrFrameY, QS, QS);
-        c.fillStyle = '#ffffff';
-        c.font = 'bold 12px Arial, sans-serif';
-        c.fillText('OFFICIAL QR PASS', W / 2, qrFrameY + QS / 2);
-      }
-
-      // Instruction Subtitle
-      c.fillStyle = '#1a1614';
-      c.font = 'bold 11px Arial, sans-serif';
-      c.textAlign = 'center';
-      c.fillText('SCAN WITH CAMERA OR TELEGRAM BOT TO TRACK STATUS', W / 2, qrFrameY + QS + 20);
-
-      c.fillStyle = '#b89248';
-      c.font = 'bold 10.5px "DM Mono", monospace';
-      c.fillText(`REF: ${curRefId}  •  hope-photo-velo-jade.vercel.app`, W / 2, qrFrameY + QS + 36);
-      c.textAlign = 'left';
-
-      // 6. Perforated Tear Line
-      const tearY = qrBoxY + qrBoxH + 24;
-      c.setLineDash([5, 5]);
-      c.strokeStyle = '#d4c5b0';
-      c.lineWidth = 1.5;
-      c.beginPath();
-      c.moveTo(36, tearY);
-      c.lineTo(W - 36, tearY);
-      c.stroke();
-      c.setLineDash([]);
-
-      // Cutout circles on edges for real ticket feel
-      [[0, tearY], [W, tearY]].forEach(([cx, cy]) => {
-        c.fillStyle = '#ffffff';
-        c.beginPath();
-        c.arc(cx, cy, 14, 0, Math.PI * 2);
-        c.fill();
-        c.strokeStyle = '#ede5d8';
-        c.lineWidth = 1.5;
-        c.beginPath();
-        c.arc(cx, cy, 14, 0, Math.PI * 2);
-        c.stroke();
-      });
-
-      // 7. Footer text
-      const fy = tearY + 28;
-      c.fillStyle = '#7a6e66';
-      c.font = '500 11px Arial, sans-serif';
-      c.textAlign = 'center';
-      c.fillText('Date held 24 hrs pending verification  \u00B7  Hayahulet Tigat Building, Addis Ababa', W / 2, fy);
-
-      c.fillStyle = '#bd2637';
-      c.font = 'bold 11px Arial, sans-serif';
-      c.fillText('hope-photo-velo.vercel.app', W / 2, fy + 20);
-      c.textAlign = 'left';
-
-      // 8. Download as PNG image
+      // Trigger download
       const a = document.createElement('a');
-      a.download = `HOPE-Receipt-${curRefId}.png`;
+      a.download = `HOPE_Receipt_Pass_${curRefId}.png`;
       a.href = cv.toDataURL('image/png');
       a.click();
     } catch (err) {
-      console.error('Receipt image generation failed:', err);
+      console.error('Failed to generate receipt card:', err);
     }
     setDownloadingCard(false);
   };
 
-  const pkgIcons = [
-    { icon: <Camera size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ፎቶግራፊ' : 'Photography' },
-    { icon: <Film size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ቪዲዮግራፊ' : 'Videography' },
-    { icon: <Users size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ባለሙያ ቡድን' : 'Professional Team' },
-    { icon: <ImageIcon size={22} strokeWidth={1.8} />, label: activeLang === 'am' ? 'ከፍተኛ ጥራት' : 'High-Quality Output' },
+  const telePhone = serverPaymentAccounts?.telebirr?.phone || serverPaymentAccounts?.telebirr?.accountNumber || '09 10 52 69 62';
+  const cbeAcc = serverPaymentAccounts?.cbe?.accountNumber || '1000542389123';
+  const awashAcc = serverPaymentAccounts?.awash?.accountNumber || '0132087654321';
+
+  const paymentMethods = [
+    { id: 'telebirr', title: 'Telebirr', sub: 'Mobile Wallet', acc: telePhone, lbl: 'Wallet Number', logoClass: 'tb', letter: 'T' },
+    { id: 'cbe', title: 'CBE Bank', sub: 'Commercial Bank of Ethiopia', acc: cbeAcc, lbl: 'Account Number', logoClass: 'cbe', letter: 'C' },
+    { id: 'awash', title: 'Awash Bank', sub: 'Awash International Bank', acc: awashAcc, lbl: 'Account Number', logoClass: 'aw', letter: 'A' },
+    { id: 'cash', title: activeLang === 'am' ? 'በአካል ስቱዲዮ' : 'Pay Cash at Studio', sub: 'Hayahulet, Tigat Bldg', acc: 'Addis Ababa', lbl: 'Address', logoClass: 'cs', letter: '₵' },
   ];
 
-  // ── Header ──
-  const renderHeader = () => (
-    <div className={`vbf-header ${step === 1 ? 'vbf-header--hero-overlay' : ''}`}>
-      <button
-        className="vbf-back-icon"
-        onClick={step === 1 ? onClose : () => setStep(s => Math.max(1, s - 1))}
-        aria-label="Back"
-      >
-        <ChevronLeft size={20}/>
-      </button>
-      <div className="vbf-brand">
-        <img
-          src="/assets/hope-logo.png"
-          alt="HOPE Photo &amp; Velo Studio"
-          className="vbf-brand-logo-img"
-        />
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        {step >= 2 && step <= 3 ? (
-          <div className="vbf-step-pill">{step - 1}/3</div>
-        ) : step === 5 ? (
-          <div className="vbf-step-pill">{activeLang === 'am' ? 'ክፍያ' : activeLang === 'om' ? 'Kaffaltii' : 'Payment'}</div>
-        ) : step === 6 ? (
-          <div className="vbf-step-pill">{activeLang === 'am' ? 'ደረሰኝ' : activeLang === 'om' ? 'Nagahee' : 'Receipt'}</div>
-        ) : null}
-        <button
-          className="vbf-menu-icon"
-          onClick={() => setMenuOpen(v => !v)}
-          aria-label="Open menu"
-        >
-          <Menu size={20}/>
-        </button>
-      </div>
-    </div>
-  );
+  const curRefId = createdOrder?.id || orderId;
+  const trackingUrl = `${window.location.origin}/?order=${curRefId}`;
 
-  // ── STEP 1: Package Details ──
-  const renderStep1 = () => (
-    <div className="vbf-step-scroll vbf-step1-scroll">
-      {/* Tall Hero Image Carousel with Auto-slide & Touch Gestures */}
-      <div
-        className="vbf-hero-img-wrap"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <div
-          className="vbf-carousel-track"
-          style={{ transform: `translateX(-${slideIdx * 100}%)` }}
-        >
-          {images.map((imgSrc, i) => (
-            <div key={i} className="vbf-carousel-slide">
-              <img
-                src={imgSrc}
-                alt={`${pkgName} slide ${i + 1}`}
-                className="vbf-hero-img"
-                loading="eager"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Hero Text Overlay */}
-        <div className="vbf-hero-overlay">
-          <div className="vbf-hero-text">
-            <div className="vbf-hero-eyebrow">
-              {activeLang === 'am' ? 'ማህደር' : activeLang === 'om' ? 'KUUSAA' : 'CAPTURE'}
-            </div>
-            <div className="vbf-hero-title">
-              {activeLang === 'am' ? (
-                <>ልዩ አፍታዎችዎን<br/>እናስቀርልዎታለን</>
-              ) : activeLang === 'om' ? (
-                <>YEROOWWAN KEESSAN<br/>ISA ADDAA</>
-              ) : (
-                <>YOUR SPECIAL<br/>MOMENTS</>
-              )}
-            </div>
-            <div className="vbf-hero-line"/>
-          </div>
-        </div>
-
-        {/* Slide Counter Badge (e.g. 2 / 3) */}
-        {images.length > 1 && (
-          <div className="vbf-slide-counter">
-            {slideIdx + 1} / {images.length}
-          </div>
-        )}
-
-        {/* Interactive Prev/Next Navigation Buttons */}
-        {images.length > 1 && (
-          <>
-            <button
-              type="button"
-              className="vbf-carousel-nav-btn prev"
-              onClick={prevSlide}
-              aria-label="Previous image"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              type="button"
-              className="vbf-carousel-nav-btn next"
-              onClick={nextSlide}
-              aria-label="Next image"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </>
-        )}
-
-        {/* Slide Indicator Dots */}
-        {images.length > 1 && (
-          <div className="vbf-carousel-dots">
-            {images.map((_, i) => (
-              <span
-                key={i}
-                className={`vbf-dot ${i === slideIdx ? 'active' : ''}`}
-                onClick={(e) => { e.stopPropagation(); setSlideIdx(i); }}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Package Card — High-Radius Curvy Overlap on Image */}
-      <div className="vbf-pkg-card">
-        <div className="vbf-pkg-badge-row">
-          <span className="vbf-pkg-badge">
-            <Crown size={12} style={{ color: '#d4af37' }}/> {badgeText}
-          </span>
-        </div>
-        <h2 className="vbf-pkg-title">{pkgName}</h2>
-        <p className="vbf-pkg-desc">{descText}</p>
-        <div className="vbf-pkg-price">
-          <span className="vbf-price-num">{totalPrice.toLocaleString()}</span>
-          <span className="vbf-price-cur"> ETB</span>
-        </div>
-
-        {/* Feature Icons Grid */}
-        <div className="vbf-feature-icons">
-          {pkgIcons.map((f, i) => (
-            <div key={i} className="vbf-feature-icon-item">
-              <div className="vbf-feature-icon-box">{f.icon}</div>
-              <span>{f.label}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="vbf-divider"/>
-
-        {/* What's Included */}
-        <div className="vbf-section">
-          <h4 className="vbf-section-title">
-            {activeLang === 'am' ? 'የተካተቱ አገልግሎቶች' : "What's Included"}
-          </h4>
-          <ul className="vbf-deliv-list">
-            {(deliverables.length > 0 ? deliverables : [
-              '200 Thank-You Cards',
-              '40×60 Board Photo',
-              'Professional Makeup',
-              '10 Post Photos',
-              '150 Soft Copies'
-            ]).map((d, i) => (
-              <li key={i}>
-                <Check size={15} className="vbf-check-icon" strokeWidth={2.5} />
-                <span>{d.replace(/^•\s*/, '')}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="vbf-cta-wrap">
-          <button className="vbf-cta-btn" onClick={handleStep1Next}>
-            {activeLang === 'am' ? 'ቀን ወደመምረጥ ይቀጥሉ' : 'Continue to Date Selection'} <ArrowRight size={18}/>
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ── STEP 2: Date + Contact ──
-  const renderStep2 = () => (
-    <form onSubmit={handleStep2Next} className="vbf-step-scroll">
-      <div className="vbf-step2-body">
-        <div className="vbf-step2-header">
-          <h2 className="vbf-step2-title">Select Your Date</h2>
-          <p className="vbf-step2-sub">Choose a date for your event.</p>
-        </div>
-
-        <VeloCalendar
-          value={form.date}
-          onChange={(d) => setForm(f => ({ ...f, date: d }))}
-          blackoutDates={blackoutDates}
-          bookedDates={bookedDates}
-        />
-
-        {/* Contact Details */}
-        <div className="vbf-contact-section">
-          <h3 className="vbf-contact-title">Contact Details</h3>
-          <div className="vbf-contact-fields">
-            <div className="vbf-field-wrap">
-              <User size={16} className="vbf-field-icon"/>
-              <input required className="vbf-field-input" name="name" value={form.name} onChange={update} placeholder="Full Name"/>
-            </div>
-            <div className="vbf-field-wrap">
-              <Phone size={16} className="vbf-field-icon"/>
-              <input required className="vbf-field-input" name="phone" type="tel" value={form.phone} onChange={update} placeholder="Phone Number"/>
-            </div>
-            <div className="vbf-field-wrap">
-              <Globe size={16} className="vbf-field-icon"/>
-              <input className="vbf-field-input" name="email" type="email" value={form.email} onChange={update} placeholder="Email (Optional)"/>
-            </div>
-            <div className="vbf-field-wrap">
-              <MapPin size={16} className="vbf-field-icon"/>
-              <input className="vbf-field-input" name="location" value={form.location} onChange={update} placeholder="Addis Ababa"/>
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Notes */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div className="vbf-field-label-above">
-            <MessageCircle size={14} style={{ display: 'inline', marginRight: '5px', verticalAlign: 'middle' }}/>
-            Additional Notes <span className="vbf-optional">(Optional)</span>
-          </div>
-          <div className="vbf-field-wrap vbf-field-wrap-textarea">
-            <textarea
-              className="vbf-field-input vbf-field-textarea"
-              name="note"
-              value={form.note}
-              onChange={update}
-              rows="3"
-              maxLength={500}
-              placeholder="Any special requests or details..."
-            />
-            <span className="vbf-char-count">{(form.note || '').length}/500</span>
-          </div>
-        </div>
-
-        {error && <p className="vbf-error">{error}</p>}
-      </div>
-
-      <div className="vbf-cta-wrap">
-        <button type="submit" className="vbf-cta-btn">
-          Review &amp; Sign Agreement <ArrowRight size={18}/>
-        </button>
-      </div>
-    </form>
-  );
-
-  // ── STEP 3: Agreement + Signature (Official doc left, dedicated sig pad right) ──
-  const renderStep3 = () => {
-    return (
-      <div className="vbf-step-scroll">
-        <div className="vbf-step3-body" style={{ padding: '16px 20px' }}>
-          {/* Header spans both columns */}
-          <div className="vbf-step3-header" style={{ marginBottom: '16px' }}>
-            <h2 className="vbf-step3-title">
-              {activeLang === 'am' ? 'ይፋዊ የስምምነት ሰነድ እና ፊርማ' : 'Official Agreement Document'}
-            </h2>
-            <p className="vbf-step3-sub">
-              {activeLang === 'am'
-                ? 'ውሉን ወደ ታች ያንሸራትቱ ያንብቡ — ከዚያ በቀኝ ያለው ሳጥን ውስጥ ፊርማዎን ይሳሉ።'
-                : 'Scroll through the contract on the left — then draw your signature in the box on the right.'}
-            </p>
-          </div>
-
-          {/* ── Column 1: Scrollable Official Legal Document (readOnly, no internal sig pad) ── */}
-          <div style={{ maxHeight: '560px', overflowY: 'auto', borderRadius: '16px', border: '1px solid #e2d9cf', background: '#fff' }}>
-            <DocumentStyleAgreement
-              agreement={activeAgreement}
-              clientName={form.name}
-              phone={form.phone}
-              eventDate={form.date}
-              location={form.location || 'Addis Ababa'}
-              totalPrice={totalPrice}
-              depositAmount={deposit}
-              remainingBalance={remaining}
-              signature={signature}
-              onSign={setSignature}
-              onClearSignature={() => setSignature(null)}
-              lang={activeLang === 'om' ? 'en' : activeLang}
-              orderId={createdOrder?.id || orderId}
-              readOnly={true}
-            />
-          </div>
-
-          {/* ── Column 2: Dedicated Signature & Acceptance Box ── */}
-          <div className="vbf-sig-section">
-            {/* Sig header with clear button */}
-            <div className="vbf-sig-header">
-              <div className="vbf-sig-title">
-                <Edit2 size={15} />
-                <span>{activeLang === 'am' ? '✍️ የእርስዎ ፊርማ (Your Signature)' : '✍️ Your Digital Signature'}</span>
+  // ─────────────────────────────────────────────────────────────────────────
+  // DESKTOP LAYOUT RENDERING (Exact right-anchored modal with 2-column grids)
+  // ─────────────────────────────────────────────────────────────────────────
+  const renderDesktopModal = () => (
+    <div className="overlay" role="dialog" aria-modal="true">
+      <div className="modal">
+        {/* ===== SCREEN 1: scrBooking ===== */}
+        {dScreen === 'scrBooking' && (
+          <section className="scr active" id="scrBooking">
+            <div className="m-head">
+              <button type="button" className="m-back" onClick={onClose} aria-label="Close">
+                <ChevronLeft size={18}/>
+              </button>
+              <div>
+                <h2>{t('createBooking')}</h2>
+                <div className="sub">{pkgName} • {totalPrice.toLocaleString()} ETB</div>
               </div>
-              {signature && (
-                <button
-                  type="button"
-                  className="vbf-sig-clear"
-                  onClick={() => { sigPadRef.current?.clear(); setSignature(null); }}
-                >
-                  {activeLang === 'am' ? 'አጥፋ' : 'Clear'}
+              <div className="m-head-actions">
+                <button type="button" className="m-icon-btn" onClick={() => handleSelectLang(activeLang === 'am' ? 'en' : 'am')} title="Language">
+                  <Globe size={18}/>
                 </button>
-              )}
-            </div>
-
-            {/* Signature Canvas */}
-            <div className="vbf-sig-canvas-container">
-              <VeloSigPad
-                ref={sigPadRef}
-                onSign={setSignature}
-                onClear={() => setSignature(null)}
-              />
-            </div>
-
-            {/* Signed / Hint feedback */}
-            {signature ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 16px', background: '#f0fdf4', borderTop: '1px solid #bbf7d0' }}>
-                <Check size={13} style={{ color: '#16a34a', flexShrink: 0 }} />
-                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#16a34a' }}>
-                  {activeLang === 'am' ? 'ፊርማ ተቀባይነት አለው ✓' : 'Signature captured ✓'}
-                </span>
+                <button type="button" className="m-close" onClick={onClose} aria-label="Close">
+                  <X size={18}/>
+                </button>
               </div>
-            ) : (
-              <p style={{ margin: 0, padding: '4px 16px 8px', fontSize: '0.74rem', color: '#b5aba0', fontStyle: 'italic' }}>
-                {activeLang === 'am' ? 'ከላይ ባለው ሳጥን ውስጥ ፊርማዎን ይሳሉ' : 'Draw your signature in the pad above'}
-              </p>
-            )}
-
-            {/* 50% Deposit Reminder */}
-            <div style={{ margin: '8px 16px', padding: '10px 12px', background: '#fef9ef', borderRadius: '10px', border: '1px solid #f0e0aa' }}>
-              <p style={{ fontSize: '0.78rem', margin: 0, lineHeight: 1.5, color: '#5a4e3a' }}>
-                <span style={{ fontWeight: 700, color: '#b89248' }}>
-                  {activeLang === 'am' ? '50% ቅድሚያ ክፍያ:' : '50% Advance Deposit:'}
-                </span>{' '}
-                <strong style={{ fontFamily: 'DM Mono, monospace', color: '#1a1614' }}>{deposit.toLocaleString()} ETB</strong>
-                {'  ·  '}
-                <span style={{ color: '#7a6e66' }}>{activeLang === 'am' ? 'ቀሪ:' : 'Balance:'}</span>{' '}
-                <strong>{remaining.toLocaleString()} ETB</strong>
-              </p>
             </div>
 
-            {/* Terms Checkbox */}
-            <label className="vbf-terms-row" style={{ padding: '6px 16px 14px' }}>
-              <input
-                type="checkbox"
-                checked={termsAccepted}
-                onChange={e => setTerms(e.target.checked)}
-                className="vbf-terms-check"
-              />
-              <span className="vbf-terms-text">
-                {activeLang === 'am' ? (
-                  <>የአገልግሎት <span className="vbf-terms-link">ውሎችንና ስምምነቶችን</span> አንብቤ ተስማምቻለሁ</>
-                ) : (
-                  <>I have read and agree to the <span className="vbf-terms-link">terms and conditions</span></>
-                )}
-              </span>
-            </label>
-          </div>
-        </div>
-
-        {error && <p className="vbf-error" style={{ padding: '0 20px 8px', marginTop: 0 }}>{error}</p>}
-
-        <div className="vbf-cta-wrap">
-          <button
-            type="button"
-            className="vbf-cta-btn"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
-            <span>{submitting ? 'Submitting…' : (activeLang === 'am' ? 'አረጋግጥ እና አስረክብ' : 'Confirm & Submit')}</span>
-            <ArrowRight size={18} />
-          </button>
-        </div>
-      </div>
-    );
-  };
-
-  // ── STEP 4: Confirmation ──
-  const renderStep4 = () => (
-    <div className="vbf-step-scroll">
-      <div className="vbf-confirm-body">
-        <div className="vbf-confirm-check"><Check size={40} strokeWidth={3}/></div>
-        <h2 className="vbf-confirm-title">Booking Confirmed!</h2>
-        <p className="vbf-confirm-sub">Your booking has been received and your date is reserved pending verification.</p>
-        <div className="vbf-confirm-card">
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Package</span><span className="vbf-confirm-val">{createdOrder?.packageName || pkgName}</span></div>
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Client</span><span className="vbf-confirm-val">{form.name}</span></div>
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Phone</span><span className="vbf-confirm-val">{form.phone}</span></div>
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Event Date</span><span className="vbf-confirm-val">{form.date}</span></div>
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Deposit</span><span className="vbf-confirm-val vbf-confirm-green">{deposit.toLocaleString()} ETB</span></div>
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Balance Due</span><span className="vbf-confirm-val">{remaining.toLocaleString()} ETB</span></div>
-          <div className="vbf-confirm-row"><span className="vbf-confirm-lbl">Reference</span><span className="vbf-confirm-ref">{createdOrder?.id || orderId}</span></div>
-        </div>
-        <div className="vbf-confirm-actions">
-          <button
-            type="button"
-            className="vbf-cta-btn"
-            onClick={() => setStep(5)}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            <span>{activeLang === 'am' ? 'ክፍያ ይፈጽሙ እና ይፋዊ ደረሰኝ ይውሰዱ' : activeLang === 'om' ? 'Kaffaltii Kaffaluun Nagahee Fudhadhaa' : 'Proceed to Payment & Receipt'}</span>
-            <ArrowRight size={17}/>
-          </button>
-          <a
-            className="vbf-telegram-sub-btn"
-            href={`https://t.me/HoopStudioSystemBot?start=order_${createdOrder?.id || orderId}`}
-            target="_blank" rel="noopener noreferrer"
-            style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            <Send size={16}/> {activeLang === 'am' ? 'በቴሌግራም ቦት ይመልከቱ' : 'View in Telegram Bot'}
-          </a>
-          <button type="button" className="vbf-confirm-close" onClick={onClose}>
-            {activeLang === 'am' ? 'ተከናውኗል (ዝጋ)' : activeLang === 'om' ? 'Xumurameera' : 'Done'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ── STEP 5: Payment Method Selection matching Image 2 ──
-  const renderStep5 = () => {
-    const telePhone = serverPaymentAccounts?.telebirr?.phone || serverPaymentAccounts?.telebirr?.accountNumber || '0995270894';
-    const teleName = serverPaymentAccounts?.telebirr?.accountName || 'Dagmawi Amare (HOPE Studio)';
-    const teleDesc = activeLang === 'am'
-      ? (serverPaymentAccounts?.telebirr?.instructionsAm || 'በቴሌብር መተግበሪያ ወይም በ *127# ይላኩ')
-      : (serverPaymentAccounts?.telebirr?.instructionsEn || 'Send via Telebirr App or *127#');
-
-    const cbeAcc = serverPaymentAccounts?.cbe?.accountNumber || '1000123456789';
-    const cbeName = serverPaymentAccounts?.cbe?.accountName || 'HOPE Photo & Velo Studio';
-    const cbeDesc = activeLang === 'am'
-      ? (serverPaymentAccounts?.cbe?.instructionsAm || 'በ CBE Birr ወይም በሞባይል ባንኪንግ')
-      : (serverPaymentAccounts?.cbe?.instructionsEn || 'Via CBE Birr or Mobile Banking');
-
-    const paymentMethods = [
-      {
-        id: 'telebirr',
-        title: 'Telebirr (ቴሌብር)',
-        tag: activeLang === 'am' ? 'ፈጣን / ተመራጭ' : 'Fast / Recommended',
-        accountNumber: telePhone,
-        accountName: teleName,
-        desc: teleDesc
-      },
-      {
-        id: 'cbe',
-        title: 'Commercial Bank of Ethiopia (CBE)',
-        tag: activeLang === 'am' ? 'የኢትዮጵያ ንግድ ባንክ' : 'CBE Mobile',
-        accountNumber: cbeAcc,
-        accountName: cbeName,
-        desc: cbeDesc
-      },
-      {
-        id: 'awash',
-        title: 'Awash Bank (አዋሽ ባንክ)',
-        tag: activeLang === 'am' ? 'አዋሽ ባንክ' : 'Awash Bank',
-        accountNumber: serverPaymentAccounts?.awash?.accountNumber || '0132087654321',
-        accountName: serverPaymentAccounts?.awash?.accountName || 'HOPE Pictures Studio',
-        desc: activeLang === 'am' ? 'በአዋሽ ሞባይል ባንኪንግ' : 'Via Awash Mobile Banking'
-      },
-      {
-        id: 'cash',
-        title: activeLang === 'am' ? 'በአካል ስቱዲዮ መክፈል (Cash)' : 'Pay Cash at Studio',
-        tag: activeLang === 'am' ? 'ስቱዲዮ ቢሮ' : 'Studio Office',
-        accountNumber: 'Addis Ababa, Hayahulet',
-        accountName: 'Tigat Building, 3rd Floor',
-        desc: activeLang === 'am' ? 'በስራ ሰዓት ወደ ስቱዲዮአችን በመምጣት መክፈል ይችላሉ' : 'Visit our studio during business hours to pay in cash'
-      }
-    ];
-
-    return (
-      <div className="vbf-step-scroll">
-        <div className="vbf-step5-body">
-          <div className="vbf-step5-header">
-            <h2 className="vbf-step5-title">
-              {activeLang === 'am' ? 'የክፍያ አማራጭ ይምረጡ' : 'Select Payment Method'}
-            </h2>
-            <p className="vbf-step5-sub">
-              {activeLang === 'am'
-                ? 'የ 50% ቅድመ-ክፍያ በመፈጸም ቀኑን ያረጋግጡ እና ይፋዊ ደረሰኝዎን ይውሰዱ።'
-                : 'Pay 50% deposit to secure your event date & generate your official receipt.'}
-            </p>
-          </div>
-
-          {/* Amount Due Summary Card matching Image 2 */}
-          <div className="vbf-pay-amount-card">
-            <div className="vbf-pay-amount-row">
-              <span className="vbf-pay-amount-lbl">
-                {activeLang === 'am' ? 'የጥቅሉ ጠቅላላ ዋጋ' : 'Total Package Price'}
-              </span>
-              <span className="vbf-pay-amount-val">{totalPrice.toLocaleString()} ETB</span>
-            </div>
-            <div className="vbf-pay-amount-row vbf-pay-deposit-row">
-              <span className="vbf-pay-amount-lbl">
-                {activeLang === 'am' ? 'አሁን የሚከፈል 50% ቅድመ-ክፍያ' : '50% Upfront Deposit (Due Now)'}
-              </span>
-              <span className="vbf-pay-deposit-val">{deposit.toLocaleString()} ETB</span>
-            </div>
-            <div className="vbf-pay-amount-row">
-              <span className="vbf-pay-amount-lbl">
-                {activeLang === 'am' ? 'ቀሪ ክፍያ (በቀረጻው ቀን)' : 'Remaining Balance (On Event Day)'}
-              </span>
-              <span className="vbf-pay-amount-val">{remaining.toLocaleString()} ETB</span>
-            </div>
-          </div>
-
-          {/* Payment Method Cards matching Image 2 */}
-          <div className="vbf-pay-methods-list">
-            {paymentMethods.map(m => {
-              const isSelected = payMethod === m.id;
-              const isCopied = copyFeedback === m.id;
-
-              return (
-                <div
-                  key={m.id}
-                  className={`vbf-pay-method-card ${isSelected ? 'selected' : ''}`}
-                  onClick={() => setPayMethod(m.id)}
-                >
-                  <div className="vbf-pay-method-top">
-                    <div className="vbf-pay-radio-wrap">
-                      <div className={`vbf-pay-radio ${isSelected ? 'checked' : ''}`} />
-                      <div>
-                        <div className="vbf-pay-title">{m.title}</div>
-                        <div className="vbf-pay-desc">{m.desc}</div>
-                      </div>
-                    </div>
-                    {m.tag && <span className="vbf-pay-tag">{m.tag}</span>}
+            <div className="m-body book-grid">
+              {/* Left Column: Event details, hero banner, deliverables */}
+              <div>
+                <div className="panel">
+                  <div className="panel-head-row">
+                    <h3 className="panel-title">{t('evtDetails')}</h3>
+                    <span className="panel-pill">{t('studioPackage')}</span>
                   </div>
 
-                  {/* Account Details & One-Click Copy */}
-                  <div className="vbf-pay-acc-box">
-                    <div className="vbf-pay-acc-info">
-                      <div className="vbf-pay-acc-num">{m.accountNumber}</div>
-                      <div className="vbf-pay-acc-name">{m.accountName}</div>
+                  <div className="pkg-hero-banner" style={{ backgroundImage: `url('${images[0]}')` }}>
+                    <div className="pkg-hero-content">
+                      <div className="pkg-hero-top">
+                        <span className="badge-best">
+                          <Crown size={13} style={{ color: '#e31e24' }}/>
+                          <span>{t('bestValue')}</span>
+                        </span>
+                        <span className="pkg-hero-pill">{t('studioPackage')}</span>
+                      </div>
+                      <h2 className="pkg-hero-title">{pkgName}</h2>
+                      <p className="pkg-hero-desc">{t('pkgDesc')}</p>
+                      <div className="pkg-hero-price-wrap">
+                        <span className="pkg-hero-price">{totalPrice.toLocaleString()}</span>
+                        <span className="pkg-hero-curr">ETB</span>
+                      </div>
                     </div>
-                    {m.id !== 'cash' && (
-                      <button
-                        type="button"
-                        className={`vbf-pay-copy-btn ${isCopied ? 'copied' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleCopyAccount(m.accountNumber, m.id);
-                        }}
-                      >
-                        {isCopied ? (
-                          <>
-                            <Check size={14} />
-                            <span>{activeLang === 'am' ? 'ተቀድቷል' : 'Copied'}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy size={14} />
-                            <span>{activeLang === 'am' ? 'ቅዳ' : 'Copy'}</span>
-                          </>
-                        )}
+                  </div>
+
+                  <h3 className="panel-title" style={{ marginTop: '22px' }}>{t('whatsIncluded')}</h3>
+                  <div className="inc-grid">
+                    <div className="inc"><Camera size={22}/><span>{t('photography')}</span></div>
+                    <div className="inc"><Film size={22}/><span>{t('videography')}</span></div>
+                    <div className="inc"><Users size={22}/><span>{t('proTeam')}</span></div>
+                    <div className="inc"><ImageIcon size={22}/><span>{t('hiOutput')}</span></div>
+                  </div>
+
+                  <div className="pkg-checklist">
+                    <div className="pkg-check-head">
+                      <Check size={18} strokeWidth={2.5}/>
+                      <span>{t('pkgIncludedTitle')}</span>
+                    </div>
+                    <ul className="checklist">
+                      {deliverables.map((item, idx) => (
+                        <li key={idx}>
+                          <Check size={16} strokeWidth={2.4}/>
+                          <span>{item.replace(/^•\s*/, '')}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Calendar & Contact Form */}
+              <div className="col-right">
+                <VeloCalendar
+                  value={form.date}
+                  onChange={d => setForm(f => ({ ...f, date: d }))}
+                  blackoutDates={blackoutDates}
+                  bookedDates={bookedDates}
+                  lang={activeLang}
+                />
+
+                <h3 className="panel-title" style={{ marginTop: '20px' }}>{t('contactDetails')}</h3>
+                <div className="field">
+                  <User size={16}/>
+                  <input required placeholder={t('fullName')} name="name" value={form.name} onChange={update}/>
+                </div>
+                <div className="field">
+                  <Phone size={16}/>
+                  <input required type="tel" placeholder={t('phonePh')} name="phone" value={form.phone} onChange={update}/>
+                </div>
+                <div className="field">
+                  <Globe size={16}/>
+                  <input type="email" placeholder={t('emailPh')} name="email" value={form.email} onChange={update}/>
+                </div>
+                <div className="field">
+                  <MapPin size={16}/>
+                  <input placeholder="Addis Ababa" name="location" value={form.location} onChange={update}/>
+                </div>
+
+                <div className="notes-label">
+                  <MessageCircle size={14}/>
+                  <span>{t('notesLbl')}</span>
+                  <span className="opt">{t('optLbl')}</span>
+                </div>
+                <div className="notes-wrap">
+                  <textarea
+                    placeholder={t('notesPh')}
+                    name="note"
+                    value={form.note}
+                    onChange={update}
+                    maxLength={500}
+                  />
+                  <span className="cnt">{(form.note || '').length}/500</span>
+                </div>
+
+                {error && <p style={{ color: '#e31e24', fontSize: '13px', marginTop: '8px', fontWeight: 600 }}>{error}</p>}
+              </div>
+            </div>
+
+            <div className="m-foot">
+              <button type="button" className="btn btn-ghost" onClick={onClose}>{t('cancel')}</button>
+              <button type="button" className="btn btn-red" onClick={handleProceedToSign}>
+                <span>{t('reviewSign')}</span>
+                <ArrowRight size={16}/>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* ===== SCREEN 2: scrSign ===== */}
+        {dScreen === 'scrSign' && (
+          <section className="scr active" id="scrSign">
+            <div className="m-head">
+              <button type="button" className="m-back" onClick={() => setDScreen('scrBooking')}>
+                <ChevronLeft size={18}/>
+              </button>
+              <div>
+                <h2>{t('signTitle')}</h2>
+                <div className="sub">{t('signSub')}</div>
+              </div>
+              <div className="m-head-actions">
+                <button type="button" className="m-close" onClick={onClose} aria-label="Close">
+                  <X size={18}/>
+                </button>
+              </div>
+            </div>
+
+            <div className="m-body sign-grid">
+              {/* Left Column: Official 4-page Contract Reader */}
+              <div className="doc-panel">
+                <div className="doc-top">
+                  <div className="pdf-badge"><FileText size={22} color="#fff"/></div>
+                  <div>
+                    <h4>{t('contractDocument')}</h4>
+                    <span className="fname">HOPE_Official_Agreement_2026.pdf • 4 Pages</span>
+                  </div>
+                  <button type="button" className="expand-btn" onClick={() => setContractFullscreen(true)} title="Expand Fullscreen">
+                    <Maximize2 size={16}/>
+                  </button>
+                </div>
+
+                <div className="doc-scroll">
+                  <DocumentStyleAgreement
+                    agreement={activeAgreement}
+                    clientName={form.name}
+                    phone={form.phone}
+                    eventDate={form.date}
+                    location={form.location || 'Addis Ababa'}
+                    totalPrice={totalPrice}
+                    depositAmount={deposit}
+                    remainingBalance={remaining}
+                    signature={signature}
+                    onSign={setSignature}
+                    onClearSignature={() => setSignature(null)}
+                    lang={activeLang}
+                    orderId={orderId}
+                    readOnly={true}
+                  />
+                </div>
+
+                <div className="pager">
+                  <button type="button" className="pg-btn" onClick={() => setContractPage(p => Math.max(1, p - 1))} disabled={contractPage === 1}>‹</button>
+                  <span className="pg-count">{contractPage} / 4</span>
+                  <button type="button" className="pg-btn" onClick={() => setContractPage(p => Math.min(4, p + 1))} disabled={contractPage === 4}>›</button>
+                </div>
+              </div>
+
+              {/* Right Column: Signature & Details Card */}
+              <div className="side">
+                <div className="card">
+                  <div className="card-head">
+                    <FileText size={18} color="#e31e24"/>
+                    <h4>{t('contractDetails')}</h4>
+                  </div>
+                  <div className="detail-rows">
+                    <div className="row"><span>{t('rowDoc')}</span><b>HOPE-{orderId}.pdf</b></div>
+                    <div className="row"><span>{t('rowClient')}</span><b>{form.name || '—'}</b></div>
+                    <div className="row"><span>{t('rowPhone')}</span><b>{form.phone || '—'}</b></div>
+                    <div className="row"><span>{t('rowDate')}</span><b>{form.date || '—'}</b></div>
+                  </div>
+                </div>
+
+                <div className="sig-card">
+                  <div className="card-head">
+                    <Edit2 size={16} color="#e31e24"/>
+                    <h4>{t('yourSignature')}</h4>
+                    {signature && (
+                      <button type="button" className="clear-btn" onClick={() => { sigPadRef.current?.clear(); setSignature(null); }}>
+                        {t('clear')}
                       </button>
                     )}
                   </div>
-                </div>
-              );
-            })}
-          </div>
 
-          {/* Payment Screenshot Upload */}
-          <div className="vbf-proof-upload-wrap">
-            <div className="vbf-proof-upload-lbl">
-              {activeLang === 'am' ? 'የክፍያ ስክሪን ሾት አያይዙ (አማራጭ)' : 'Attach Payment Screenshot (Optional)'}
+                  <VeloSigPad ref={sigPadRef} onSign={setSignature} onClear={() => setSignature(null)}/>
+
+                  <label className="terms">
+                    <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)}/>
+                    <p>{t('agreePre')}<a href="#terms" onClick={e => { e.preventDefault(); setContractFullscreen(true); }}>{t('agreeTerms')}</a></p>
+                  </label>
+                </div>
+
+                {error && <p style={{ color: '#e31e24', fontSize: '13px', fontWeight: 600 }}>{error}</p>}
+              </div>
             </div>
-            <input
-              ref={proofInputRef}
-              type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleProofFileChange}
-            />
-            {paymentProof ? (
-              <div className="vbf-proof-preview-row">
-                <img src={paymentProof} alt="proof" className="vbf-proof-thumb" />
-                <div className="vbf-proof-file-name">{proofFileName}</div>
-                <button
-                  type="button"
-                  className="vbf-proof-remove-btn"
-                  onClick={() => { setPaymentProof(null); setProofFileName(''); if (proofInputRef.current) proofInputRef.current.value = ''; }}
-                >
-                  <X size={14} />
+
+            <div className="m-foot">
+              <button type="button" className="btn btn-ghost" onClick={() => setDScreen('scrBooking')}>{t('cancel')}</button>
+              <button type="button" className="btn btn-red" onClick={handleSubmitBooking} disabled={submitting}>
+                <span>{submitting ? 'Submitting…' : t('confirmSubmit')}</span>
+                <ArrowRight size={16}/>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* ===== SCREEN 3: dPay1 (Summary) ===== */}
+        {dScreen === 'dPay1' && (
+          <section className="scr active" id="dPay1">
+            <div className="m-head">
+              <button type="button" className="m-back" onClick={() => setDScreen('scrSign')}>
+                <ChevronLeft size={18}/>
+              </button>
+              <div>
+                <h2>{t('payTitle')}</h2>
+                <div className="sub">{t('paySub')}</div>
+              </div>
+              <div className="m-head-actions">
+                <button type="button" className="m-close" onClick={onClose} aria-label="Close">
+                  <X size={18}/>
                 </button>
               </div>
-            ) : (
-              <button
-                type="button"
-                className="vbf-proof-upload-btn"
-                onClick={() => proofInputRef.current?.click()}
-              >
-                <Download size={16} style={{ transform: 'rotate(180deg)' }} />
-                <span>{activeLang === 'am' ? 'ፋይል ይምረጡ' : 'Choose File'}</span>
+            </div>
+
+            <div className="m-body">
+              <div className="dst">
+                <div className="dst-s now"><span className="dst-dot">1</span><span className="dst-l">{t('stPay')}</span></div>
+                <div className="dst-s"><span className="dst-dot">2</span><span className="dst-l">{t('stUp')}</span></div>
+                <div className="dst-s"><span className="dst-dot">3</span><span className="dst-l">{t('stWait')}</span></div>
+              </div>
+
+              <div className="verify-grid">
+                <div>
+                  <div className="pay-card">
+                    <div className="pay-head">
+                      <span className="ph-ic"><Clock size={18}/></span>
+                      <b>{t('bookingSummary')}</b>
+                      <span className="chip-studio">HOPE Studio</span>
+                    </div>
+                    <div className="prow"><span>{t('pkgLbl')}</span><b>{pkgName}</b></div>
+                    <div className="prow"><span>{t('clientLbl')}</span><b>{form.name}</b></div>
+                    <div className="prow"><span>{t('dateLbl')}</span><b>{form.date}</b></div>
+                    <div className="prow"><span>{t('depositLbl')}</span><b className="red">{deposit.toLocaleString()} ETB</b></div>
+                    <div className="prow"><span>{t('balanceLbl')}</span><b>{remaining.toLocaleString()} ETB</b></div>
+                    <div className="prow"><span>{t('refLbl')}</span><b className="red">{curRefId}</b></div>
+                  </div>
+                  <div className="total-card">
+                    <span className="ph-ic"><CreditCard size={18}/></span>
+                    <div><small>{t('totalLbl')}</small><b>{totalPrice.toLocaleString()} ETB</b></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="pay-card" style={{ marginTop: 0 }}>
+                    <div className="pay-head">
+                      <span className="ph-ic"><CreditCard size={18}/></span>
+                      <b>{t('payMTitle')}</b>
+                    </div>
+                    <p style={{ fontSize: '12.5px', color: '#7c828c', marginTop: '10px' }}>{t('payMSub')}</p>
+                    {paymentMethods.map(m => {
+                      const isSel = payMethod === m.id;
+                      const isCopied = copyFeedback === m.id;
+                      return (
+                        <div key={m.id} className={`pm-card${isSel ? ' sel' : ''}`} onClick={() => setPayMethod(m.id)}>
+                          <div className="pm-top">
+                            <span className={`pm-logo ${m.logoClass}`}>{m.letter}</span>
+                            <div><b>{m.title}</b><small>{m.sub}</small></div>
+                            <span className="pm-radio"/>
+                          </div>
+                          <div className="pm-acc">
+                            <div className="pm-acc-in">
+                              <span>
+                                <span className="acc-lbl">{m.lbl}</span>
+                                <span className="acc-num">{m.acc}</span>
+                              </span>
+                              {m.id !== 'cash' && (
+                                <button type="button" className="copy-btn" onClick={e => { e.stopPropagation(); handleCopy(m.acc, m.id); }} aria-label="Copy">
+                                  {isCopied ? <Check size={15}/> : <Copy size={15}/>}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="m-foot">
+              <button type="button" className="btn btn-ghost" onClick={onClose}>{t('cancel')}</button>
+              <button type="button" className="btn btn-red" onClick={() => setDScreen('dPay2')}>
+                <span>{t('toUpload')}</span>
+                <ArrowRight size={16}/>
               </button>
+            </div>
+          </section>
+        )}
+
+        {/* ===== SCREEN 4: dPay2 (Upload) ===== */}
+        {dScreen === 'dPay2' && (
+          <section className="scr active" id="dPay2">
+            <div className="m-head">
+              <button type="button" className="m-back" onClick={() => setDScreen('dPay1')}>
+                <ChevronLeft size={18}/>
+              </button>
+              <div>
+                <h2>{t('uploadTitle')}</h2>
+                <div className="sub">{t('uploadSub')}</div>
+              </div>
+              <div className="m-head-actions">
+                <button type="button" className="m-close" onClick={onClose} aria-label="Close">
+                  <X size={18}/>
+                </button>
+              </div>
+            </div>
+
+            <div className="m-body">
+              <div className="dst">
+                <div className="dst-s done"><span className="dst-dot"><Check size={13} strokeWidth={3}/></span><span className="dst-l">{t('stPay')}</span></div>
+                <div className="dst-s now"><span className="dst-dot">2</span><span className="dst-l">{t('stUp')}</span></div>
+                <div className="dst-s"><span className="dst-dot">3</span><span className="dst-l">{t('stWait')}</span></div>
+              </div>
+
+              <div className="payvia">
+                <span>{t('payVia')}</span> <b>{paymentMethods.find(m => m.id === payMethod)?.title || 'Telebirr'}</b>
+              </div>
+
+              <div
+                className={`up-zone${paymentProof ? ' has' : ''}`}
+                onClick={() => proofInputRef.current?.click()}
+                onDragOver={e => e.preventDefault()}
+                onDrop={e => {
+                  e.preventDefault();
+                  const f = e.dataTransfer.files?.[0];
+                  if (f) {
+                    setProofFileName(f.name);
+                    const r = new FileReader();
+                    r.onload = ev => setPaymentProof(ev.target.result);
+                    r.readAsDataURL(f);
+                  }
+                }}
+                style={{ maxWidth: '640px', margin: '18px auto 0' }}
+              >
+                <input ref={proofInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProofChange}/>
+                <div className="cloud"><Upload size={28}/></div>
+                {paymentProof ? (
+                  <>
+                    <img src={paymentProof} alt="Receipt preview" style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 10, objectFit: 'cover' }}/>
+                    <div className="up-file show">
+                      <Check size={14} strokeWidth={2.4}/>
+                      <span>{proofFileName || 'receipt_screenshot.png'}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <b>{t('tapUpload')}</b>
+                    <p>{t('dragText')}</p>
+                    <span className="fhint"><ImageIcon size={13}/><span>{t('fileHint')}</span></span>
+                  </>
+                )}
+              </div>
+
+              {paymentProof && (
+                <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                  <button type="button" className="btn btn-ghost" style={{ fontSize: '12px' }} onClick={() => { setPaymentProof(null); setProofFileName(''); }}>
+                    ✕ Remove Screenshot
+                  </button>
+                </div>
+              )}
+
+              <div className="info-card" style={{ maxWidth: '640px', margin: '16px auto 0' }}>
+                <ShieldCheck size={16} strokeWidth={2}/>
+                <span>{t('uploadNote')}</span>
+              </div>
+            </div>
+
+            <div className="m-foot">
+              <button type="button" className="btn btn-ghost" onClick={() => setDScreen('dPay1')}>{activeLang === 'am' ? 'ተመለስ' : 'Back'}</button>
+              <button type="button" className="btn btn-red" onClick={handleSubmitProof} disabled={submitProofLoading}>
+                <span>{submitProofLoading ? 'Submitting…' : t('submitShot')}</span>
+                <ArrowRight size={16}/>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* ===== SCREEN 5: dPayPending ===== */}
+        {dScreen === 'dPayPending' && (
+          <section className="scr active" id="dPayPending">
+            <div className="m-head">
+              <div>
+                <h2>{t('pendingTitle')}</h2>
+                <div className="sub">{t('pendingSub')}</div>
+              </div>
+              <div className="m-head-actions">
+                <button type="button" className="m-close" onClick={onClose} aria-label="Close">
+                  <X size={18}/>
+                </button>
+              </div>
+            </div>
+
+            <div className="m-body">
+              <div className="dst">
+                <div className="dst-s done"><span className="dst-dot"><Check size={13} strokeWidth={3}/></span><span className="dst-l">{t('stPay')}</span></div>
+                <div className="dst-s done"><span className="dst-dot"><Check size={13} strokeWidth={3}/></span><span className="dst-l">{t('stUp')}</span></div>
+                <div className="dst-s now"><span className="dst-dot">3</span><span className="dst-l">{t('stWait')}</span></div>
+              </div>
+
+              <div className="v2-pending-card">
+                <div className="v2-pending-circle"><Clock size={20} color="#fff"/></div>
+                <div className="v2-ptext">
+                  <h2>{t('pendingTitle')}</h2>
+                  <p>{t('pendingSub')}</p>
+                </div>
+              </div>
+
+              <div className="verify-grid" style={{ marginTop: '18px' }}>
+                <div>
+                  <div className="v2-card" style={{ marginTop: 0 }}>
+                    <div className="v2-card-head">
+                      <span className="v2-ic-box amber"><Clock size={18}/></span>
+                      <b>{t('bookingSummary')}</b>
+                    </div>
+                    <div className="v2-rows">
+                      <div className="v2-row"><span>{t('pkgLbl')}</span><b>{pkgName}</b></div>
+                      <div className="v2-row"><span>{t('clientLbl')}</span><b>{form.name}</b></div>
+                      <div className="v2-row"><span>{t('dateLbl')}</span><b>{form.date}</b></div>
+                      <div className="v2-row"><span>{t('depositLbl')}</span><b className="v2-amber">{deposit.toLocaleString()} ETB</b></div>
+                      <div className="v2-row"><span>Reference</span><b className="v2-red">{curRefId}</b></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="v2-card v2-qr-card" style={{ marginTop: 0 }}>
+                    <div className="v2-qr-wrap">
+                      <QRCode value={trackingUrl} size={92}/>
+                    </div>
+                    <div className="v2-qr-info">
+                      <b className="v2-act-title">{t('trackTitle')}</b>
+                      <p className="v2-act-desc">{t('trackDesc')}</p>
+                      <div className="v2-pill-row">
+                        <span className="ref-pill">
+                          {curRefId}
+                          <button type="button" onClick={() => handleCopy(curRefId, 'ref-dpend')} aria-label="Copy">
+                            {copyFeedback === 'ref-dpend' ? <Check size={15}/> : <Copy size={15}/>}
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="v2-btn-group">
+                    <button type="button" className="btn-open-agr" onClick={() => setContractFullscreen(true)}>
+                      <FileText size={17}/>
+                      <span>{t('openAgreement')}</span>
+                    </button>
+                    <button type="button" className="vbf-rc-download-btn" onClick={handleDownloadReceiptCard} disabled={downloadingCard}>
+                      <Download size={17}/>
+                      <span>{downloadingCard ? 'Generating…' : t('downloadCard')}</span>
+                    </button>
+                    <button type="button" className="btn-simulate-qr" onClick={() => setDScreen('dPayVerified')}>
+                      <ShieldCheck size={17}/>
+                      <span>{t('viewReceipt')}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="m-foot">
+              <button type="button" className="btn btn-ghost" onClick={onClose}>{t('cancel')}</button>
+              <a className="btn btn-red" href={`/?order=${curRefId}`} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                <ExternalLink size={16}/>
+                <span>{t('liveOrderPage')}</span>
+              </a>
+            </div>
+          </section>
+        )}
+
+        {/* ===== SCREEN 6: dPayVerified ===== */}
+        {dScreen === 'dPayVerified' && (
+          <section className="scr active" id="dPayVerified">
+            <div className="m-head">
+              <div>
+                <h2>{t('verifiedTitle')}</h2>
+                <div className="sub">{t('verifiedSub')}</div>
+              </div>
+              <div className="m-head-actions">
+                <button type="button" className="m-close" onClick={onClose} aria-label="Close">
+                  <X size={18}/>
+                </button>
+              </div>
+            </div>
+
+            <div className="m-body">
+              <div className="v2-verified-card">
+                <div className="v2-check-circle"><Check size={22} color="#fff" strokeWidth={3}/></div>
+                <div className="v2-vtext">
+                  <h2>{t('verifiedTitle')}</h2>
+                  <p>{t('verifiedSub')}</p>
+                </div>
+              </div>
+
+              <div className="verify-grid" style={{ marginTop: '18px' }}>
+                <div>
+                  <div className="v2-card" style={{ marginTop: 0 }}>
+                    <div className="v2-card-head">
+                      <span className="v2-ic-box green"><CheckCircle size={18}/></span>
+                      <b>{t('bookingSummary')}</b>
+                    </div>
+                    <div className="v2-rows">
+                      <div className="v2-row"><span>{t('pkgLbl')}</span><b>{pkgName}</b></div>
+                      <div className="v2-row"><span>{t('clientLbl')}</span><b>{form.name}</b></div>
+                      <div className="v2-row"><span>{t('dateLbl')}</span><b>{form.date}</b></div>
+                      <div className="v2-row"><span>{t('depositLbl')}</span><b className="v2-green">{deposit.toLocaleString()} ETB</b></div>
+                      <div className="v2-row"><span>Reference</span><b className="v2-red">{curRefId}</b></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="v2-card v2-qr-card" style={{ marginTop: 0 }}>
+                    <div className="v2-qr-wrap">
+                      <QRCode value={trackingUrl} size={92}/>
+                    </div>
+                    <div className="v2-qr-info">
+                      <b className="v2-act-title">{t('trackTitle')}</b>
+                      <p className="v2-act-desc">{t('trackDesc')}</p>
+                      <div className="v2-pill-row">
+                        <span className="ref-pill">
+                          {curRefId}
+                          <button type="button" onClick={() => handleCopy(curRefId, 'ref-dver')} aria-label="Copy">
+                            {copyFeedback === 'ref-dver' ? <Check size={15}/> : <Copy size={15}/>}
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="v2-btn-group">
+                    <button type="button" className="btn-open-agr" onClick={() => setContractFullscreen(true)}>
+                      <FileText size={17}/>
+                      <span>{t('openAgreement')}</span>
+                    </button>
+                    <button type="button" className="vbf-rc-download-btn" onClick={handleDownloadReceiptCard} disabled={downloadingCard}>
+                      <Download size={17}/>
+                      <span>{downloadingCard ? 'Generating…' : t('downloadCard')}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="m-foot">
+              <button type="button" className="btn btn-ghost" onClick={onClose}>{t('cancel')}</button>
+              <button type="button" className="btn btn-red" onClick={onClose}>
+                <Home size={16}/>
+                <span>{t('backHome')}</span>
+              </button>
+            </div>
+          </section>
+        )}
+      </div>
+    </div>
+  );
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // MOBILE LAYOUT RENDERING (Exact Hope UI 8-step mobile app wizard)
+  // ─────────────────────────────────────────────────────────────────────────
+  const renderMobileApp = () => (
+    <div className="mobile-app" style={{ display: 'block' }}>
+      {/* Mobile Sticky Header */}
+      <div className="m-head">
+        <button
+          type="button"
+          className="m-circ"
+          onClick={() => {
+            if (step > 1) setStep(s => s - 1);
+            else onClose();
+          }}
+          aria-label="Back"
+        >
+          <ChevronLeft size={18}/>
+        </button>
+        <div className="m-logo">
+          <b>HOPE</b>
+          <span>PHOTO &amp; EVENT STUDIO</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span className="m-chip">{step}/8</span>
+          <button type="button" className="m-circ" onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu" style={{ width: '38px', height: '38px', boxShadow: 'none', border: '1px solid #e7e5e1' }}>
+            <Menu size={17}/>
+          </button>
+        </div>
+      </div>
+
+      {/* Hamburger Drawer */}
+      {menuOpen && (
+        <div className="menu-scrim open" onClick={() => setMenuOpen(false)}>
+          <div className="m-menu open" onClick={e => e.stopPropagation()}>
+            <button type="button" className="mm-item" onClick={() => handleSelectLang(activeLang === 'am' ? 'en' : 'am')}>
+              <div className="mm-ic"><Globe size={18}/></div>
+              <div><b>{activeLang === 'am' ? 'Switch to English' : 'ቋንቋ ወደ አማርኛ ቀይር'}</b><small>{activeLang === 'am' ? 'English' : 'አማርኛ'}</small></div>
+            </button>
+            <a href="https://t.me/HoopStudioSystemBot" target="_blank" rel="noopener noreferrer" className="mm-item">
+              <div className="mm-ic"><Send size={18}/></div>
+              <div><b>Telegram Bot</b><small>@HoopStudioSystemBot</small></div>
+            </a>
+            <button type="button" className="mm-item" onClick={() => { setMenuOpen(false); onClose(); }}>
+              <div className="mm-ic"><X size={18}/></div>
+              <div><b>{t('backHome')}</b><small>Exit Booking</small></div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 1: EVENT */}
+      {step === 1 && (
+        <section className="m-scr active">
+          <div className="m-hero">
+            <div className="h-track" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
+              {images.map((img, i) => (
+                <div key={i} className="h-slide" style={{ background: `url('${img}') center 35%/cover no-repeat` }}>
+                  <div className="hero-cap">CAPTURE<br/>YOUR SPECIAL<br/>MOMENTS</div>
+                </div>
+              ))}
+            </div>
+            {images.length > 1 && (
+              <div className="h-dots">
+                {images.map((_, i) => (
+                  <span key={i} className={i === slideIdx ? 'on' : ''} onClick={() => setSlideIdx(i)}/>
+                ))}
+              </div>
             )}
           </div>
 
-          <div className="vbf-cta-wrap" style={{ padding: '8px 0 16px' }}>
-            <button
-              type="button"
-              className="vbf-cta-btn"
-              onClick={handleConfirmPayment}
-              disabled={updatingPay}
+          <div className="m-sheet">
+            <span className="badge-best">
+              <Crown size={12} color="#e31e24"/>
+              <span>{t('bestValue')}</span>
+            </span>
+            <h1>{pkgName}</h1>
+            <p className="m-sub">{t('pkgDesc')}</p>
+            <div className="price">{totalPrice.toLocaleString()} <small>ETB</small></div>
+
+            <div className="m-icons">
+              <div className="inc"><Camera size={22}/><span>{t('photography')}</span></div>
+              <div className="inc"><Film size={22}/><span>{t('videography')}</span></div>
+              <div className="inc"><Users size={22}/><span>{t('proTeam')}</span></div>
+              <div className="inc"><ImageIcon size={22}/><span>{t('hiOutput')}</span></div>
+            </div>
+
+            <div className="pkg-checklist">
+              <div className="pkg-check-head">
+                <Check size={18} strokeWidth={2.5}/>
+                <span>{t('pkgIncludedTitle')}</span>
+              </div>
+              <ul className="checklist">
+                {deliverables.map((d, i) => (
+                  <li key={i}>
+                    <Check size={16} strokeWidth={2.4}/>
+                    <span>{d.replace(/^•\s*/, '')}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <button type="button" className="m-cta" onClick={() => setStep(2)}>
+              <span>{t('continueDate')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 2: DATE & CONTACT */}
+      {step === 2 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <h1>{t('selectDate')}</h1>
+            <p className="m-sub">{t('chooseDate')}</p>
+
+            <VeloCalendar
+              value={form.date}
+              onChange={d => setForm(f => ({ ...f, date: d }))}
+              blackoutDates={blackoutDates}
+              bookedDates={bookedDates}
+              lang={activeLang}
+            />
+
+            <h2 className="m-h2">{t('contactDetails')}</h2>
+            <div className="field"><User size={16}/><input placeholder={t('fullName')} name="name" value={form.name} onChange={update}/></div>
+            <div className="field"><Phone size={16}/><input type="tel" placeholder={t('phonePh')} name="phone" value={form.phone} onChange={update}/></div>
+            <div className="field"><Globe size={16}/><input type="email" placeholder={t('emailPh')} name="email" value={form.email} onChange={update}/></div>
+            <div className="field"><MapPin size={16}/><input placeholder="Addis Ababa" name="location" value={form.location} onChange={update}/></div>
+
+            <div className="notes-label"><MessageCircle size={14}/><span>{t('notesLbl')}</span></div>
+            <div className="notes-wrap">
+              <textarea placeholder={t('notesPh')} name="note" value={form.note} onChange={update} maxLength={500}/>
+              <span className="cnt">{(form.note || '').length}/500</span>
+            </div>
+
+            {error && <p style={{ color: '#e31e24', fontSize: '13px', marginTop: '8px' }}>{error}</p>}
+
+            <button type="button" className="m-cta" onClick={handleProceedToSign}>
+              <span>{t('reviewSign')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 3: SIGN */}
+      {step === 3 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <h1>{t('signTitle')}</h1>
+            <p className="m-sub">{t('signSub')}</p>
+
+            <div className="doc-trigger-card">
+              <div className="doc-trigger-top">
+                <div className="pdf-badge"><FileText size={22} color="#fff"/></div>
+                <div className="doc-trigger-info">
+                  <h4>{t('contractDocument')}</h4>
+                  <span className="fname">HOPE_Official_Agreement_2026.pdf</span>
+                </div>
+                <button type="button" className="btn-view-doc" onClick={() => setContractFullscreen(true)}>
+                  <Maximize2 size={13}/>
+                  <span>{activeLang === 'am' ? 'ሙሉ ውሉን ክፈት' : 'View Doc'}</span>
+                </button>
+              </div>
+            </div>
+
+            <h2 className="m-h2">{t('yourSignature')}</h2>
+            <div className="sig-card">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: '#6b7280' }}>{t('tapSign')}</span>
+                {signature && (
+                  <button type="button" className="clear-btn" onClick={() => { sigPadRef.current?.clear(); setSignature(null); }}>
+                    {t('clear')}
+                  </button>
+                )}
+              </div>
+              <VeloSigPad ref={sigPadRef} onSign={setSignature} onClear={() => setSignature(null)}/>
+              <label className="terms">
+                <input type="checkbox" checked={termsAccepted} onChange={e => setTerms(e.target.checked)}/>
+                <p>{t('agreePre')}<a href="#terms" onClick={e => { e.preventDefault(); setContractFullscreen(true); }}>{t('agreeTerms')}</a></p>
+              </label>
+            </div>
+
+            {error && <p style={{ color: '#e31e24', fontSize: '13px', marginTop: '8px' }}>{error}</p>}
+
+            <button type="button" className="m-cta" onClick={handleSubmitBooking} disabled={submitting}>
+              <span>{submitting ? 'Submitting…' : t('confirmSubmit')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 4: SUMMARY */}
+      {step === 4 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <div className="recv-ic"><Check size={40} color="#e31e24" strokeWidth={3}/></div>
+            <h1 className="recv-title">{t('payTitle')}</h1>
+            <p className="recv-msg">{t('paySub')}</p>
+
+            <div className="pay-card" style={{ marginTop: '20px' }}>
+              <div className="pay-head"><Clock size={18}/><b>{t('bookingSummary')}</b></div>
+              <div className="prow"><span>{t('pkgLbl')}</span><b>{pkgName}</b></div>
+              <div className="prow"><span>{t('clientLbl')}</span><b>{form.name}</b></div>
+              <div className="prow"><span>{t('dateLbl')}</span><b>{form.date}</b></div>
+              <div className="prow"><span>{t('depositLbl')}</span><b className="red">{deposit.toLocaleString()} ETB</b></div>
+              <div className="prow"><span>{t('balanceLbl')}</span><b>{remaining.toLocaleString()} ETB</b></div>
+              <div className="prow"><span>{t('refLbl')}</span><b className="red">{curRefId}</b></div>
+            </div>
+
+            <div className="total-card">
+              <CreditCard size={20}/>
+              <div><small>{t('totalLbl')}</small><b>{totalPrice.toLocaleString()} ETB</b></div>
+            </div>
+
+            <button type="button" className="m-cta" onClick={() => setStep(5)}>
+              <span>{t('continuePayment')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 5: PAYMENT METHODS */}
+      {step === 5 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <h1>{t('payMTitle')}</h1>
+            <p className="m-sub">{t('payMSub')}</p>
+
+            <div className="pay-card" style={{ marginTop: '16px' }}>
+              {paymentMethods.map(m => {
+                const isSel = payMethod === m.id;
+                const isCopied = copyFeedback === m.id;
+                return (
+                  <div key={m.id} className={`pm-card${isSel ? ' sel' : ''}`} onClick={() => setPayMethod(m.id)}>
+                    <div className="pm-top">
+                      <span className={`pm-logo ${m.logoClass}`}>{m.letter}</span>
+                      <div><b>{m.title}</b><small>{m.sub}</small></div>
+                      <span className="pm-radio"/>
+                    </div>
+                    <div className="pm-acc">
+                      <div className="pm-acc-in">
+                        <span>
+                          <span className="acc-lbl">{m.lbl}</span>
+                          <span className="acc-num">{m.acc}</span>
+                        </span>
+                        {m.id !== 'cash' && (
+                          <button type="button" className="copy-btn" onClick={e => { e.stopPropagation(); handleCopy(m.acc, m.id); }} aria-label="Copy">
+                            {isCopied ? <Check size={15}/> : <Copy size={15}/>}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button type="button" className="m-cta" onClick={() => setStep(6)}>
+              <span>{t('toUpload')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* STEP 6: UPLOAD */}
+      {step === 6 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <h1>{t('uploadTitle')}</h1>
+            <p className="m-sub">{t('uploadSub')}</p>
+
+            <div
+              className={`up-zone${paymentProof ? ' has' : ''}`}
+              onClick={() => proofInputRef.current?.click()}
+              style={{ marginTop: '16px' }}
             >
-              {updatingPay ? (
-                <span>{activeLang === 'am' ? 'ደረሰኝ በማዘጋጀት ላይ…' : 'Generating Receipt…'}</span>
+              <input ref={proofInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleProofChange}/>
+              <div className="cloud"><Upload size={28}/></div>
+              {paymentProof ? (
+                <>
+                  <img src={paymentProof} alt="Proof preview" style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 10, objectFit: 'cover' }}/>
+                  <div className="up-file show"><Check size={14}/><span>{proofFileName || 'receipt.png'}</span></div>
+                </>
               ) : (
                 <>
-                  <span>{activeLang === 'am' ? 'ክፍያውን አረጋግጥ እና ይፋዊ ደረሰኝ ውሰድ' : 'Confirm Payment & Generate Receipt'}</span>
-                  <ArrowRight size={18} />
+                  <b>{t('tapUpload')}</b>
+                  <p>{t('dragText')}</p>
+                  <span className="fhint"><ImageIcon size={13}/><span>{t('fileHint')}</span></span>
                 </>
               )}
+            </div>
+
+            {paymentProof && (
+              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <button type="button" className="btn btn-ghost" style={{ fontSize: '12px' }} onClick={() => { setPaymentProof(null); setProofFileName(''); }}>
+                  ✕ Remove Screenshot
+                </button>
+              </div>
+            )}
+
+            <div className="info-card">
+              <ShieldCheck size={16}/>
+              <span>{t('uploadNote')}</span>
+            </div>
+
+            <button type="button" className="m-cta" onClick={handleSubmitProof} disabled={submitProofLoading}>
+              <span>{submitProofLoading ? 'Submitting…' : t('submitShot')}</span>
+              <ArrowRight size={16}/>
             </button>
           </div>
-        </div>
-      </div>
-    );
-  };
+        </section>
+      )}
 
-  // ── STEP 6: Official Receipt with Scannable QR Code ──
-  const renderStep6 = () => {
-    const curRefId = createdOrder?.id || orderId;
-    const trackingUrl = `${window.location.origin}/?order=${curRefId}`;
-
-    return (
-      <div className="vbf-step-scroll">
-        <div className="vbf-receipt-view">
-          {/* Printable Official Receipt Card */}
-          <div className="vbf-receipt-card" id="velo-official-receipt">
-            {/* Receipt Header */}
-            <div className="vbf-rc-header">
-              <div className="vbf-rc-brand">HOPE</div>
-              <div className="vbf-rc-subtitle">PHOTO &amp; VELO STUDIO</div>
-              <div className="vbf-rc-contact">+251 910 52 69 62 • Addis Ababa, Tigat Building</div>
-              <div className="vbf-rc-line-double" />
-              <div className="vbf-rc-type">OFFICIAL CLIENT DIGITAL RECEIPT</div>
-            </div>
-
-            {/* Status Badges */}
-            <div className="vbf-rc-badges-row">
-              <div className="vbf-rc-badge vbf-rc-badge-gold">
-                <Clock size={13} />
-                <span>{activeLang === 'am' ? 'ክፍያ: በማረጋገጥ ላይ' : 'Payment: Pending Verification'}</span>
-              </div>
-              <div className="vbf-rc-badge vbf-rc-badge-dark">
-                <Sparkles size={13} />
-                <span>{activeLang === 'am' ? 'ሁኔታ: ቀን ተይዟል' : 'Status: Date Reserved'}</span>
+      {/* STEP 7: PENDING VERIFICATION */}
+      {step === 7 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <div className="v2-pending-card">
+              <div className="v2-pending-circle"><Clock size={20} color="#fff"/></div>
+              <div className="v2-ptext">
+                <h2>{t('pendingTitle')}</h2>
+                <p>{t('pendingSub')}</p>
               </div>
             </div>
 
-            {/* Receipt Key Details */}
-            <div className="vbf-rc-table">
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'የትዕዛዝ ቁጥር (Ref #)' : 'Receipt / Ref #'}</span>
-                <span className="vbf-rc-val vbf-rc-ref">{curRefId}</span>
-              </div>
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'ደንበኛ' : 'Client Name'}</span>
-                <span className="vbf-rc-val">{form.name || createdOrder?.clientName}</span>
-              </div>
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'ስልክ' : 'Phone'}</span>
-                <span className="vbf-rc-val">{form.phone || createdOrder?.phone}</span>
-              </div>
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'የቀረጻ ቀን' : 'Event Date'}</span>
-                <span className="vbf-rc-val">{form.date || createdOrder?.eventDate}</span>
-              </div>
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'ፓኬጅ' : 'Package'}</span>
-                <span className="vbf-rc-val">{createdOrder?.packageName || pkgName}</span>
-              </div>
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'የተመረጠ ክፍያ' : 'Payment Method'}</span>
-                <span className="vbf-rc-val" style={{ textTransform: 'capitalize' }}>
-                  {payMethod === 'telebirr' ? 'Telebirr (ቴሌብር)' : payMethod === 'cbe' ? 'Commercial Bank (CBE)' : payMethod === 'awash' ? 'Awash Bank' : 'Cash at Studio'}
-                </span>
-              </div>
-              {payReference && (
-                <div className="vbf-rc-row">
-                  <span className="vbf-rc-lbl">{activeLang === 'am' ? 'የክፍያ ማረጋገጫ ቁጥር' : 'Txn Reference'}</span>
-                  <span className="vbf-rc-val">{payReference}</span>
-                </div>
-              )}
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'ጠቅላላ ዋጋ' : 'Total Package'}</span>
-                <span className="vbf-rc-val">{totalPrice.toLocaleString()} ETB</span>
-              </div>
-              <div className="vbf-rc-row vbf-rc-row-deposit">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'የተከፈለ / የተያዘ ቅድመ-ክፍያ' : 'Deposit Committed'}</span>
-                <span className="vbf-rc-val vbf-rc-deposit-val">{deposit.toLocaleString()} ETB</span>
-              </div>
-              <div className="vbf-rc-row">
-                <span className="vbf-rc-lbl">{activeLang === 'am' ? 'ቀሪ ክፍያ' : 'Balance Due on Event'}</span>
-                <span className="vbf-rc-val">{remaining.toLocaleString()} ETB</span>
+            <div className="v2-card" style={{ marginTop: '16px' }}>
+              <div className="v2-card-head"><Clock size={16} color="#d97706"/><b>{t('bookingSummary')}</b></div>
+              <div className="v2-rows">
+                <div className="v2-row"><span>{t('pkgLbl')}</span><b>{pkgName}</b></div>
+                <div className="v2-row"><span>{t('clientLbl')}</span><b>{form.name}</b></div>
+                <div className="v2-row"><span>{t('dateLbl')}</span><b>{form.date}</b></div>
+                <div className="v2-row"><span>{t('depositLbl')}</span><b className="v2-amber">{deposit.toLocaleString()} ETB</b></div>
+                <div className="v2-row"><span>Reference</span><b className="v2-red">{curRefId}</b></div>
               </div>
             </div>
 
-            {/* SCANNABLE QR CODE PASS */}
-            <div className="vbf-rc-qr-section">
-              <div className="vbf-rc-qr-card">
-                <QRCode
-                  value={trackingUrl}
-                  size={220}
-                  label={activeLang === 'am' ? 'በስልክ ካሜራ ወይም በቴሌግራም ስካን ያድርጉ' : 'Scan with phone camera or Telegram bot'}
-                  sublabel={activeLang === 'am' ? 'ይፋዊ የዲጂታል ፓስፖርት QR' : 'HOPE Studio Official Pass'}
-                />
-              </div>
-              <div className="vbf-rc-qr-instructions" style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#1a1614', letterSpacing: '0.05em' }}>
-                  {activeLang === 'am' ? 'ይፋዊ ዲጂታል ፓስፖርት QR' : 'OFFICIAL DIGITAL PASS QR'}
+            <div className="v2-card v2-qr-card">
+              <div className="v2-qr-wrap"><QRCode value={trackingUrl} size={92}/></div>
+              <div className="v2-qr-info">
+                <b className="v2-act-title">{t('trackTitle')}</b>
+                <p className="v2-act-desc">{t('trackDesc')}</p>
+                <div className="v2-pill-row">
+                  <span className="ref-pill">
+                    {curRefId}
+                    <button type="button" onClick={() => handleCopy(curRefId, 'ref-mpend')} aria-label="Copy">
+                      {copyFeedback === 'ref-mpend' ? <Check size={15}/> : <Copy size={15}/>}
+                    </button>
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Receipt Footer */}
-            <div className="vbf-rc-footer">
-              <div>HOPE PHOTO &amp; VELO STUDIO • TIGAT BUILDING HAYAHULET</div>
-              <div className="vbf-rc-footer-sub">www.hope-photo-velo.vercel.app • Official Digital Record</div>
+            <div className="v2-btn-group">
+              <button type="button" className="btn-open-agr" onClick={() => setContractFullscreen(true)}>
+                <FileText size={17}/>
+                <span>{t('openAgreement')}</span>
+              </button>
+              <button type="button" className="vbf-rc-download-btn" onClick={handleDownloadReceiptCard} disabled={downloadingCard}>
+                <Download size={17}/>
+                <span>{downloadingCard ? 'Generating…' : t('downloadCard')}</span>
+              </button>
+              <button type="button" className="btn-simulate-qr" onClick={() => setStep(8)}>
+                <ShieldCheck size={17}/>
+                <span>{t('viewReceipt')}</span>
+              </button>
+              <a className="btn btn-red btn-back-home" style={{ textDecoration: 'none', justifyContent: 'center' }} href={`/?order=${curRefId}`} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={16}/>
+                <span>{t('liveOrderPage')}</span>
+              </a>
             </div>
           </div>
+        </section>
+      )}
 
-          {/* Action Buttons */}
-          <div className="vbf-rc-actions">
-            {/* 1. Click to Open Order Page directly */}
-            <a
-              href={`/?order=${curRefId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="vbf-cta-btn"
-              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-            >
-              <ExternalLink size={17} />
-              <span>{activeLang === 'am' ? 'የሥራ እና የክፍያ መከታተያ ገጽን ክፈት' : 'Open Live Order Status & Comments Page'}</span>
-            </a>
+      {/* STEP 8: VERIFIED */}
+      {step === 8 && (
+        <section className="m-scr active">
+          <div className="m-pad">
+            <div className="v2-verified-card">
+              <div className="v2-check-circle"><Check size={22} color="#fff" strokeWidth={3}/></div>
+              <div className="v2-vtext">
+                <h2>{t('verifiedTitle')}</h2>
+                <p>{t('verifiedSub')}</p>
+              </div>
+            </div>
 
-            {/* 2. Download Receipt Card as high-res image */}
-            <button
-              type="button"
-              className="vbf-rc-download-btn"
-              onClick={handleDownloadReceiptCard}
-              disabled={downloadingCard}
-            >
-              <Download size={17} />
-              <span>
-                {downloadingCard
-                  ? (activeLang === 'am' ? 'ደረሰኝ ካርድ በማዘጋጀት ላይ…' : 'Generating Receipt Card…')
-                  : (activeLang === 'am' ? 'ደረሰኙን አውርድ / Download Card' : activeLang === 'om' ? 'Nagahee Buufadhu' : 'Download Receipt Card')}
-              </span>
-            </button>
+            <div className="v2-card" style={{ marginTop: '16px' }}>
+              <div className="v2-card-head"><CheckCircle size={16} color="#15803d"/><b>{t('bookingSummary')}</b></div>
+              <div className="v2-rows">
+                <div className="v2-row"><span>{t('pkgLbl')}</span><b>{pkgName}</b></div>
+                <div className="v2-row"><span>{t('clientLbl')}</span><b>{form.name}</b></div>
+                <div className="v2-row"><span>{t('dateLbl')}</span><b>{form.date}</b></div>
+                <div className="v2-row"><span>{t('depositLbl')}</span><b className="v2-green">{deposit.toLocaleString()} ETB</b></div>
+                <div className="v2-row"><span>Reference</span><b className="v2-red">{curRefId}</b></div>
+              </div>
+            </div>
 
-            {/* 3. Telegram Bot link */}
-            <a
-              className="vbf-telegram-sub-btn"
-              href={`https://t.me/HoopStudioSystemBot?start=order_${curRefId}`}
-              target="_blank" rel="noopener noreferrer"
-              style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-            >
-              <Send size={16}/> {activeLang === 'am' ? 'በቴሌግራም ቦት ተከታተሉ' : 'View in Telegram Bot'}
-            </a>
+            <div className="v2-card v2-qr-card">
+              <div className="v2-qr-wrap"><QRCode value={trackingUrl} size={92}/></div>
+              <div className="v2-qr-info">
+                <b className="v2-act-title">{t('trackTitle')}</b>
+                <p className="v2-act-desc">{t('trackDesc')}</p>
+                <div className="v2-pill-row">
+                  <span className="ref-pill">
+                    {curRefId}
+                    <button type="button" onClick={() => handleCopy(curRefId, 'ref-mver')} aria-label="Copy">
+                      {copyFeedback === 'ref-mver' ? <Check size={15}/> : <Copy size={15}/>}
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            {/* 4. Done */}
-            <button type="button" className="vbf-confirm-close" onClick={onClose}>
-              {activeLang === 'am' ? 'ተከናውኗል (ዝጋ)' : activeLang === 'om' ? 'Xumurameera' : 'Done'}
-            </button>
+            <div className="v2-btn-group">
+              <button type="button" className="btn-open-agr" onClick={() => setContractFullscreen(true)}>
+                <FileText size={17}/>
+                <span>{t('openAgreement')}</span>
+              </button>
+              <button type="button" className="vbf-rc-download-btn" onClick={handleDownloadReceiptCard} disabled={downloadingCard}>
+                <Download size={17}/>
+                <span>{downloadingCard ? 'Generating…' : t('downloadCard')}</span>
+              </button>
+              <button type="button" className="btn btn-red btn-back-home" onClick={onClose}>
+                <Home size={16}/>
+                <span>{t('backHome')}</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </div>
-    );
-  };
+        </section>
+      )}
+    </div>
+  );
 
   return (
-    <div className="vbf-overlay" role="dialog" aria-modal="true" aria-labelledby="vbf-title">
-      <button className="vbf-backdrop" aria-label="Close" onClick={onClose}/>
-      <div className="vbf-modal">
-        {renderHeader()}
+    <>
+      {/* Either Desktop 2-column slide-in modal or Mobile app */}
+      {isDesktop ? renderDesktopModal() : (
+        <div className="vbf-overlay" role="dialog" aria-modal="true">
+          <button type="button" className="vbf-backdrop" aria-label="Close" onClick={onClose}/>
+          <div className="vbf-modal" style={{ padding: 0, overflow: 'auto', background: '#f4f3f1' }}>
+            {renderMobileApp()}
+          </div>
+        </div>
+      )}
 
-        {/* Hamburger Contextual Menu (Language selector + Go to Chat Bot) */}
-        {menuOpen && (
-          <div className="vbf-menu-overlay" onClick={() => setMenuOpen(false)}>
-            <div className="vbf-menu-drawer" onClick={e => e.stopPropagation()}>
-              <div className="vbf-menu-header">
-                <div className="vbf-menu-title">
-                  <Menu size={18} />
-                  <span>{activeLang === 'am' ? 'ምናሌ' : 'Menu'}</span>
-                </div>
-                <button
-                  type="button"
-                  className="vbf-menu-close-btn"
-                  onClick={() => setMenuOpen(false)}
-                  aria-label="Close menu"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              {/* Language Selection */}
-              <div className="vbf-menu-section">
-                <div className="vbf-menu-section-lbl">
-                  <Globe size={15} />
-                  <span>{activeLang === 'am' ? 'ቋንቋ ይምረጡ' : 'Change Language'}</span>
-                </div>
-                <div className="vbf-lang-grid">
-                  {[
-                    { code: 'am', label: 'አማርኛ', flag: '🇪🇹' },
-                    { code: 'en', label: 'English', flag: '🇬🇧' },
-                  ].map(opt => {
-                    const isSel = activeLang === opt.code;
-                    return (
-                      <button
-                        key={opt.code}
-                        type="button"
-                        className={`vbf-lang-opt${isSel ? ' vbf-lang-opt-active' : ''}`}
-                        onClick={() => {
-                          handleSelectLang(opt.code);
-                          setMenuOpen(false);
-                        }}
-                      >
-                        <span className="vbf-lang-flag">{opt.flag}</span>
-                        <span className="vbf-lang-name">{opt.label}</span>
-                        {isSel && <Check size={14} className="vbf-lang-check" />}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Go to Chat Bot Button */}
-              <div className="vbf-menu-section">
-                <div className="vbf-menu-section-lbl">
-                  <MessageCircle size={15} />
-                  <span>{activeLang === 'am' ? 'የቀጥታ እርዳታ እና ቦት' : 'Support & Assistant'}</span>
-                </div>
-                <a
-                  href={`https://t.me/HoopStudioSystemBot?start=inquire_${selectedPackage?.id || 'studio'}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="vbf-chatbot-btn"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <div className="vbf-chatbot-icon-wrap">
-                    <Send size={18} />
-                  </div>
-                  <div className="vbf-chatbot-text">
-                    <div className="vbf-chatbot-main">
-                      {activeLang === 'am' ? 'ወደ ቴሌግራም ቦት ይሂዱ' : 'Go to Chat Bot'}
-                    </div>
-                    <div className="vbf-chatbot-sub">
-                      @HoopStudioSystemBot • Instant Replies
-                    </div>
-                  </div>
-                  <ExternalLink size={16} className="vbf-chatbot-arrow" />
-                </a>
-              </div>
-
-              {/* Exit / Close Booking Button */}
-              <div className="vbf-menu-footer">
-                <button
-                  type="button"
-                  className="vbf-menu-exit-btn"
-                  onClick={() => { setMenuOpen(false); onClose(); }}
-                >
-                  {activeLang === 'am' ? 'ወደ ድረ-ገጽ ተመለስ (Exit Booking)' : 'Exit Booking'}
-                </button>
+      {/* Global Fullscreen Document Popup */}
+      {contractFullscreen && (
+        <div className="doc-fs-overlay active" style={{ display: 'flex' }}>
+          <div className="doc-fs-top">
+            <div className="doc-fs-brand">
+              <div className="pdf-badge"><FileText size={22} color="#fff"/></div>
+              <div>
+                <h4>{activeLang === 'am' ? 'የሆፕ ስቱዲዮ ይፋዊ ውል' : 'HOPE Studio Official Contract'}</h4>
+                <span className="fname">HOPE_Official_Agreement_2026.pdf • Official Legal Contract</span>
               </div>
             </div>
+            <div className="doc-fs-actions">
+              <button type="button" className="doc-fs-close" onClick={() => setContractFullscreen(false)}>
+                ✕ {t('cancel')}
+              </button>
+            </div>
           </div>
-        )}
-
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
-        {step === 5 && renderStep5()}
-        {step === 6 && renderStep6()}
-      </div>
-    </div>
+          <div className="doc-fs-body">
+            <div className="doc-fs-paper">
+              <DocumentStyleAgreement
+                agreement={activeAgreement}
+                clientName={form.name || 'Client'}
+                phone={form.phone || ''}
+                eventDate={form.date || ''}
+                location={form.location || 'Addis Ababa'}
+                totalPrice={totalPrice}
+                depositAmount={deposit}
+                remainingBalance={remaining}
+                signature={signature}
+                onSign={setSignature}
+                onClearSignature={() => setSignature(null)}
+                lang={activeLang}
+                readOnly={step >= 4 || dScreen !== 'scrSign'}
+                orderId={curRefId}
+              />
+            </div>
+          </div>
+          <div className="doc-fs-foot">
+            <button type="button" className="btn btn-red" onClick={() => setContractFullscreen(false)}>
+              {t('doneReview')}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

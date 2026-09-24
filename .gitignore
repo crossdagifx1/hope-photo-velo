@@ -5,6 +5,8 @@ dist
 chrome-check-profile
 .DS_Store
 *.local
-
-.vercel
 .env*
+extracted_telegram_hope/
+public/assets/hope.zip
+public/assets/hope-extracted/
+scratch_inspect_*.js
