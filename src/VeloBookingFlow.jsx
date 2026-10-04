@@ -1394,18 +1394,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <ArrowRight size={17}/>
             </button>
           </div>
-
-          {/* Sticky Bottom Bar */}
-          <div className="m-bottom-bar">
-            <div className="m-bar-price">
-              <span className="m-bar-num">{totalPrice.toLocaleString()} <small>ETB</small></span>
-              <span className="m-bar-dep">{activeLang === 'am' ? 'ቅድመ ክፍያ' : 'Deposit'}: {deposit.toLocaleString()} ETB</span>
-            </div>
-            <button type="button" className="m-bar-cta" onClick={() => setStep(2)}>
-              <span>{t('continueDate')}</span>
-              <ArrowRight size={16}/>
-            </button>
-          </div>
         </section>
       )}
 
@@ -1439,17 +1427,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             {error && <p style={{ color: '#e31e24', fontSize: '13px', marginTop: '8px' }}>{error}</p>}
 
             <button type="button" className="m-cta" onClick={handleProceedToSign}>
-              <span>{t('reviewSign')}</span>
-              <ArrowRight size={16}/>
-            </button>
-          </div>
-
-          <div className="m-bottom-bar">
-            <button type="button" className="m-bar-back" onClick={() => setStep(1)}>
-              <ChevronLeft size={16}/>
-              <span>{t('back')}</span>
-            </button>
-            <button type="button" className="m-bar-cta" onClick={handleProceedToSign}>
               <span>{t('reviewSign')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1502,17 +1479,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <ArrowRight size={16}/>
             </button>
           </div>
-
-          <div className="m-bottom-bar">
-            <button type="button" className="m-bar-back" onClick={() => setStep(2)}>
-              <ChevronLeft size={16}/>
-              <span>{t('back')}</span>
-            </button>
-            <button type="button" className="m-bar-cta" onClick={handleSubmitBooking} disabled={submitting}>
-              <span>{submitting ? 'Submitting…' : t('confirmSubmit')}</span>
-              <ArrowRight size={16}/>
-            </button>
-          </div>
         </section>
       )}
 
@@ -1540,17 +1506,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             </div>
 
             <button type="button" className="m-cta" onClick={() => setStep(5)}>
-              <span>{t('continuePayment')}</span>
-              <ArrowRight size={16}/>
-            </button>
-          </div>
-
-          <div className="m-bottom-bar">
-            <button type="button" className="m-bar-back" onClick={() => setStep(3)}>
-              <ChevronLeft size={16}/>
-              <span>{t('back')}</span>
-            </button>
-            <button type="button" className="m-bar-cta" onClick={() => setStep(5)}>
               <span>{t('continuePayment')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1595,17 +1550,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             </div>
 
             <button type="button" className="m-cta" onClick={() => setStep(6)}>
-              <span>{t('toUpload')}</span>
-              <ArrowRight size={16}/>
-            </button>
-          </div>
-
-          <div className="m-bottom-bar">
-            <button type="button" className="m-bar-back" onClick={() => setStep(4)}>
-              <ChevronLeft size={16}/>
-              <span>{t('back')}</span>
-            </button>
-            <button type="button" className="m-bar-cta" onClick={() => setStep(6)}>
               <span>{t('toUpload')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1655,17 +1599,6 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             </div>
 
             <button type="button" className="m-cta" onClick={handleSubmitProof} disabled={submitProofLoading}>
-              <span>{submitProofLoading ? 'Submitting…' : t('submitShot')}</span>
-              <ArrowRight size={16}/>
-            </button>
-          </div>
-
-          <div className="m-bottom-bar">
-            <button type="button" className="m-bar-back" onClick={() => setStep(5)}>
-              <ChevronLeft size={16}/>
-              <span>{t('back')}</span>
-            </button>
-            <button type="button" className="m-bar-cta" onClick={handleSubmitProof} disabled={submitProofLoading}>
               <span>{submitProofLoading ? 'Submitting…' : t('submitShot')}</span>
               <ArrowRight size={16}/>
             </button>
