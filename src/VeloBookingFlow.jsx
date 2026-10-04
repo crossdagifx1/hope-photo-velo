@@ -53,6 +53,7 @@ const I18N = {
     openAgreement: "Open Agreement", viewReceipt: "View Official Receipt", backHome: "Back to Home",
     liveOrderPage: "Open Live Order Page", downloadCard: "Download Receipt Card",
     viewDoc: "View Fullscreen Contract", doneReview: "Done Reviewing",
+    back: "Back",
   },
   am: {
     createBooking: "የዝግጅት ቦታ ማስያዣ ይፍጠሩ", evtDetails: "የዝግጅት ዝርዝሮች", studioPackage: "የስቱዲዮ ጥቅል",
@@ -90,6 +91,7 @@ const I18N = {
     openAgreement: "ውሉን ይክፈቱ", viewReceipt: "ይፋዊ ደረሰኝ ይመልከቱ", backHome: "ወደ ዋናው ገጽ",
     liveOrderPage: "ቀጥታ ሁኔታ ገጽ", downloadCard: "ደረሰኙን አውርድ",
     viewDoc: "ሙሉ ውሉን በሙሉ ስክሪን ይመልከቱ", doneReview: "ተመልክቼ ጨርሻለሁ",
+    back: "ተመለስ",
   }
 };
 
@@ -352,6 +354,15 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   ];
 
   const images = getPackageHeroImages(selectedPackage);
+
+  // Auto-advance hero slider on Step 1
+  useEffect(() => {
+    if (step !== 1) return;
+    const imgs = getPackageHeroImages(selectedPackage);
+    if (imgs.length <= 1) return;
+    const timer = setInterval(() => setSlideIdx(i => (i + 1) % imgs.length), 4000);
+    return () => clearInterval(timer);
+  }, [step, selectedPackage?.id]);
 
   // Load server settings & booked orders
   useEffect(() => {
@@ -1237,7 +1248,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   // MOBILE LAYOUT RENDERING (Exact Hope UI 8-step mobile app wizard)
   // ─────────────────────────────────────────────────────────────────────────
   const renderMobileApp = () => (
-    <div className="mobile-app" style={{ display: 'block' }}>
+    <div className="mobile-app">
       {/* Mobile Sticky Header */}
       <div className="m-head">
         <button
@@ -1289,8 +1300,14 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
           <div className="m-hero">
             <div className="h-track" style={{ transform: `translateX(-${slideIdx * 100}%)` }}>
               {images.map((img, i) => (
-                <div key={i} className="h-slide" style={{ background: `url('${img}') center 35%/cover no-repeat` }}>
-                  <div className="hero-cap">CAPTURE<br/>YOUR SPECIAL<br/>MOMENTS</div>
+                <div key={i} className="h-slide" style={{ backgroundImage: `url('${img}')` }}>
+                  <div className="m-hero-overlay">
+                    <span className="m-hero-pill">✦ HOPE SIGNATURE</span>
+                    <div className="hero-cap">
+                      <span>{activeLang === 'am' ? 'የልዩ ጊዜያትዎ' : 'Crafting Timeless'}</span>
+                      <b>{activeLang === 'am' ? 'የማይረሳ ትውስታ' : 'Precious Moments'}</b>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1304,37 +1321,87 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
           </div>
 
           <div className="m-sheet">
-            <span className="badge-best">
-              <Crown size={12} color="#e31e24"/>
-              <span>{t('bestValue')}</span>
-            </span>
-            <h1>{pkgName}</h1>
-            <p className="m-sub">{t('pkgDesc')}</p>
-            <div className="price">{totalPrice.toLocaleString()} <small>ETB</small></div>
-
-            <div className="m-icons">
-              <div className="inc"><Camera size={22}/><span>{t('photography')}</span></div>
-              <div className="inc"><Film size={22}/><span>{t('videography')}</span></div>
-              <div className="inc"><Users size={22}/><span>{t('proTeam')}</span></div>
-              <div className="inc"><ImageIcon size={22}/><span>{t('hiOutput')}</span></div>
+            <div className="m-sheet-pill" />
+            <div className="m-badge-row">
+              <span className="badge-best">
+                <Crown size={12}/>
+                <span>{t('bestValue')}</span>
+              </span>
+              <span className="m-tag-pill">★ 4.9 Studio Rating</span>
             </div>
 
-            <div className="pkg-checklist">
-              <div className="pkg-check-head">
-                <Check size={18} strokeWidth={2.5}/>
-                <span>{t('pkgIncludedTitle')}</span>
+            <h1 className="m-sheet-title">{pkgName}</h1>
+            <p className="m-sub">{t('pkgDesc')}</p>
+
+            <div className="m-price-banner">
+              <div className="m-pb-left">
+                <span className="m-pb-lbl">{activeLang === 'am' ? 'ጠቅላላ የጥቅል ዋጋ' : 'Total Package Investment'}</span>
+                <div className="m-pb-val">{totalPrice.toLocaleString()} <small>ETB</small></div>
               </div>
-              <ul className="checklist">
+              <div className="m-pb-right">
+                <span className="m-dep-tag">{activeLang === 'am' ? 'ቅድመ ክፍያ 50%' : '50% Deposit'}</span>
+                <span className="m-dep-amt">{deposit.toLocaleString()} ETB</span>
+              </div>
+            </div>
+
+            <div className="m-features-grid">
+              <div className="m-feat-card">
+                <div className="m-feat-ic"><Camera size={19}/></div>
+                <b>{t('photography')}</b>
+                <small>{activeLang === 'am' ? 'ከፍተኛ ጥራት' : 'Full HD / 4K'}</small>
+              </div>
+              <div className="m-feat-card">
+                <div className="m-feat-ic"><Film size={19}/></div>
+                <b>{t('videography')}</b>
+                <small>{activeLang === 'am' ? 'ሲኒማቲክ ሪልስ' : 'Cinema Reels'}</small>
+              </div>
+              <div className="m-feat-card">
+                <div className="m-feat-ic"><Users size={19}/></div>
+                <b>{t('proTeam')}</b>
+                <small>{activeLang === 'am' ? '4+ ባለሙያዎች' : '4+ Masters'}</small>
+              </div>
+              <div className="m-feat-card">
+                <div className="m-feat-ic"><ImageIcon size={19}/></div>
+                <b>{t('hiOutput')}</b>
+                <small>{activeLang === 'am' ? 'ቦርድና ክላውድ' : 'Board & Cloud'}</small>
+              </div>
+            </div>
+
+            <div className="m-checklist-card">
+              <div className="m-check-head">
+                <div className="m-check-title">
+                  <div className="m-check-badge-ic"><Check size={14} strokeWidth={3}/></div>
+                  <b>{t('pkgIncludedTitle')}</b>
+                </div>
+                <span className="m-check-count">{deliverables.length} {activeLang === 'am' ? 'አገልግሎቶች' : 'Items'}</span>
+              </div>
+              <ul className="m-check-items">
                 {deliverables.map((d, i) => (
                   <li key={i}>
-                    <Check size={16} strokeWidth={2.4}/>
+                    <div className="m-check-bullet"><Check size={12} strokeWidth={3}/></div>
                     <span>{d.replace(/^•\s*/, '')}</span>
                   </li>
                 ))}
               </ul>
+              <div className="m-trust-bar">
+                <ShieldCheck size={15} color="#059669"/>
+                <span>{activeLang === 'am' ? 'ይፋዊ ሕጋዊ ውል በደረጃ 3 ይፈረማል • 100% የቦታ ማስያዝ ዋስትና' : 'Official legal agreement signed on Step 3 • 100% date guarantee'}</span>
+              </div>
             </div>
 
             <button type="button" className="m-cta" onClick={() => setStep(2)}>
+              <span>{t('continueDate')}</span>
+              <ArrowRight size={17}/>
+            </button>
+          </div>
+
+          {/* Sticky Bottom Bar */}
+          <div className="m-bottom-bar">
+            <div className="m-bar-price">
+              <span className="m-bar-num">{totalPrice.toLocaleString()} <small>ETB</small></span>
+              <span className="m-bar-dep">{activeLang === 'am' ? 'ቅድመ ክፍያ' : 'Deposit'}: {deposit.toLocaleString()} ETB</span>
+            </div>
+            <button type="button" className="m-bar-cta" onClick={() => setStep(2)}>
               <span>{t('continueDate')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1372,6 +1439,17 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             {error && <p style={{ color: '#e31e24', fontSize: '13px', marginTop: '8px' }}>{error}</p>}
 
             <button type="button" className="m-cta" onClick={handleProceedToSign}>
+              <span>{t('reviewSign')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+
+          <div className="m-bottom-bar">
+            <button type="button" className="m-bar-back" onClick={() => setStep(1)}>
+              <ChevronLeft size={16}/>
+              <span>{t('back')}</span>
+            </button>
+            <button type="button" className="m-bar-cta" onClick={handleProceedToSign}>
               <span>{t('reviewSign')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1424,6 +1502,17 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
               <ArrowRight size={16}/>
             </button>
           </div>
+
+          <div className="m-bottom-bar">
+            <button type="button" className="m-bar-back" onClick={() => setStep(2)}>
+              <ChevronLeft size={16}/>
+              <span>{t('back')}</span>
+            </button>
+            <button type="button" className="m-bar-cta" onClick={handleSubmitBooking} disabled={submitting}>
+              <span>{submitting ? 'Submitting…' : t('confirmSubmit')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
         </section>
       )}
 
@@ -1451,6 +1540,17 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             </div>
 
             <button type="button" className="m-cta" onClick={() => setStep(5)}>
+              <span>{t('continuePayment')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+
+          <div className="m-bottom-bar">
+            <button type="button" className="m-bar-back" onClick={() => setStep(3)}>
+              <ChevronLeft size={16}/>
+              <span>{t('back')}</span>
+            </button>
+            <button type="button" className="m-bar-cta" onClick={() => setStep(5)}>
               <span>{t('continuePayment')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1495,6 +1595,17 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             </div>
 
             <button type="button" className="m-cta" onClick={() => setStep(6)}>
+              <span>{t('toUpload')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+
+          <div className="m-bottom-bar">
+            <button type="button" className="m-bar-back" onClick={() => setStep(4)}>
+              <ChevronLeft size={16}/>
+              <span>{t('back')}</span>
+            </button>
+            <button type="button" className="m-bar-cta" onClick={() => setStep(6)}>
               <span>{t('toUpload')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1544,6 +1655,17 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
             </div>
 
             <button type="button" className="m-cta" onClick={handleSubmitProof} disabled={submitProofLoading}>
+              <span>{submitProofLoading ? 'Submitting…' : t('submitShot')}</span>
+              <ArrowRight size={16}/>
+            </button>
+          </div>
+
+          <div className="m-bottom-bar">
+            <button type="button" className="m-bar-back" onClick={() => setStep(5)}>
+              <ChevronLeft size={16}/>
+              <span>{t('back')}</span>
+            </button>
+            <button type="button" className="m-bar-cta" onClick={handleSubmitProof} disabled={submitProofLoading}>
               <span>{submitProofLoading ? 'Submitting…' : t('submitShot')}</span>
               <ArrowRight size={16}/>
             </button>
@@ -1674,14 +1796,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
   return (
     <>
       {/* Either Desktop 2-column slide-in modal or Mobile app */}
-      {isDesktop ? renderDesktopModal() : (
-        <div className="vbf-overlay" role="dialog" aria-modal="true">
-          <button type="button" className="vbf-backdrop" aria-label="Close" onClick={onClose}/>
-          <div className="vbf-modal" style={{ padding: 0, overflow: 'auto', background: '#f4f3f1' }}>
-            {renderMobileApp()}
-          </div>
-        </div>
-      )}
+      {isDesktop ? renderDesktopModal() : renderMobileApp()}
 
       {/* Global Fullscreen Document Popup */}
       {contractFullscreen && (
