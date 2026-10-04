@@ -302,16 +302,15 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  if (!BOT_TOKEN) {
-    return res.status(503).json({ error: 'Service unavailable' });
-  }
-
-  const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
-
   if (req.method === 'GET') {
+    if (!BOT_TOKEN) {
+      return res.status(200).json({ ok: true, status: 'Telegram endpoint active', botConfigured: false });
+    }
+
+    const ADMIN_API_KEY = process.env.ADMIN_API_KEY;
     const providedKey = req.query.key;
     if (!ADMIN_API_KEY || providedKey !== ADMIN_API_KEY) {
-      return res.status(404).end();
+      return res.status(200).json({ ok: true, status: 'Telegram endpoint active', botConfigured: true });
     }
 
     const host = req.headers.host || 'hope-photo-velo-jade.vercel.app';
@@ -345,6 +344,10 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
+    if (!BOT_TOKEN) {
+      return res.status(200).json({ ok: true, warning: 'Telegram bot token not configured' });
+    }
+
     const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
     if (WEBHOOK_SECRET) {
       const incomingSecret = req.headers['x-telegram-bot-api-secret-token'];

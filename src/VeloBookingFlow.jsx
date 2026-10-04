@@ -439,7 +439,7 @@ export default function VeloBookingFlow({ selectedPackage, onClose, lang = 'en',
     setCreatedOrder(newOrder);
 
     try {
-      await fetch(`${apiBase}/api/booking`, {
+      await fetch(`${apiBase}/api/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newOrder),
